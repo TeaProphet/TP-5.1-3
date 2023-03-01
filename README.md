@@ -1,1 +1,1 @@
-# AppForBoardGamesMeetings
+# App for board games meetings
