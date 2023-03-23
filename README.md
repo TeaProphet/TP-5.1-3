@@ -16,4 +16,4 @@
 
 [Yandex.Tracker](https://docs.google.com/document/d/1esMn-L8x2q1sNRL3jg6hi2o9e-7awD45wHRp4baL2wE/edit?usp=sharing)<br />
 [Miro](https://miro.com/app/board/uXjVPiN6orU=/?share_link_id=691673774508)<br />
-[Диаграммы](https://github.com/TeaProphet/TP-5.1-3/tree/master/diagrams)<br />
+[Диаграммы](https://github.com/TeaProphet/TP-5.1-3/tree/main/documentation/diagrams)<br />
