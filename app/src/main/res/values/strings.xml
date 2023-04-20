@@ -47,4 +47,8 @@
     <string name="action_home_item">Главная</string>
     <string name="action_dice_item">Кинуть кубик</string>
     <string name="action_profile_item">Профиль</string>
+    <string name="title_activity_base_with_bottom_nav_bar">BaseActivityWithBottomNavBar</string>
+    <string name="button_first_fragment">Кнопочка</string>
+    <string name="second_fragment_text">Второй фрагмент - кубик</string>
+    <string name="third_fragment_text">Третий фрагмент - профиль</string>
 </resources>
