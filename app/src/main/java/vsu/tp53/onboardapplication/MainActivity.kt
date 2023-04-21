@@ -40,20 +40,6 @@ class MainActivity : AppCompatActivity() {
 
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavView.setupWithNavController(navController)
-        bottomNavView.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.action_home -> {
-                    navController.navigate(R.id.FirstFragment)
-                }
-                R.id.action_dice -> {
-                    navController.navigate(R.id.SecondFragment)
-                }
-                R.id.action_profile -> {
-                    navController.navigate(R.id.ThirdFragment)
-                }
-            }
-            true
-        }
     }
 
 

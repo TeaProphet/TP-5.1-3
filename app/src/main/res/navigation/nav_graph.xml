@@ -3,42 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/homeFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="vsu.tp53.onboardapplication.FirstFragment"
+        android:id="@+id/homeFragment"
+        android:name="vsu.tp53.onboardapplication.HomeFragment"
         android:label="fragment_first"
-        tools:layout="@layout/fragment_first" >
-        <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
-        <action
-            android:id="@+id/action_FirstFragment_to_ThirdFragment"
-            app:destination="@id/ThirdFragment" />
+        tools:layout="@layout/fragment_home" >
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="vsu.tp53.onboardapplication.SecondFragment"
+        android:id="@+id/diceFragment"
+        android:name="vsu.tp53.onboardapplication.DiceFragment"
         android:label="fragment_second"
-        tools:layout="@layout/fragment_second" >
-        <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
-        <action
-            android:id="@+id/action_SecondFragment_to_ThirdFragment"
-            app:destination="@id/ThirdFragment" />
+        tools:layout="@layout/fragment_dice" >
     </fragment>
     <fragment
-        android:id="@+id/ThirdFragment"
-        android:name="vsu.tp53.onboardapplication.ThirdFragment"
+        android:id="@+id/profileFragment"
+        android:name="vsu.tp53.onboardapplication.ProfileFragment"
         android:label="fragment_third"
-        tools:layout="@layout/fragment_third" >
-        <action
-            android:id="@+id/action_ThirdFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
-        <action
-            android:id="@+id/action_ThirdFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+        tools:layout="@layout/fragment_profile" >
     </fragment>
 </navigation>
