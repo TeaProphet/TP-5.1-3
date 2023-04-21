@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="vsu.tp53.onboardapplication.HomeFragment"
+        android:name="vsu.tp53.onboardapplication.home.HomeFragment"
         android:label="fragment_first"
         tools:layout="@layout/fragment_home" >
     </fragment>

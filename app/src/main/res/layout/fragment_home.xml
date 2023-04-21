@@ -1,35 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".HomeFragment">
+    tools:context=".home.HomeFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="0dp"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_sessions_session"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/lorem_ipsum"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:background="@color/white"
+            android:padding="15dp"
+            android:visibility="visible"/>
+    </ScrollView>
 
-        <Button
-            android:id="@+id/button_second_fragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/button_first_fragment"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+    <ImageButton
+        android:id="@+id/add_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="end"
+        android:background="@drawable/roundedbutton"
+        android:clickable="true"
+        android:contentDescription="@string/add_button_text"
+        android:elevation="10dp"
+        android:foreground="@drawable/roundedrippledbutton"
+        android:foregroundTintMode="screen"
+        android:maxWidth="45dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_add_circle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
