@@ -8,19 +8,29 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="vsu.tp53.onboardapplication.home.HomeFragment"
-        android:label="fragment_first"
+        android:label="Список игровых сессий"
         tools:layout="@layout/fragment_home" >
     </fragment>
     <fragment
         android:id="@+id/diceFragment"
         android:name="vsu.tp53.onboardapplication.DiceFragment"
-        android:label="fragment_second"
+        android:label="Бросок кубика"
         tools:layout="@layout/fragment_dice" >
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="vsu.tp53.onboardapplication.ProfileFragment"
-        android:label="fragment_third"
+        android:label="Профиль"
         tools:layout="@layout/fragment_profile" >
     </fragment>
+    <fragment
+        android:id="@+id/sessionFragment"
+        android:name="vsu.tp53.onboardapplication.home.SessionFragment"
+        android:label="Игровая сессия"
+        tools:layout="@layout/fragment_session" />
+    <fragment
+        android:id="@+id/createSessionFragment"
+        android:name="vsu.tp53.onboardapplication.home.CreateSessionFragment"
+        android:label="fragment_create_session"
+        tools:layout="@layout/fragment_create_session" />
 </navigation>
