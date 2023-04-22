@@ -1,0 +1,72 @@
+package vsu.tp53.onboardapplication.profile
+
+import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
+import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import vsu.tp53.onboardapplication.R
+import vsu.tp53.onboardapplication.databinding.FragmentProfileBinding
+import java.io.File
+import java.nio.file.Paths
+
+class ProfileFragment : Fragment() {
+
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentProfileBinding.inflate(inflater, container, false)
+
+        binding.openUserSessions.setOnClickListener {
+            it.findNavController().navigate(R.id.userSessionsFragment)
+        }
+
+        binding.blockUser.setOnClickListener {
+            binding.userBlockedInfo.text = "Учётная запись заблокирована"
+        }
+
+        binding.unblockUser.setOnClickListener {
+            binding.userBlockedInfo.text = ""
+        }
+
+        binding.editProfileButton.setOnClickListener {
+            it.findNavController().navigate(R.id.editProfileFragment)
+        }
+
+        binding.increaseRep.setOnClickListener {
+            var rep: Int = binding.playerReputation.text.toString().toInt()
+            rep += 1
+            binding.playerReputation.text = rep.toString()
+        }
+
+        binding.decreaseRep.setOnClickListener {
+            var rep: Int = binding.playerReputation.text.toString().toInt()
+            rep -= 1
+            binding.playerReputation.text = rep.toString()
+        }
+
+        return binding.root
+    }
+
+    @SuppressLint("ResourceType")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val imageview = binding.profileImage
+        imageview.setImageResource(R.drawable.profile_kitten)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

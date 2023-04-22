@@ -19,8 +19,18 @@
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
-        android:name="vsu.tp53.onboardapplication.ProfileFragment"
+        android:name="vsu.tp53.onboardapplication.profile.ProfileFragment"
         android:label="fragment_third"
         tools:layout="@layout/fragment_profile" >
     </fragment>
+    <fragment
+        android:id="@+id/userSessionsFragment"
+        android:name="vsu.tp53.onboardapplication.profile.UserSessionsFragment"
+        android:label="fragment_user_sessions"
+        tools:layout="@layout/fragment_user_sessions" />
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="vsu.tp53.onboardapplication.profile.EditProfileFragment"
+        android:label="fragment_edit_profile"
+        tools:layout="@layout/fragment_edit_profile" />
 </navigation>
