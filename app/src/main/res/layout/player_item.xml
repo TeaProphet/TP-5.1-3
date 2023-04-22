@@ -26,7 +26,8 @@
                 android:id="@+id/playerName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Name" />
+                android:text="Name"
+                android:textColor="@color/primary_text" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -38,13 +39,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
-                    android:text="@string/reputation" />
+                    android:text="@string/reputation"
+                    android:textColor="@color/primary_text" />
 
                 <TextView
                     android:id="@+id/playerReputation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Reputation" />
+                    android:text="Reputation"
+                    android:textColor="@color/primary_text" />
             </LinearLayout>
 
         </LinearLayout>

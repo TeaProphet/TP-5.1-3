@@ -60,7 +60,8 @@
                     android:id="@+id/inSessionCity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="TextView"
+                    android:textColor="@color/primary_text" />
             </LinearLayout>
 
             <LinearLayout
@@ -80,7 +81,8 @@
                     android:id="@+id/inSessionDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="TextView"
+                    android:textColor="@color/primary_text" />
             </LinearLayout>
 
             <LinearLayout
@@ -100,7 +102,8 @@
                     android:id="@+id/inSessionPlayers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="TextView"
+                    android:textColor="@color/primary_text" />
             </LinearLayout>
 
             <TextView
@@ -114,7 +117,8 @@
                 android:id="@+id/inSessionGames"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textColor="@color/primary_text" />
 
             <TextView
                 android:id="@+id/inSessionPlayersList"
@@ -124,22 +128,13 @@
                 android:textSize="@dimen/session_headings"
                 android:textStyle="bold" />
 
-            <ScrollView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_players_player"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/inSessionPlayersList"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_players_player"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/white"
-                    android:padding="15dp"
-                    android:visibility="visible" />
-            </ScrollView>
+                android:background="@color/white"
+                android:padding="15dp"
+                android:visibility="visible" />
 
             <Button
                 android:id="@+id/change_session_name_button"

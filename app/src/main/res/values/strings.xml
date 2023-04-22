@@ -70,4 +70,10 @@
     <string name="time_hint">HH/MM</string>
     <string name="players_num">Кол-во недостающих игроков:</string>
     <string name="create">Создать</string>
+    <string name="dice_sides">Кол-во граней</string>
+    <string name="dice_num">Кол-во кубов</string>
+    <string name="dice_mod">Модификатор</string>
+    <string name="dice_throw">Бросить кубы</string>
+    <string name="dice_result">Результат броска:</string>
+    <string name="dice_fill_error">Ошибка: заполните все поля</string>
 </resources>

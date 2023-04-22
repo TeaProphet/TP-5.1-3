@@ -19,9 +19,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
                 android:text="@string/id"
-                android:textSize="20sp"
-                android:layout_marginEnd="5dp"/>
+                android:textColor="@color/primary_text"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/sessionID"
@@ -29,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="ID"
+                android:textColor="@color/primary_text"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -44,6 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Session name"
+                android:textColor="@color/primary_text"
                 android:textSize="20sp" />
         </LinearLayout>
 
@@ -59,6 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="5dp"
                 android:text="@string/address"
+                android:textColor="@color/primary_text"
                 android:textSize="20sp" />
 
             <TextView
@@ -67,6 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="City"
+                android:textColor="@color/primary_text"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -82,6 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="5dp"
                 android:text="@string/date_and_time"
+                android:textColor="@color/primary_text"
                 android:textSize="20sp" />
 
             <TextView
@@ -90,6 +96,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Date"
+                android:textColor="@color/primary_text"
                 android:textSize="20sp" />
         </LinearLayout>
 
@@ -104,6 +111,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="5dp"
                 android:text="@string/players"
+                android:textColor="@color/primary_text"
                 android:textSize="20sp" />
 
             <TextView
@@ -112,6 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="0/num_of_players"
+                android:textColor="@color/primary_text"
                 android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
