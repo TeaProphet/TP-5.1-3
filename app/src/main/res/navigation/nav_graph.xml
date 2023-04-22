@@ -31,6 +31,6 @@
     <fragment
         android:id="@+id/createSessionFragment"
         android:name="vsu.tp53.onboardapplication.home.CreateSessionFragment"
-        android:label="fragment_create_session"
+        android:label="Создание игровой сессии"
         tools:layout="@layout/fragment_create_session" />
 </navigation>
