@@ -36,11 +36,11 @@
     <fragment
         android:id="@+id/userSessionsFragment"
         android:name="vsu.tp53.onboardapplication.profile.UserSessionsFragment"
-        android:label="fragment_user_sessions"
+        android:label="Игровые сессии пользователя"
         tools:layout="@layout/fragment_user_sessions" />
     <fragment
         android:id="@+id/editProfileFragment"
         android:name="vsu.tp53.onboardapplication.profile.EditProfileFragment"
-        android:label="fragment_edit_profile"
+        android:label="Изменение профиля"
         tools:layout="@layout/fragment_edit_profile" />
 </navigation>

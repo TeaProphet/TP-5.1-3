@@ -30,7 +30,7 @@ class DiceFragment : Fragment() {
                     binding.diceResultLabel.visibility = View.VISIBLE
                 }
                 binding.errorLabel.visibility = View.INVISIBLE
-                val result = (0..binding.diceNum.text.toString().toInt() *
+                val result = (binding.diceNum.text.toString().toInt()..binding.diceNum.text.toString().toInt() *
                         binding.diceSides.text.toString().toInt()).random() +
                         binding.diceMod.text.toString().toInt()
                 binding.diceResult.text = result.toString()
