@@ -53,17 +53,13 @@
     <string name="third_fragment_text">Третий фрагмент - профиль</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="reputation">Репутация</string>
-    <string name="games_list_example">        Игра
-        Игра
-        Игра
-        Игра</string>
     <string name="games">Список игр: </string>
     <string name="id">ID: </string>
     <string name="address">Город, адрес: </string>
     <string name="address_hint">Город, улица, номер дома </string>
     <string name="date_and_time">Дата и время: </string>
     <string name="players">Кол-во игроков: </string>
+    <string name="reputation">Значение репутации: </string>
     <string name="change_session_name">Изменить название</string>
     <string name="remove_session">Удалить</string>
     <string name="join_session">Записаться</string>
@@ -75,4 +71,14 @@
     <string name="time_hint">HH/MM</string>
     <string name="players_num">Кол-во недостающих игроков:</string>
     <string name="create">Создать</string>
+    <string name="dice_sides">Кол-во граней</string>
+    <string name="dice_num">Кол-во кубов</string>
+    <string name="dice_mod">Модификатор</string>
+    <string name="dice_throw">Бросить кубы</string>
+    <string name="dice_result">Результат броска:</string>
+    <string name="dice_fill_error">Ошибка: заполните все поля</string>
+    <string name="games_list_example">        Игра
+        Игра
+        Игра
+        Игра</string>
 </resources>

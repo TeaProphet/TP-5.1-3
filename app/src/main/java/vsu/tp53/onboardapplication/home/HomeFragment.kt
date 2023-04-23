@@ -1,15 +1,13 @@
 package vsu.tp53.onboardapplication.home
 
-import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.databinding.FragmentHomeBinding
 import java.time.LocalDate
@@ -23,7 +21,6 @@ class HomeFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var sessionAdapter: SessionAdapter
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,10 +33,8 @@ class HomeFragment : Fragment() {
         sessionAdapter = SessionAdapter(getDataSession() as MutableList<SessionModel>)
         recyclerView.adapter = sessionAdapter
 
-        binding.addButton.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAnchorView(R.id.add_button)
-                .setAction("Action", null).show()
+        binding.addButton.setOnClickListener {
+            it.findNavController().navigate(R.id.createSessionFragment)
         }
 
         return binding.root
@@ -48,15 +43,15 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
     }
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun getDataSession(): List<SessionModel> {
         val listSession: MutableList<SessionModel> = java.util.ArrayList()
         val date: LocalDate = LocalDate.now()
-        val dateString = date.year.toString()+ " " + date.month.value.toString() + " " + date.dayOfMonth.toString()
+        val dateString = date.year.toString()+ "." + date.month.value.toString() + "." + date.dayOfMonth.toString()
 
         listSession.add(SessionModel(1,"Сессия 1", dateString, "Воронеж", "1/4"))
-        listSession.add(SessionModel(2,"Сессия 2", dateString, "Подольск", "10000/100000"))
-
+        listSession.add(SessionModel(2,"Сессия 2", dateString, "Подольск", "10/16"))
+        listSession.add(SessionModel(3,"Сессия 3", dateString, "Омск", "10/16"))
+        listSession.add(SessionModel(4,"Сессия 4", dateString, "Энск", "10/16"))
         return listSession
     }
 }

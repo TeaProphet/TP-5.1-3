@@ -10,7 +10,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.snackbar.Snackbar
 import vsu.tp53.onboardapplication.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

@@ -1,10 +1,12 @@
 package vsu.tp53.onboardapplication
 
+import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.transition.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import vsu.tp53.onboardapplication.databinding.FragmentDiceBinding
 
 /**
@@ -12,16 +14,32 @@ import vsu.tp53.onboardapplication.databinding.FragmentDiceBinding
  */
 class DiceFragment : Fragment() {
 
-    private var _binding: FragmentDiceBinding? = null
-
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentDiceBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        _binding = FragmentDiceBinding.inflate(inflater, container, false)
+        binding = FragmentDiceBinding.inflate(inflater, container, false)
+        binding.button.setOnClickListener {
+            if (binding.diceNum.text.isNotEmpty() && binding.diceSides.text.isNotEmpty()
+                && binding.diceMod.text.isNotEmpty()
+            ){
+                if (binding.diceResultLabel.visibility == View.INVISIBLE && binding.diceResult.visibility == View.INVISIBLE){
+                    binding.diceResult.visibility = View.VISIBLE
+                    binding.diceResultLabel.visibility = View.VISIBLE
+                }
+                binding.errorLabel.visibility = View.INVISIBLE
+                val result = (0..binding.diceNum.text.toString().toInt() *
+                        binding.diceSides.text.toString().toInt()).random() +
+                        binding.diceMod.text.toString().toInt()
+                binding.diceResult.text = result.toString()
+            } else {
+                binding.errorLabel.visibility = View.VISIBLE
+                binding.diceResult.visibility = View.INVISIBLE
+                binding.diceResultLabel.visibility = View.INVISIBLE
+            }
+        }
         return binding.root
 
     }
@@ -29,10 +47,5 @@ class DiceFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }
