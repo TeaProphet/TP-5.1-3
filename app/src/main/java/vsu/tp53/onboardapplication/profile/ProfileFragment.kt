@@ -42,16 +42,31 @@ class ProfileFragment : Fragment() {
         binding.editProfileButton.setOnClickListener {
             it.findNavController().navigate(R.id.editProfileFragment)
         }
-
+        var isChangedPositive = false
+        var isChangedNegative = false
         binding.increaseRep.setOnClickListener {
             var rep: Int = binding.playerReputation.text.toString().toInt()
-            rep += 1
+            if (!isChangedPositive) {
+                rep += 1
+                isChangedPositive = true
+                if (isChangedNegative){
+                    isChangedNegative = false
+                    rep += 1
+                }
+            }
             binding.playerReputation.text = rep.toString()
         }
 
         binding.decreaseRep.setOnClickListener {
             var rep: Int = binding.playerReputation.text.toString().toInt()
-            rep -= 1
+            if (!isChangedNegative) {
+                rep -= 1
+                isChangedNegative = true
+                if (isChangedPositive){
+                    isChangedPositive = false
+                    rep -= 1
+                }
+            }
             binding.playerReputation.text = rep.toString()
         }
 

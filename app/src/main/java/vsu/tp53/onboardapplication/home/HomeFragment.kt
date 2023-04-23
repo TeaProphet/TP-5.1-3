@@ -48,10 +48,10 @@ class HomeFragment : Fragment() {
         val date: LocalDate = LocalDate.now()
         val dateString = date.year.toString()+ "." + date.month.value.toString() + "." + date.dayOfMonth.toString()
 
-        listSession.add(SessionModel(1,"Сессия 1", dateString, "Воронеж", "1/4"))
-        listSession.add(SessionModel(2,"Сессия 2", dateString, "Подольск", "10/16"))
-        listSession.add(SessionModel(3,"Сессия 3", dateString, "Омск", "10/16"))
-        listSession.add(SessionModel(4,"Сессия 4", dateString, "Энск", "10/16"))
+        listSession.add(SessionModel(1,"Битвы героев", dateString, "Воронеж", "1/4"))
+        listSession.add(SessionModel(2,"DnD: Затерянный город", dateString, "Подольск", "3/4"))
+        listSession.add(SessionModel(3,"Компания Затерянный рудник Фандельвера", dateString, "Омск", "2/4"))
+        listSession.add(SessionModel(4,"Играем в Бэнг", dateString, "Энск", "3/8"))
         return listSession
     }
 }

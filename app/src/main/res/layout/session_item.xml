@@ -17,42 +17,38 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:text="@string/id"
-                android:textColor="@color/primary_text"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/sessionID"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="ID"
-                android:textColor="@color/primary_text"
-                android:textSize="20sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
                 android:id="@+id/sessionName"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Session name"
                 android:textColor="@color/primary_text"
                 android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:text="@string/id"
+                android:textColor="@color/secondary_text"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/sessionID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:gravity="right"
+                android:text="ID"
+                android:textColor="@color/secondary_text"
+                android:textSize="14sp" />
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#F1F1F1"
             android:gravity="start"
             android:orientation="horizontal">
 
@@ -63,7 +59,7 @@
                 android:layout_marginEnd="5dp"
                 android:text="@string/address"
                 android:textColor="@color/primary_text"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/sessionCity"
@@ -72,13 +68,14 @@
                 android:layout_weight="1"
                 android:text="City"
                 android:textColor="@color/primary_text"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#F1F1F1"
             android:orientation="horizontal">
 
             <TextView
@@ -88,7 +85,7 @@
                 android:layout_marginEnd="5dp"
                 android:text="@string/date_and_time"
                 android:textColor="@color/primary_text"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/sessionDateAndTime"
@@ -97,12 +94,13 @@
                 android:layout_weight="1"
                 android:text="Date"
                 android:textColor="@color/primary_text"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#F1F1F1"
             android:orientation="horizontal">
 
             <TextView
@@ -112,7 +110,7 @@
                 android:layout_marginEnd="5dp"
                 android:text="@string/players"
                 android:textColor="@color/primary_text"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/sessionPlayers"
@@ -121,7 +119,7 @@
                 android:layout_weight="1"
                 android:text="0/num_of_players"
                 android:textColor="@color/primary_text"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
