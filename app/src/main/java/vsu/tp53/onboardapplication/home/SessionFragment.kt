@@ -1,15 +1,23 @@
 package vsu.tp53.onboardapplication.home
 
+import android.app.AlertDialog
+import android.content.ContentValues
+import android.content.DialogInterface
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.databinding.FragmentSessionBinding
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+
 
 class SessionFragment : Fragment() {
 
@@ -44,6 +52,24 @@ class SessionFragment : Fragment() {
             } else {
                 binding.joinSessionButton.setText("Записаться")
             }
+        }
+
+        binding.changeSessionNameButton.setOnClickListener {
+            val taskEditText = EditText(this.context)
+            val dialog: AlertDialog = AlertDialog.Builder(this.context)
+                .setTitle("Изменение названия")
+                .setView(taskEditText)
+                .setPositiveButton("Изменить", DialogInterface.OnClickListener { dialog, which ->
+                    binding.inSessionName.text = taskEditText.text.toString()
+                })
+                .setNegativeButton("Отменить", null)
+                .create()
+            dialog.show()
+        }
+
+        binding.removeSessionButton.setOnClickListener {
+
+            it.findNavController().navigate(R.id.homeFragment)
         }
 
         return binding.root
