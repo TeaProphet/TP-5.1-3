@@ -43,4 +43,16 @@
         android:name="vsu.tp53.onboardapplication.profile.EditProfileFragment"
         android:label="Изменение профиля"
         tools:layout="@layout/fragment_edit_profile" />
+    <fragment
+        android:id="@+id/pageUnauthorizedFragment"
+        android:name="vsu.tp53.onboardapplication.auth.PageUnauthorizedFragment"
+        android:label="Варианты работы" />
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="vsu.tp53.onboardapplication.auth.SignInFragment"
+        android:label="Авторизация" />
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="vsu.tp53.onboardapplication.auth.SignUpFragment"
+        android:label="Регистрация" />
 </navigation>

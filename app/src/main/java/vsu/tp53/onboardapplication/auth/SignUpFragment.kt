@@ -20,7 +20,7 @@ class SignUpFragment : Fragment() {
         _binding = SignUpBinding.inflate(inflater, container, false)
 
         binding.signUpButton.setOnClickListener {
-            it.findNavController().navigate(R.id.homeFragment)
+            it.findNavController().navigate(R.id.profileFragment)
         }
         return binding.root
     }

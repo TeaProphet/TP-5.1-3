@@ -20,11 +20,11 @@ class PageUnauthorizedFragment : Fragment() {
         _binding = UnauthorizedBinding.inflate(inflater, container, false)
 
         binding.buttonSignIn.setOnClickListener {
-            it.findNavController().navigate(R.id.homeFragment)
+            it.findNavController().navigate(R.id.signInFragment)
         }
 
         binding.buttonSignUp.setOnClickListener {
-            it.findNavController().navigate(R.id.homeFragment)
+            it.findNavController().navigate(R.id.signUpFragment)
         }
 
         binding.buttonWithoutAuth.setOnClickListener {
