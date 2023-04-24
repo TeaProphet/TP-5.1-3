@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.databinding.FragmentHomeBinding
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -46,7 +48,9 @@ class HomeFragment : Fragment() {
     private fun getDataSession(): List<SessionModel> {
         val listSession: MutableList<SessionModel> = java.util.ArrayList()
         val date: LocalDate = LocalDate.now()
-        val dateString = date.year.toString()+ "." + date.month.value.toString() + "." + date.dayOfMonth.toString()
+        val cur_time = LocalTime.now()
+        val t_formatter = DateTimeFormatter.ofPattern("HH:mm")
+        val dateString = date.year.toString()+ "." + date.month.value.toString() + "." + date.dayOfMonth.toString() + " " + cur_time.format(t_formatter)
 
         listSession.add(SessionModel(1,"Битвы героев", dateString, "Воронеж", "1/4"))
         listSession.add(SessionModel(2,"DnD: Затерянный город", dateString, "Подольск", "3/4"))
