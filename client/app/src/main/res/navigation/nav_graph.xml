@@ -36,7 +36,7 @@
     <fragment
         android:id="@+id/userSessionsFragment"
         android:name="vsu.tp53.onboardapplication.profile.UserSessionsFragment"
-        android:label="Сыгранные сессии"
+        android:label="Сессии игрока"
         tools:layout="@layout/fragment_user_sessions" />
     <fragment
         android:id="@+id/editProfileFragment"
