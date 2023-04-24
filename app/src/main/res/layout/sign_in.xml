@@ -12,12 +12,17 @@
             android:gravity="center"
             android:layout_marginHorizontal="30dp">
 
-        <TextView
+        <EditText
                 android:id="@+id/login_sign_in"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="Логин"
+                android:ems="10"
+                android:gravity="start|top"
+                android:hint="Логин"
+                android:inputType="textMultiLine"
+                android:minHeight="50dp"
+                android:textAlignment="viewStart"
                 android:textColor="#000000"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -25,12 +30,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <EditText
                 android:id="@+id/password_sign_in"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="Пароль"
+                android:ems="10"
+                android:gravity="start|top"
+                android:hint="Логин"
+                android:inputType="textMultiLine"
+                android:minHeight="50dp"
+                android:textAlignment="viewStart"
                 android:textColor="#000000"
                 android:textSize="16sp"
                 android:textStyle="bold"
