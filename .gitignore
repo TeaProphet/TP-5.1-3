@@ -24,3 +24,5 @@ hs_err_pid*
 client/.idea
 .idea
 client/.gradle
+server/onboard/onboard_config.json
+server/onboard/onboard_service_account.json
