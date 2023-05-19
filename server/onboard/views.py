@@ -82,8 +82,8 @@ def create_session(request):
     body_data = json.loads(body_unicode)
     session_id = 0
     try:
-        last_session_id = database.child("sessions").order_by_child("sessionId").get().each()[0].key()
-        session_id = last_session_id + 1
+        all_sessions = database.child("sessions").get().each()
+        session_id = len(all_sessions)
     except TypeError:
         pass
 
@@ -127,8 +127,8 @@ def create_session(request):
 def get_profile_info(request):
     body_unicode = request.body.decode('utf-8')
     body_data = json.loads(body_unicode)
-    id_token = body_data.get('idToken')
-    user = __get_user_token(id_token)
+    id_token = body_data.get('searchedLogin')
+    user = __get_user(id_token)
     user_info = dict(user.val())
     del user_info['idToken']
     del user_info['password']
@@ -144,14 +144,39 @@ def get_session_info(request):
     session_info = dict(database.child('sessions').child(session_id).get().val())
     players_info = {}
     for player_login in session_info.get('players'):
-        players_info[player_login] = {'reputation': __get_user(player_login).get('reputation')}
+        players_info[player_login] = {'reputation': dict(__get_user(player_login).val()).get('reputation')}
     session_info['players'] = players_info
     return JsonResponse(session_info)
 
 
+@api_view(['POST'])
+def change_profile(request):
+    body_unicode = request.body.decode('utf-8')
+    body_data = json.loads(body_unicode)
+    try:
+        id_token = body_data.get('idToken')
+        age = body_data.get('age')
+        games = body_data.get('games')
+        vk = body_data.get('vk')
+        tg = body_data.get('tg')
+    except Exception:
+        return JsonResponse('INVALID_DATA')
+    login = __get_user_token(id_token).key()
+    database.child("users").child(login).child("age").set(age)
+    database.child("users").child(login).child("games").set(games)
+    database.child("users").child(login).child("vk").set(vk)
+    database.child("users").child(login).child("tg").set(tg)
+    try:
+        new_password = body_data.get('password')
+        database.child("users").child(login).child("password").set(new_password)
+    except Exception:
+        pass
+    return Response(status=204)
+
+
 def __get_user(login):
     user = database.child("users").child(login).get()
-    return dict(user.val())
+    return user
 
 def __get_user_token(id_token):
     find_response = database.child("users").order_by_child("idToken").equal_to(id_token).get().each()
