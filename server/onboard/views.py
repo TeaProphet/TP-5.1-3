@@ -136,6 +136,19 @@ def get_profile_info(request):
     return Response(status=204)
 
 
+@api_view(['POST'])
+def get_session_info(request):
+    body_unicode = request.body.decode('utf-8')
+    body_data = json.loads(body_unicode)
+    session_id = body_data.get('sessionId')
+    session_info = dict(database.child('sessions').child(session_id).get().val())
+    players_info = {}
+    for player_login in session_info.get('players'):
+        players_info[player_login] = {'reputation': __get_user(player_login).get('reputation')}
+    session_info['players'] = players_info
+    return JsonResponse(session_info)
+
+
 def __get_user(login):
     user = database.child("users").child(login).get()
     return dict(user.val())
