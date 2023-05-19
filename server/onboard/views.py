@@ -123,6 +123,19 @@ def create_session(request):
     return Response(status=204)
 
 
+@api_view(['POST'])
+def get_profile_info(request):
+    body_unicode = request.body.decode('utf-8')
+    body_data = json.loads(body_unicode)
+    id_token = body_data.get('idToken')
+    user = __get_user_token(id_token)
+    user_info = dict(user.val())
+    del user_info['idToken']
+    del user_info['password']
+
+    return Response(status=204)
+
+
 def __get_user(login):
     user = database.child("users").child(login).get()
     return dict(user.val())
