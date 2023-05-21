@@ -158,6 +158,16 @@ class EditProfileFragment : Fragment() {
         imageview.setImageResource(R.drawable.profile_kitten)
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            val uri = data?.data
+            val fileName = uri?.lastPathSegment
+            Toast.makeText(requireContext(), "Выбран файл $fileName", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     // extension function to filter edit text number range
     private fun EditText.inputFilterNumberRange(range: IntRange) {
         filterMin(range.first)
