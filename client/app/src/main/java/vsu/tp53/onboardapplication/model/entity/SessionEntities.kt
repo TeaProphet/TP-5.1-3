@@ -39,6 +39,15 @@ data class SessionInfoBody(
 ) {
     fun mapToDomain(id: Int) = SessionInfo(id, name, city_address, date_time, players_max, players)
 }
+//TODO json property + datetimeserializer ???
+//@Serializable
+//data class SessionInfoEntity @JsonCreator constructor(
+//    @JsonProperty("name") var name: String? = "",
+//    @JsonProperty("city_address") var city_address: String? = "",
+//    @JsonProperty("date_time") var date_time: String? = "",
+//    @JsonProperty("players_max") var players_max: Int? = 0,
+//    @JsonProperty("players") var players: Map<String, PlayerBody>? = null
+//)
 
 @Serializable
 data class PlayerBody(
