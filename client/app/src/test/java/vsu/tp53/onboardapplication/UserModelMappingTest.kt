@@ -2,6 +2,7 @@ package vsu.tp53.onboardapplication
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.codehaus.jackson.map.ObjectMapper
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,6 +61,15 @@ class UserModelMappingTest {
         val json = "{\"error\":\"INVALID\",\"idToken\":\"token12\"}"
         val expected = UserToken("INVALID", "token12")
         val actual = Json.decodeFromString<UserToken>(json)
+        Assert.assertEquals(expected, actual)
+    }
+
+    @Test
+    fun userTokenTestFromJsonToDomainObjectMapper() {
+        val mapper = ObjectMapper()
+        val json = "{\"error\":\"INVALID\",\"idToken\":\"token12\"}"
+        val expected = UserToken("INVALID", "token12")
+        val actual = mapper.reader(UserToken::class.java).readValue<UserToken>(json)
         Assert.assertEquals(expected, actual)
     }
 

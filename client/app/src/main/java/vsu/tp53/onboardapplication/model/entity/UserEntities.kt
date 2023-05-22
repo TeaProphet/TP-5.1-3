@@ -10,9 +10,9 @@ data class UserRegAuthorize(
     @JsonProperty("error")
     var error: String? = null,
     @JsonProperty("login")
-    var login: String,
+    var login: String = "",
     @JsonProperty("password")
-    var password: String
+    var password: String = ""
 ) {
     fun mapToDomain() = User(login, password)
 }
@@ -20,17 +20,17 @@ data class UserRegAuthorize(
 @Serializable
 data class UserRegAuthorizePost(
     @JsonProperty("login")
-    var login: String,
+    var login: String = "",
     @JsonProperty("password")
-    var password: String
+    var password: String = ""
 )
 
 @Serializable
 data class UserToken(
     @JsonProperty("error")
-    var error: String,
+    var error: String? = null,
     @JsonProperty("idToken")
-    var idToken: String
+    var idToken: String = ""
 ) {
     fun mapToDomain() = Token(idToken)
 }
@@ -38,5 +38,5 @@ data class UserToken(
 @Serializable
 data class UserTokenPost(
     @JsonProperty("idToken")
-    var idToken: String
+    var idToken: String = ""
 )

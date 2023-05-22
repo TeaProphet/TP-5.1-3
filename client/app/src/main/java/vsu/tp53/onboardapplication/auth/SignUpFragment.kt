@@ -1,17 +1,25 @@
 package vsu.tp53.onboardapplication.auth
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
+import vsu.tp53.onboardapplication.auth.service.AuthService
 import vsu.tp53.onboardapplication.databinding.SignUpBinding
+import vsu.tp53.onboardapplication.model.domain.User
 
 class SignUpFragment : Fragment() {
     private var _binding: SignUpBinding? = null
     private val binding get() = _binding!!
+
+//    @Autowired
+    private var _authService: AuthService = AuthService(RestTemplate())
+    private val authService get() = _authService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -19,9 +27,20 @@ class SignUpFragment : Fragment() {
     ): View {
         _binding = SignUpBinding.inflate(inflater, container, false)
 
+        Log.i("messageSignUp", "SignUp!")
         binding.signUpButton.setOnClickListener {
+            getUser()
             it.findNavController().navigate(R.id.profileFragment)
         }
         return binding.root
+    }
+
+    private fun getUser() {
+        val login = binding.loginSignUp.text.toString()
+        val password = binding.passwordSignUp.text.toString()
+        Log.i("messageSignUp", login)
+        Log.i("messageSignUp", password)
+
+        authService.registerUser(User(login, password))
     }
 }
