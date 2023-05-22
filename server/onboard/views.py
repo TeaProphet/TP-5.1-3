@@ -1,16 +1,14 @@
 import json
 from datetime import datetime
-
 import firebase
+import math
 from django.core import serializers
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-
 from onboard import models
 
-# Create your views here.
 config = json.load(open('onboard/onboard_config.json'))
 app = firebase.initialize_app(config)
 auth = app.auth()
@@ -22,7 +20,6 @@ def register(request):
     try:
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
-        print(body_data)
         user = models.UserSerializer(data=body_data)
         if not user.is_valid():
             raise ValidationError
@@ -51,7 +48,6 @@ def credentials_authorize(request):
         user.auth_firebase_credentials(database)
     except ValueError:
         return JsonResponse({'error': 'WRONG_CREDENTIALS'})
-    print(__get_user(user.login))
     return JsonResponse({'idToken': user.idToken})
 
 
@@ -67,7 +63,7 @@ def token_authorize(request):
     except ValidationError:
         return JsonResponse({'error': 'INVALID_CREDENTIALS'})
     try:
-        user.auth_firebase_token(database, auth)
+        user.auth_firebase_token(database)
     except ValueError:
         return JsonResponse({'error': 'WRONG_CREDENTIALS'})
     data = serializers.serialize('json', [user, ])
@@ -100,7 +96,6 @@ def create_session(request):
     try:
         login = __get_user_token(id_token).key()
     except Exception as e:
-        print(e)
         return JsonResponse({"error": "PERMISSION_DENIED"})
     session_info = {
         "name": name,
@@ -118,8 +113,6 @@ def create_session(request):
     else:
         user_sessions = [session_id]
     database.child("users").child(login).child("played_sessions").set(user_sessions)
-
-
     return Response(status=204)
 
 
@@ -174,11 +167,96 @@ def change_profile(request):
     return Response(status=204)
 
 
+@api_view(['POST'])
+def plus_reputation(request):
+    body_unicode = request.body.decode('utf-8')
+    body_data = json.loads(body_unicode)
+    try:
+        id_token = body_data.get('idToken')
+        address_login = body_data.get('address_login')
+    except Exception:
+        return JsonResponse({"error": "WRONG_DATA"})
+    already_plused = database.child("reputation_data").child(address_login).child("plused_reputation").get().val()
+    requester_login = __get_user_token(id_token).key()
+    if requester_login == address_login:
+        return JsonResponse({"error": "REQUESTER_IS_ADDRESSER"})
+    if already_plused:
+        already_plused = dict(already_plused)
+        if dict(already_plused).keys().__contains__(requester_login):
+            return JsonResponse({"error": "ALREADY_CHANGED"})
+        else:
+            address_reputation = __plus_algorithm(address_login, requester_login, already_plused)
+            return JsonResponse({"new_reputation": address_reputation})
+    else:
+        address_reputation = __plus_algorithm(address_login, requester_login, {})
+        return JsonResponse({"new_reputation": address_reputation})
+
+
+@api_view(['POST'])
+def minus_reputation(request):
+    body_unicode = request.body.decode('utf-8')
+    body_data = json.loads(body_unicode)
+    try:
+        id_token = body_data.get('idToken')
+        address_login = body_data.get('address_login')
+    except Exception:
+        return JsonResponse({"error": "WRONG_DATA"})
+    already_minused = database.child("reputation_data").child(address_login).child("minused_reputation").get().val()
+    requester_login = __get_user_token(id_token).key()
+    if requester_login == address_login:
+        return JsonResponse({"error": "REQUESTER_IS_ADDRESSER"})
+    if already_minused:
+        already_minused = dict(already_minused)
+        if dict(already_minused).keys().__contains__(requester_login):
+            return JsonResponse({"error": "ALREADY_CHANGED"})
+        else:
+            address_reputation = __minus_algorithm(address_login, requester_login, already_minused)
+            return JsonResponse({"new_reputation": address_reputation})
+    else:
+        address_reputation = __minus_algorithm(address_login, requester_login, {})
+        return JsonResponse({"new_reputation": address_reputation})
+
+
+
+
+
 def __get_user(login):
     user = database.child("users").child(login).get()
     return user
+
 
 def __get_user_token(id_token):
     find_response = database.child("users").order_by_child("idToken").equal_to(id_token).get().each()
     return find_response[0]
 
+def __plus_algorithm(address_login, requester_login, already_plused):
+    address_reputation = database.child("users").child(address_login).child("reputation").get().val()
+    reputation = database.child("users").child(requester_login).child("reputation").get().val()
+    address_reputation += (math.atan(0.1) * reputation / math.pi) + 0.5
+    already_plused[requester_login] = (math.atan(0.1) * reputation / math.pi) + 0.5
+    already_minused = database.child("reputation_data").child(address_login).child("minused_reputation").get().val()
+    if already_minused:
+        already_minused = dict(already_minused)
+        if already_minused.__contains__(requester_login):
+            address_reputation += already_minused[requester_login]
+            already_minused.pop(requester_login)
+    database.child("reputation_data").child(address_login).child("minused_reputation").set(already_minused)
+    database.child("reputation_data").child(address_login).child("plused_reputation").set(already_plused)
+    database.child("users").child(address_login).child("reputation").set(address_reputation)
+    return address_reputation
+
+def __minus_algorithm(address_login, requester_login, already_minused):
+    address_reputation = database.child("users").child(address_login).child("reputation").get().val()
+    reputation = database.child("users").child(requester_login).child("reputation").get().val()
+    address_reputation -= (math.atan(0.1) * reputation / math.pi) + 0.5
+    already_minused[requester_login] = (math.atan(0.1) * reputation / math.pi) + 0.5
+    already_plused = database.child("reputation_data").child(address_login).child("plused_reputation").get().val()
+    if already_plused:
+        already_plused = dict(already_plused)
+        if already_plused.__contains__(requester_login):
+            address_reputation -= already_plused[requester_login]
+            already_plused.pop(requester_login)
+    database.child("reputation_data").child(address_login).child("minused_reputation").set(already_minused)
+    database.child("reputation_data").child(address_login).child("plused_reputation").set(already_plused)
+    database.child("users").child(address_login).child("reputation").set(address_reputation)
+    return address_reputation

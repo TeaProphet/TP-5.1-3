@@ -47,26 +47,25 @@ class User(models.Model):
 					break
 		else:
 			raise ValueError
-		self.__init_user(database)
 
-	def auth_firebase_token(self, database: firebase.Database, auth: firebase.Auth):
+	def auth_firebase_token(self, database: firebase.Database):
 		find_response = database.child("users").order_by_child("idToken").equal_to(self.idToken).get().each()
 		if len(find_response) != 0:
 			self.login = find_response[0].key()
 			self.__init_user(database)
 
 	def __init_user(self, database: firebase.Database):
-		user_path = database.child("users").child(self.login)
-		self.reputation = user_path.child("reputation").get().val()
-		self.age = user_path.child("age").get().val()
-		self.games = user_path.child("games").get().val()
-		self.vk = user_path.child("vk").get().val()
-		self.tg = user_path.child("tg").get().val()
-		self.played_sessions = user_path.child("played_sessions").get().val()
+		self.reputation = database.child("users").child(self.login).child("reputation").get().val()
+		self.age = database.child("users").child(self.login).child("age").get().val()
+		self.games = database.child("users").child(self.login).child("games").get().val()
+		self.vk = database.child("users").child(self.login).child("vk").get().val()
+		self.tg = database.child("users").child(self.login).child("tg").get().val()
+		print(database.child("users").child(self.login).child("played_sessions").get().val())
+		self.played_sessions = database.child("users").child(self.login).child("played_sessions").get().val()
 
 	def save_firebase(self, database: firebase.Database, auth: firebase.Auth):
 		self.idToken = auth.create_custom_token(database.generate_key())
-		database.child("users").set(
+		database.child("users").update(
 			{self.login: {"password": self.password, "idToken": self.idToken, "reputation": self.reputation,
 			              "age": self.age, "games": self.games, "vk": self.vk, "tg": self.tg,
 			              "played_sessions": self.played_sessions}})
@@ -85,15 +84,3 @@ class UserSerializer(serializers.Serializer):
 
 	def create(self, validated_data):
 		return User(**validated_data)
-
-	def update(self, instance, validated_data):
-		instance.authorize = validated_data.get('login', instance.authorize)
-		instance.password = validated_data.get('password', instance.password)
-		instance.idToken = validated_data.get('idToken', instance.idToken)
-		return instance
-
-
-class UserForm(ModelForm):
-	class Meta:
-		model = User
-		exclude = ['login', 'password', 'idToken']
