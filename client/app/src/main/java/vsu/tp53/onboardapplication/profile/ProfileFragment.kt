@@ -14,6 +14,7 @@ import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.auth.service.AuthService
 import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentProfileBinding
+import vsu.tp53.onboardapplication.model.entity.ChangeReputationEntity
 
 class ProfileFragment : Fragment() {
 
@@ -58,29 +59,33 @@ class ProfileFragment : Fragment() {
             var isChangedPositive = false
             var isChangedNegative = false
             binding.increaseRep.setOnClickListener {
-                var rep: Int = binding.playerReputation.text.toString().toInt()
-                if (!isChangedPositive) {
-                    rep += 1
-                    isChangedPositive = true
-                    if (isChangedNegative) {
-                        isChangedNegative = false
-                        rep += 1
-                    }
-                }
-                binding.playerReputation.text = rep.toString()
+//                var rep: Int = binding.playerReputation.text.toString().toInt()
+//                if (!isChangedPositive) {
+//                    rep += 1
+//                    isChangedPositive = true
+//                    if (isChangedNegative) {
+//                        isChangedNegative = false
+//                        rep += 1
+//                    }
+//                }
+//                binding.playerReputation.text = rep.toString()
+                changeRepPlus()
+                initProfile()
             }
 
             binding.decreaseRep.setOnClickListener {
-                var rep: Int = binding.playerReputation.text.toString().toInt()
-                if (!isChangedNegative) {
-                    rep -= 1
-                    isChangedNegative = true
-                    if (isChangedPositive) {
-                        isChangedPositive = false
-                        rep -= 1
-                    }
-                }
-                binding.playerReputation.text = rep.toString()
+//                var rep: Int = binding.playerReputation.text.toString().toInt()
+//                if (!isChangedNegative) {
+//                    rep -= 1
+//                    isChangedNegative = true
+//                    if (isChangedPositive) {
+//                        isChangedPositive = false
+//                        rep -= 1
+//                    }
+//                }
+//                binding.playerReputation.text = rep.toString()
+                changeRepMinus()
+                initProfile()
             }
         }
         return binding.root
@@ -98,11 +103,28 @@ class ProfileFragment : Fragment() {
         if (profileInfo != null) {
             Log.i("ProfileFragment", "Init profile")
             binding.profileName.text = profileService.getUserLogin()
+            binding.playerReputation.text = profileInfo.reputation.toString()
             binding.userAge.text = profileInfo.age?.toString()
             binding.userGames.text = profileInfo.games
             binding.vkUrl.text = profileInfo.vk
             binding.tgUrl.text = profileInfo.tg
         }
+    }
+
+    private fun changeRepPlus() {
+        val changeRepEntity = ChangeReputationEntity(
+            authService.getRowByLogin(profileService.getUserLogin())!!.tokenId,
+            binding.profileName.text.toString()
+        )
+        profileService.increaseReputation(changeRepEntity)
+    }
+
+    private fun changeRepMinus() {
+        val changeRepEntity = ChangeReputationEntity(
+            authService.getRowByLogin(profileService.getUserLogin())!!.tokenId,
+            binding.profileName.text.toString()
+        )
+        profileService.decreaseReputation(changeRepEntity)
     }
 
     override fun onDestroyView() {

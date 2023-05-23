@@ -82,6 +82,7 @@ class AuthService(
         )!!
 
         Log.i("Auth-authSuc", userToken.toString())
+        Log.i("Auth-authSuc", user.login)
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         val db = dbHelper.writableDatabase
@@ -93,6 +94,7 @@ class AuthService(
                 formatter.format(LocalDateTime.now()).toString()
             )
         }
+        readData()
         val selection = "${UserTokenContract.UserTokenEntry.COLUMN_LOGIN} LIKE ?"
         val selectionArgs = arrayOf(user.login)
         val newRowId = db?.update(
@@ -106,7 +108,6 @@ class AuthService(
         prefs.edit().putBoolean(IS_LOGIN_KEY, true).apply()
         prefs.edit().putString(LAST_LOGIN, user.login).apply()
         Log.i("Auth-ServAuth", "Last login is \"${prefs.getString(LAST_LOGIN, "")}\"")
-        readData()
     }
 
     fun authToken() {
