@@ -53,7 +53,7 @@
                                 android:layout_height="30dp"
                                 android:layout_marginEnd="5dp"
                                 android:lineSpacingExtra="8sp"
-                                android:text="Князь Тьмы Котофей"
+                                android:hint="Князь Тьмы Котофей"
                                 android:textAlignment="center"
                                 android:textColor="#000000"
                                 android:textSize="20sp"
@@ -190,7 +190,7 @@
                             android:id="@+id/user_age"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="4567 лет" />
+                            android:hint="4567 лет" />
                     </LinearLayout>
 
                     <TextView
@@ -206,7 +206,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
-                        android:text="@string/games_list_example" />
+                        android:hint="@string/games_list_example" />
 
                     <TextView
                         android:id="@+id/textView8"
@@ -233,7 +233,7 @@
                             android:id="@+id/vk_url"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="http://vk.com/july_cezzar" />
+                            android:hint="http://vk.com/july_cezzar" />
 
                     </LinearLayout>
 
@@ -255,7 +255,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="http://vk.com/july_cezzar" />
+                            android:hint="http://vk.com/july_cezzar" />
                     </LinearLayout>
 
                 </LinearLayout>

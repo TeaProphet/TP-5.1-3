@@ -1,5 +1,6 @@
 package vsu.tp53.onboardapplication.model.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -44,6 +45,7 @@ data class ProfileInfoEntity(
     var games: String? = "",
     var vk: String? = "",
     var tg: String? = "",
+    var reputation: Double = 0.0,
     var played_sessions: Map<Int, SessionBody>? = null
 )
 
