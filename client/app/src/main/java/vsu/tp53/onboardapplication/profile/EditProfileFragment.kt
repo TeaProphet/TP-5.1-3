@@ -22,7 +22,9 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
+import vsu.tp53.onboardapplication.auth.service.AuthService
 import vsu.tp53.onboardapplication.databinding.FragmentEditProfileBinding
 
 /**
@@ -33,6 +35,8 @@ import vsu.tp53.onboardapplication.databinding.FragmentEditProfileBinding
 class EditProfileFragment : Fragment() {
     private lateinit var binding: FragmentEditProfileBinding
     private lateinit var editText: EditText
+    private lateinit var _authService: AuthService
+    private val authService get() = _authService
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,6 +48,10 @@ class EditProfileFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentEditProfileBinding.inflate(inflater, container, false)
+        if (container != null) {
+            _authService = AuthService(RestTemplate(), container.context)
+        }
+
         editText = binding.ageInput
         editText.inputFilterNumberRange(12..100)
         binding.saveChangesButton.setOnClickListener {
@@ -58,6 +66,11 @@ class EditProfileFragment : Fragment() {
                 .setNegativeButton("Отменить", null)
                 .create()
             dialog.show()
+        }
+
+        binding.quitSystem.setOnClickListener {
+            authService.logOut()
+            it.findNavController().navigate(R.id.homeFragment)
         }
         
         return binding.root

@@ -7,19 +7,31 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
+import vsu.tp53.onboardapplication.auth.service.AuthService
 import vsu.tp53.onboardapplication.databinding.FragmentProfileBinding
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
+    private lateinit var _authService: AuthService
+    private val authService get() = _authService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        if (container != null) {
+            _authService = AuthService(RestTemplate(), container.context)
+        }
+
+        if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()) {
+            this.findNavController().navigate(R.id.pageUnauthorizedFragment)
+        }
 
         binding.openUserSessions.setOnClickListener {
             it.findNavController().navigate(R.id.userSessionsFragment)
@@ -36,6 +48,7 @@ class ProfileFragment : Fragment() {
         binding.editProfileButton.setOnClickListener {
             it.findNavController().navigate(R.id.editProfileFragment)
         }
+
         var isChangedPositive = false
         var isChangedNegative = false
         binding.increaseRep.setOnClickListener {
@@ -43,7 +56,7 @@ class ProfileFragment : Fragment() {
             if (!isChangedPositive) {
                 rep += 1
                 isChangedPositive = true
-                if (isChangedNegative){
+                if (isChangedNegative) {
                     isChangedNegative = false
                     rep += 1
                 }
@@ -56,7 +69,7 @@ class ProfileFragment : Fragment() {
             if (!isChangedNegative) {
                 rep -= 1
                 isChangedNegative = true
-                if (isChangedPositive){
+                if (isChangedPositive) {
                     isChangedPositive = false
                     rep -= 1
                 }

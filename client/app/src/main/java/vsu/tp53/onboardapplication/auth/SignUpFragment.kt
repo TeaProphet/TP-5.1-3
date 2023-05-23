@@ -17,8 +17,8 @@ class SignUpFragment : Fragment() {
     private var _binding: SignUpBinding? = null
     private val binding get() = _binding!!
 
-//    @Autowired
-    private var _authService: AuthService = AuthService(RestTemplate())
+    //    @Autowired
+    private lateinit var _authService: AuthService
     private val authService get() = _authService
 
     override fun onCreateView(
@@ -26,20 +26,23 @@ class SignUpFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = SignUpBinding.inflate(inflater, container, false)
+        if (container != null) {
+            _authService = AuthService(RestTemplate(), container.context)
+        }
 
         Log.i("messageSignUp", "SignUp!")
         binding.signUpButton.setOnClickListener {
-            getUser()
+            registerUser()
             it.findNavController().navigate(R.id.profileFragment)
         }
         return binding.root
     }
 
-    private fun getUser() {
+    private fun registerUser() {
         val login = binding.loginSignUp.text.toString()
         val password = binding.passwordSignUp.text.toString()
-        Log.i("messageSignUp", login)
-        Log.i("messageSignUp", password)
+        Log.i("signUp-login", login)
+        Log.i("signUp-password", password)
 
         authService.registerUser(User(login, password))
     }
