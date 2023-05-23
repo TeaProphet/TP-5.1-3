@@ -2,6 +2,9 @@ package vsu.tp53.onboardapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.navigation.findNavController
@@ -10,12 +13,20 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import org.springframework.web.client.RestTemplate
+import vsu.tp53.onboardapplication.auth.service.AuthService
 import vsu.tp53.onboardapplication.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var _authService: AuthService
+    private val authService get() = _authService
+
+    private lateinit var runnable: Runnable
+    private var handler = Handler(Looper.getMainLooper())
+    private val interval: Long = 60_000
 
     @SuppressLint("AppCompatMethod")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +34,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+        if (applicationContext != null) {
+            _authService = AuthService(RestTemplate(), applicationContext)
+        }
+
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
@@ -33,6 +48,12 @@ class MainActivity : AppCompatActivity() {
 
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavView.setupWithNavController(navController)
+
+        runnable = Runnable {
+            Log.i("MainActivity", "Auth service checks token not to be expired.")
+            authService.checkTokenIsNotExpired()
+            handler.postDelayed(runnable, interval)
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
