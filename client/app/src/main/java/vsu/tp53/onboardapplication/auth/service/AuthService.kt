@@ -20,8 +20,8 @@ import vsu.tp53.onboardapplication.sqlitedb.UserTokenDbHelper
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-private const val IS_LOGIN_KEY = "IsLogin"
-private const val LAST_LOGIN = "LastLogin"
+const val IS_LOGIN_KEY = "IsLogin"
+const val LAST_LOGIN = "LastLogin"
 
 class AuthService(
     private val restTemplate: RestTemplate,
@@ -149,7 +149,7 @@ class AuthService(
         Log.i("Auth-ServLogOut", "Last login is \"${prefs.getString(LAST_LOGIN, "")}\"")
     }
 
-    private fun getRowByLogin(login: String): UserLogInInfo? {
+    fun getRowByLogin(login: String): UserLogInInfo? {
         val db = dbHelper.readableDatabase
         val projection = arrayOf(
             BaseColumns._ID,

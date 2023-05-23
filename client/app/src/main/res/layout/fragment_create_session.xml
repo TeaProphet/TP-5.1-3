@@ -9,7 +9,7 @@
     tools:context=".home.CreateSessionFragment">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tg_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -92,7 +92,7 @@
         android:textSize="@dimen/session_headings" />
 
     <EditText
-        android:id="@+id/editTextText"
+        android:id="@+id/user_vk"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"

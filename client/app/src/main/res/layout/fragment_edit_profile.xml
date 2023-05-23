@@ -190,7 +190,7 @@
                             android:src="@drawable/vk_icon" />
 
                         <EditText
-                            android:id="@+id/editTextText"
+                            android:id="@+id/user_vk"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="vk./com/id"
@@ -213,7 +213,7 @@
                             android:src="@drawable/telegram_icon" />
 
                         <EditText
-                            android:id="@+id/editTextText3"
+                            android:id="@+id/user_tg"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
