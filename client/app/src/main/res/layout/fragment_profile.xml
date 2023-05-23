@@ -202,7 +202,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/textView5"
+                        android:id="@+id/user_games"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
@@ -230,7 +230,7 @@
                             android:src="@drawable/vk_icon" />
 
                         <TextView
-                            android:id="@+id/textView9"
+                            android:id="@+id/vk_url"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="http://vk.com/july_cezzar" />
@@ -251,7 +251,7 @@
                             android:src="@drawable/telegram_icon" />
 
                         <TextView
-                            android:id="@+id/textView"
+                            android:id="@+id/tg_url"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"

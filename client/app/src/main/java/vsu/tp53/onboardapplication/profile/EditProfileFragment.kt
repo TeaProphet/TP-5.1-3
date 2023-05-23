@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +26,9 @@ import androidx.navigation.fragment.findNavController
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.auth.service.AuthService
+import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentEditProfileBinding
+import vsu.tp53.onboardapplication.model.entity.ChangeProfile
 
 /**
  * A simple [Fragment] subclass.
@@ -37,6 +40,8 @@ class EditProfileFragment : Fragment() {
     private lateinit var editText: EditText
     private lateinit var _authService: AuthService
     private val authService get() = _authService
+    private lateinit var _profileService: ProfileService
+    private val profileService get() = _profileService
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -50,11 +55,14 @@ class EditProfileFragment : Fragment() {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false)
         if (container != null) {
             _authService = AuthService(RestTemplate(), container.context)
+            _profileService = ProfileService(RestTemplate(), container.context)
         }
 
         editText = binding.ageInput
         editText.inputFilterNumberRange(12..100)
         binding.saveChangesButton.setOnClickListener {
+            Log.i("EditProfileFrag", "Save changes button is clicked...")
+            changeProfile()
             it.findNavController().navigate(R.id.profileFragment)
         }
         binding.changePasswordButton.setOnClickListener {
@@ -72,8 +80,18 @@ class EditProfileFragment : Fragment() {
             authService.logOut()
             it.findNavController().navigate(R.id.homeFragment)
         }
-        
+
         return binding.root
+    }
+
+    private fun changeProfile() {
+        val changeProfileEntity = ChangeProfile(
+            binding.ageInput.text.toString().toInt(),
+            binding.editFavGames.text.toString(),
+            binding.userVk.text.toString(),
+            binding.userTg.text.toString()
+        )
+        profileService.changeProfile(changeProfileEntity)
     }
 
     @SuppressLint("ResourceType")
@@ -84,7 +102,7 @@ class EditProfileFragment : Fragment() {
     }
 
     // extension function to filter edit text number range
-    fun EditText.inputFilterNumberRange(range: IntRange){
+    fun EditText.inputFilterNumberRange(range: IntRange) {
         filterMin(range.first)
         filters = arrayOf<InputFilter>(InputFilterMax(range.last))
     }
@@ -102,14 +120,15 @@ class EditProfileFragment : Fragment() {
                     .substring(p5, p3.toString().length)
                 val input = newVal.toInt()
                 if (input <= max) return null
-            } catch (e: NumberFormatException) { }
+            } catch (e: NumberFormatException) {
+            }
             return ""
         }
     }
 
 
     // extension function to filter edit text minimum number
-    fun EditText.filterMin(min: Int){
+    fun EditText.filterMin(min: Int) {
         onFocusChangeListener = View.OnFocusChangeListener { view, b ->
             if (!b) {
                 // set minimum number if inputted number less than minimum
@@ -133,21 +152,22 @@ class EditProfileFragment : Fragment() {
 
 
     // extension function to set edit text minimum number
-    fun EditText.setTextMin(min: Int){
+    fun EditText.setTextMin(min: Int) {
         try {
             val value = text.toString().toInt()
             setUnderlineColor(Color.GREEN)
-            if (value < min){
+            if (value < min) {
                 setText("$min")
                 setUnderlineColor(Color.RED)
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             setUnderlineColor(Color.RED)
             setText("$min")
         }
     }
+
     // extension function to hide soft keyboard programmatically
-    fun Context.hideSoftKeyboard(editText: EditText){
+    fun Context.hideSoftKeyboard(editText: EditText) {
         (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).apply {
             hideSoftInputFromWindow(editText.windowToken, 0)
         }
@@ -155,11 +175,11 @@ class EditProfileFragment : Fragment() {
 
 
     // extension function to set/change edit text underline color
-    fun EditText.setUnderlineColor(color: Int){
+    fun EditText.setUnderlineColor(color: Int) {
         background.mutate().apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 colorFilter = BlendModeColorFilter(color, BlendMode.SRC_IN)
-            }else{
+            } else {
                 setColorFilter(color, PorterDuff.Mode.SRC_IN)
             }
         }
