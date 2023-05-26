@@ -73,3 +73,11 @@ def get_session_info(request):
         return JsonResponse({'error': 'INVALID_SESSION_ID'})
     session.add_reputation_to_players()
     return JsonResponse(models.SessionSerializer(session).data)
+
+@api_view(['POST'])
+def get_sessions(request):
+    raw_sessions_info = settings.database.child("sessions").get().val()
+    sessions_info = {}
+    for i in range(len(raw_sessions_info)):
+        sessions_info[i] = raw_sessions_info[i]
+    return JsonResponse(sessions_info)
