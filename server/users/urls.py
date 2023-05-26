@@ -5,10 +5,8 @@ urlpatterns = [
     path('register/', views.register),
     path('authorize/', views.credentials_authorize),
     path('token_authorize/', views.token_authorize),
-    path('create_session/', views.create_session),
     path('get_profile_info/', views.get_profile_info),
-    path('get_session_info/', views.get_session_info),
     path('change_profile/', views.change_profile),
     path('plus_reputation/', views.plus_reputation),
-    path('minus_reputation/', views.minus_reputation)
+    path('minus_reputation/', views.minus_reputation),
 ]
