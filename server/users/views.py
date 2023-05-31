@@ -1,176 +1,206 @@
 import json
 import math
 from django.http import JsonResponse
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from python_jwt import _JWTError
+from requests import HTTPError
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from onboardProject import settings
 from users import models
-from firebase_tools.users_tools import get_user, get_user_token
 
+# Expiried token: yJhbGciOiJSUzI1NiIsImtpZCI6IjJkM2E0YTllYjY0OTk0YzUxM2YyYzhlMGMwMTY1MzEzN2U5NTg3Y2EiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vb25ib2FyZGFwcC03ZjQ4ZCIsImF1ZCI6Im9uYm9hcmRhcHAtN2Y0OGQiLCJhdXRoX3RpbWUiOjE2ODU1MzQzODUsInVzZXJfaWQiOiJPVDBxRVFORVc3UXh3YzVtWEZpUnpqVDJMbDYyIiwic3ViIjoiT1QwcUVRTkVXN1F4d2M1bVhGaVJ6alQyTGw2MiIsImlhdCI6MTY4NTUzNDM4NSwiZXhwIjoxNjg1NTM3OTg1LCJlbWFpbCI6InF3ZXJ0eUB5YW5kZXgucnUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsicXdlcnR5QHlhbmRleC5ydSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.bdD3bJOsmuZYfrZuwEOiVkaIwaiQok23KByPfjnOgkHs5Wkt4RQs9yZwahJpENxGHIRHnOpIlQSzjUarqrllIBWhC9SZMJ7zuwyN7wsLZy2AJIdMgZgHliBdYIpjgYzoz8YH5tHZWZAPLVsxuJ-3U3l_iHOm-peRf-lX30pnqr0OjRc7CzLhUCqL4bXOoQ8K7OQC3oOAg3XlkobqB5sE5EdylvyDM_4GS3WHK_R5sV-lIhv5Il1oSyztaxUh_5oOxRb6_v-SlLvTLkxM34VJJ3aYmcs2DlIdwn6ODHxc4Jjdot07lT8Abz6dDjACy3h9r1xPbkxp4CF7eeXq3SQ2cg
 
+@extend_schema(
+    request=models.RegistrationSerializer,
+    responses=models.RegistrationSerializer,
+    tags=["Users"]
+)
 @api_view(['POST'])
 def register(request):
     try:
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
-        user = models.UserCredentialsSerializer(data=body_data)
-        if not user.is_valid():
-            raise ValidationError
-        user = user.save()
+        credentials = complete_serialize(body_data, models.RegistrationSerializer)
     except ValidationError:
         return JsonResponse({'error': 'INVALID_CREDENTIALS'})
     try:
-        user.register_firebase()
-    except ValueError as exception:
-        return JsonResponse({'error': str(exception)})
-    return JsonResponse({'idToken': user.idToken})
+        auth_user = settings.auth.create_user_with_email_and_password(credentials.login, credentials.password)
+    except HTTPError as exception:
+        return JsonResponse({'error': extract_http_error_message(exception.args[1])})
+    user = models.User(uid=auth_user.get('localId'), login=credentials.nickname, user_data=models.UserData(),
+                       nickname=credentials.nickname)
+    try:
+        user.save_data()
+    except ValueError as e:
+        settings.auth.delete_user_account(auth_user['idToken'])
+        return JsonResponse({'error': e.args[0]})
+    return JsonResponse({'idToken': auth_user.get('idToken')})
 
-
+@extend_schema(
+    request=models.AuthorizationSerializer,
+    responses=models.AuthorizationSerializer,
+    tags=["Users"]
+)
 @api_view(['POST'])
 def credentials_authorize(request):
     try:
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
-        user = models.UserCredentialsSerializer(data=body_data)
-        if not user.is_valid():
-            raise ValidationError
-        user = user.save()
+        auth_user = settings.auth.sign_in_with_email_and_password(body_data['login'], body_data['password'])
     except ValidationError:
         return JsonResponse({'error': 'INVALID_CREDENTIALS'})
-    try:
-        user.auth_firebase_credentials()
-    except ValueError:
-        return JsonResponse({'error': 'WRONG_CREDENTIALS'})
-    return JsonResponse({'idToken': user.idToken})
+    return JsonResponse({'idToken': auth_user.get('idToken')})
 
-
-@api_view(['POST'])
-def token_authorize(request):
-    try:
-        body_unicode = request.body.decode('utf-8')
-        body_data = json.loads(body_unicode)
-        user = models.UserCredentialsSerializer(data=body_data)
-        if not user.is_valid():
-            raise ValidationError
-        user = user.save()
-    except ValidationError:
-        return JsonResponse({'error': 'INVALID_CREDENTIALS'})
-    try:
-        user.auth_firebase_token()
-    except ValueError:
-        return JsonResponse({'error': 'WRONG_CREDENTIALS'})
-    data = models.UserCredentialsSerializer(user).data
-    data.pop('idToken')
-    return JsonResponse(data, safe=False)
-
-
-@api_view(['POST'])
-def get_profile_info(request):
-    body_unicode = request.body.decode('utf-8')
-    body_data = json.loads(body_unicode)
-    login = body_data.get('searchedLogin')
-    user_data = get_user(login)
+@extend_schema(
+    request=models.SearchedNicknameSerializer,
+    responses=models.SearchedNicknameSerializer,
+    tags=["Users"],
+)
+@api_view(['GET'])
+def get_profile_info(request, nickname):
+    user_data = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(nickname).get()
     return JsonResponse(models.UserDataSerializer(user_data).data)
 
-@api_view(['POST'])
-def change_profile(request):
+
+@extend_schema(
+    request=models.UserDataSerializer,
+    responses=models.UserDataSerializer,
+    tags=["Users"],
+)
+@api_view(['PATCH'])
+def change_profile(request, idToken):
     try:
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
-        user = models.UserCredentialsSerializer(data=body_data)
-        if not user.is_valid():
-            raise ValidationError
-        user = user.save()
         user_data = models.UserDataSerializer(data=body_data)
         if not user_data.is_valid():
             raise ValidationError
         user_data = user_data.save()
+        decoded_token = settings.auth.verify_id_token(idToken)
+        uid = decoded_token['user_id']
     except ValidationError:
         return JsonResponse({'error': 'INVALID_DATA'})
-    user.user_data = user_data
-    user.login = get_user_token(user.idToken).key()
-    user.update_user_data()
+    except _JWTError as token_error:
+        if token_error.args[0] == 'invalid JWT format':
+            return JsonResponse({'error': 'INVALID_TOKEN'})
+        else:
+            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+    print(models.UserDataSerializer(user_data).data)
+    settings.database.child(settings.USERS_TABLE).child(uid).child('user_data').update(dict(models.UserDataSerializer(user_data).data))
     return Response(status=204)
 
 
+@extend_schema(
+    request=models.ReputationRequestSerializer,
+    responses=models.ReputationRequestSerializer,
+    tags=["Users"],
+)
 @api_view(['POST'])
 def plus_reputation(request):
-    body_unicode = request.body.decode('utf-8')
-    body_data = json.loads(body_unicode)
     try:
-        id_token = body_data.get('idToken')
-        address_login = body_data.get('address_login')
-    except Exception:
-        return JsonResponse({"error": "WRONG_DATA"})
-    already_plused = settings.database.child("reputation_data").child(address_login).child("plused_reputation").get().val()
-    requester_login = get_user_token(id_token).key()
-    if requester_login == address_login:
-        return JsonResponse({"error": "REQUESTER_IS_ADDRESSER"})
-    if already_plused:
-        already_plused = dict(already_plused)
-        if dict(already_plused).keys().contains(requester_login):
-            return JsonResponse({"error": "ALREADY_CHANGED"})
+        address_uid, requester_uid = extract_reputation_data(request)
+    except _JWTError as token_error:
+        if token_error.args[0] == 'invalid JWT format':
+            return JsonResponse({'error': 'INVALID_TOKEN'})
         else:
-            address_reputation = __plus_algorithm(address_login, requester_login, already_plused)
-            return JsonResponse({"new_reputation": address_reputation})
-    else:
-        address_reputation = __plus_algorithm(address_login, requester_login, {})
-        return JsonResponse({"new_reputation": address_reputation})
+            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+    if requester_uid == address_uid:
+        return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'})
+    try:
+        new_reputation = __change_rep_algorithm(address_uid, requester_uid, True)
+    except ValueError as exception:
+        return JsonResponse({'error': exception.args[0]})
+    return JsonResponse({'new_reputation': new_reputation})
 
 
+@extend_schema(
+    request=models.ReputationRequestSerializer,
+    responses=models.ReputationRequestSerializer,
+    tags=["Users"],
+)
 @api_view(['POST'])
 def minus_reputation(request):
+    try:
+        address_uid, requester_uid = extract_reputation_data(request)
+    except _JWTError as token_error:
+        if token_error.args[0] == 'invalid JWT format':
+            return JsonResponse({'error': 'INVALID_TOKEN'})
+        else:
+            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+    if requester_uid == address_uid:
+        return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'})
+    try:
+        new_reputation = __change_rep_algorithm(address_uid, requester_uid, False)
+    except ValueError as exception:
+        return JsonResponse({'error': exception.args[0]})
+    return JsonResponse({'new_reputation': new_reputation})
+
+
+def extract_reputation_data(request):
     body_unicode = request.body.decode('utf-8')
     body_data = json.loads(body_unicode)
-    try:
-        id_token = body_data.get('idToken')
-        address_login = body_data.get('address_login')
-    except Exception:
-        return JsonResponse({"error": "WRONG_DATA"})
-    already_minused = settings.database.child("reputation_data").child(address_login).child("minused_reputation").get().val()
-    requester_login = get_user_token(id_token).key()
-    if requester_login == address_login:
-        return JsonResponse({"error": "REQUESTER_IS_ADDRESSER"})
-    if already_minused:
-        already_minused = dict(already_minused)
-        if dict(already_minused).keys().contains(requester_login):
-            return JsonResponse({"error": "ALREADY_CHANGED"})
-        else:
-            address_reputation = __minus_algorithm(address_login, requester_login, already_minused)
-            return JsonResponse({"new_reputation": address_reputation})
+    rep_request = complete_serialize(body_data, models.ReputationRequestSerializer)
+
+    address_user = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(
+        rep_request.requestedNickname).get()
+    address_uid = address_user.val().popitem()[0]
+
+    decoded_token = settings.auth.verify_id_token(rep_request.idToken)
+    requester_uid = decoded_token['user_id']
+    return address_uid, requester_uid
+
+
+def __change_rep_algorithm(address_uid, requester_uid, plused):
+    if plused:
+        opposite_modifier = -1
+        changing_name, opposite_name = 'plused', 'minused'
     else:
-        address_reputation = __minus_algorithm(address_login, requester_login, {})
-        return JsonResponse({"new_reputation": address_reputation})
+        opposite_modifier = 1
+        changing_name, opposite_name = 'minused', 'plused'
+    changes_list = settings.database.child(settings.REPUTATION_TABLE).child(address_uid).child(changing_name).get().val()
+    opposite_changes_list = settings.database.child(settings.REPUTATION_TABLE).child(address_uid).child(opposite_name).get().val()
+    if not changes_list:
+        changes_list = {}
+    if not opposite_changes_list:
+        opposite_changes_list = {}
+    if dict(changes_list).keys().__contains__(requester_uid):
+        raise ValueError('ALREADY_CHANGED')
 
-def __plus_algorithm(address_login, requester_login, already_plused):
-    address_reputation = settings.database.child("users").child(address_login).child("reputation").get().val()
-    reputation = settings.database.child("users").child(requester_login).child("reputation").get().val()
-    address_reputation += (math.atan(0.1) * reputation / math.pi) + 0.5
-    already_plused[requester_login] = (math.atan(0.1) * reputation / math.pi) + 0.5
-    already_minused = settings.database.child("reputation_data").child(address_login).child("minused_reputation").get().val()
-    if already_minused:
-        already_minused = dict(already_minused)
-        if already_minused.contains(requester_login):
-            address_reputation += already_minused[requester_login]
-            already_minused.pop(requester_login)
-    settings.database.child("reputation_data").child(address_login).child("minused_reputation").set(already_minused)
-    settings.database.child("reputation_data").child(address_login).child("plused_reputation").set(already_plused)
-    settings.database.child("users").child(address_login).child("reputation").set(address_reputation)
+    address_reputation = settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child("reputation").get().val()
+    reputation = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child("reputation").get().val()
+
+    address_reputation += opposite_modifier * (math.atan(0.1) * reputation / math.pi) + 0.5
+
+    changes_list[requester_uid] = address_reputation
+    if dict(opposite_changes_list).__contains__(requester_uid):
+        address_reputation += opposite_modifier * opposite_changes_list[requester_uid]
+        opposite_changes_list.pop(requester_uid)
+    settings.database.child(settings.REPUTATION_TABLE).child(address_uid).child(opposite_name).set(opposite_changes_list)
+    settings.database.child(settings.REPUTATION_TABLE).child(address_uid).child(changing_name).set(changes_list)
+    settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child('reputation').set(address_reputation)
     return address_reputation
 
-def __minus_algorithm(address_login, requester_login, already_minused):
-    address_reputation = settings.database.child("users").child(address_login).child("reputation").get().val()
-    reputation = settings.database.child("users").child(requester_login).child("reputation").get().val()
-    address_reputation -= (math.atan(0.1) * reputation / math.pi) + 0.5
-    already_minused[requester_login] = (math.atan(0.1) * reputation / math.pi) + 0.5
-    already_plused = settings.database.child("reputation_data").child(address_login).child("plused_reputation").get().val()
-    if already_plused:
-        already_plused = dict(already_plused)
-        if already_plused.contains(requester_login):
-            address_reputation -= already_plused[requester_login]
-            already_plused.pop(requester_login)
-    settings.database.child("reputation_data").child(address_login).child("minused_reputation").set(already_minused)
-    settings.database.child("reputation_data").child(address_login).child("plused_reputation").set(already_plused)
-    settings.database.child("users").child(address_login).child("reputation").set(address_reputation)
-    return address_reputation
+
+def remove_null_fields(data: dict):
+    for key, val in data.items():
+        if not val:
+            data.pop(key)
+
+
+def complete_serialize(used_data: dict, serializer):
+    serializing_object = serializer(data=used_data)
+    if not serializing_object.is_valid():
+        raise ValidationError
+    return serializing_object.save()
+
+
+def extract_http_error_message(exception_text):
+    message_index = exception_text.find('"message": ') + 12
+    message = ""
+    while exception_text[message_index] != '"':
+        message += exception_text[message_index]
+        message_index += 1
+    return message
+

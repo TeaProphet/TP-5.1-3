@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('create_session/', views.create_session),
-    path('get_session_info/', views.get_session_info),
+    path('get_session_info/<int:session_id>', views.get_session_info),
     path('delete_session/', views.delete_session),
     path('get_sessions/', views.get_sessions)
 ]

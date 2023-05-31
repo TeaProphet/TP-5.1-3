@@ -1,7 +1,7 @@
 from django.db import models
+from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 from rest_framework import serializers
 from onboardProject import settings
-from firebase_tools.users_tools import get_user, get_user_token
 
 
 class Session(models.Model):
@@ -13,26 +13,37 @@ class Session(models.Model):
     players = models.JSONField(default=None)
     players_max = models.IntegerField()
 
-    def save_session(self, login):
-        session_info = {
-            "owner": login,
-            "players": [login]
-        }
-        settings.database.child("sessions").child(self.session_id).update(SessionSerializer(self).data)
-        settings.database.child("sessions").child(self.session_id).update(session_info)
-        user_sessions = settings.database.child("users").child(login).child("played_sessions").get().val()
+    def save_session(self, nickname, uid):
+        self.owner = nickname
+        self.players = [self.owner]
+        settings.database.child(settings.SESSIONS_TABLE).child(self.session_id).update(SessionSerializer(self).data)
+        user_sessions = settings.database.child(settings.USERS_TABLE).child(uid).child("played_sessions").get().val()
         if user_sessions:
             user_sessions += [self.session_id]
         else:
             user_sessions = [self.session_id]
-        settings.database.child("users").child(login).child("played_sessions").set(user_sessions)
+        settings.database.child(settings.USERS_TABLE).child(uid).child('user_data').child('played_sessions')\
+            .set(user_sessions)
 
-    def add_reputation_to_players(self):
-        players_info = {}
-        for player_login in self.players:
-            players_info[player_login] = {'reputation': dict(get_user(player_login).val()).get('reputation')}
-        self.players = players_info
 
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            'Game session',
+            summary="Game session template",
+            value={
+                'idToken': '...',
+                'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
+                'date_time': "2023.06.3 12:00",
+                'name': "Кемет | ПараDice",
+                'owner': 'Андрей Морозов',
+                'players_max': 4
+            },
+            request_only=True,
+            response_only=False
+        )
+    ]
+)
 class SessionSerializer(serializers.Serializer):
     session_id = serializers.IntegerField()
     city_address = serializers.CharField(max_length=255)
@@ -44,3 +55,21 @@ class SessionSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return Session(**validated_data)
+
+
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            'Delete game session',
+            summary="Delete",
+            value={
+                'idToken': '...'
+            },
+            request_only=True,
+            response_only=False
+        )
+    ]
+)
+class SessionDeleteSerializer(serializers.Serializer):
+    session_id = serializers.IntegerField()
+    idToken = serializers.CharField(max_length=1024)
