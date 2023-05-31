@@ -13,22 +13,37 @@ class UserData(models.Model):
     vk = models.CharField(max_length=64, default=None)
     tg = models.CharField(max_length=64, default=None)
     played_sessions = models.JSONField(default=None)
+    is_admin = models.BooleanField(default=False)
+
+
+class UserDataSerializer(serializers.Serializer):
+    reputation = serializers.IntegerField(default=0)
+    age = serializers.IntegerField(default=None)
+    games = serializers.CharField(max_length=1024, default=None)
+    vk = serializers.CharField(max_length=64, default=None)
+    tg = serializers.CharField(max_length=64, default=None)
+    played_sessions = serializers.JSONField(default=None)
+    is_admin = serializers.BooleanField(default=False)
+
+    def create(self, validated_data):
+        return UserData(**validated_data)
 
 
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
-            'Update user data',
-            summary='Updates data of user',
+            'Game session',
+            summary="Game session template",
             value={
-                'vk': "vk.com/test",
-                'tg': "t.me/test",
-                'age': "256",
-                'reputation': "128",
-                'player_sessions': "[..., ...]"
+                'idToken': '...',
+                'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
+                'date_time': "2023.06.3 12:00",
+                'name': "Кемет | ПараDice",
+                'owner': 'Андрей Морозов',
+                'players_max': 4
             },
             request_only=True,
-            response_only=False
+            response_only=True
         )
     ]
 )
@@ -175,7 +190,7 @@ class ReputationRequest(models.Model):
             'Request for change reputation',
             summary="Changes users reputation if it's possible",
             value={
-                'requestedNickname': 'testrep1@yandex.ru',
+                'requestedNickname': 'testrep',
                 'idToken': '...'
             },
             request_only=True,

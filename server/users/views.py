@@ -12,6 +12,7 @@ from users import models
 
 # Expiried token: yJhbGciOiJSUzI1NiIsImtpZCI6IjJkM2E0YTllYjY0OTk0YzUxM2YyYzhlMGMwMTY1MzEzN2U5NTg3Y2EiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vb25ib2FyZGFwcC03ZjQ4ZCIsImF1ZCI6Im9uYm9hcmRhcHAtN2Y0OGQiLCJhdXRoX3RpbWUiOjE2ODU1MzQzODUsInVzZXJfaWQiOiJPVDBxRVFORVc3UXh3YzVtWEZpUnpqVDJMbDYyIiwic3ViIjoiT1QwcUVRTkVXN1F4d2M1bVhGaVJ6alQyTGw2MiIsImlhdCI6MTY4NTUzNDM4NSwiZXhwIjoxNjg1NTM3OTg1LCJlbWFpbCI6InF3ZXJ0eUB5YW5kZXgucnUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsicXdlcnR5QHlhbmRleC5ydSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.bdD3bJOsmuZYfrZuwEOiVkaIwaiQok23KByPfjnOgkHs5Wkt4RQs9yZwahJpENxGHIRHnOpIlQSzjUarqrllIBWhC9SZMJ7zuwyN7wsLZy2AJIdMgZgHliBdYIpjgYzoz8YH5tHZWZAPLVsxuJ-3U3l_iHOm-peRf-lX30pnqr0OjRc7CzLhUCqL4bXOoQ8K7OQC3oOAg3XlkobqB5sE5EdylvyDM_4GS3WHK_R5sV-lIhv5Il1oSyztaxUh_5oOxRb6_v-SlLvTLkxM34VJJ3aYmcs2DlIdwn6ODHxc4Jjdot07lT8Abz6dDjACy3h9r1xPbkxp4CF7eeXq3SQ2cg
 
+
 @extend_schema(
     request=models.RegistrationSerializer,
     responses=models.RegistrationSerializer,
@@ -38,6 +39,7 @@ def register(request):
         return JsonResponse({'error': e.args[0]})
     return JsonResponse({'idToken': auth_user.get('idToken')})
 
+
 @extend_schema(
     request=models.AuthorizationSerializer,
     responses=models.AuthorizationSerializer,
@@ -52,6 +54,7 @@ def credentials_authorize(request):
     except ValidationError:
         return JsonResponse({'error': 'INVALID_CREDENTIALS'})
     return JsonResponse({'idToken': auth_user.get('idToken')})
+
 
 @extend_schema(
     request=models.SearchedNicknameSerializer,
@@ -154,10 +157,10 @@ def extract_reputation_data(request):
 
 def __change_rep_algorithm(address_uid, requester_uid, plused):
     if plused:
-        opposite_modifier = -1
+        opposite_modifier = 1
         changing_name, opposite_name = 'plused', 'minused'
     else:
-        opposite_modifier = 1
+        opposite_modifier = -1
         changing_name, opposite_name = 'minused', 'plused'
     changes_list = settings.database.child(settings.REPUTATION_TABLE).child(address_uid).child(changing_name).get().val()
     opposite_changes_list = settings.database.child(settings.REPUTATION_TABLE).child(address_uid).child(opposite_name).get().val()
@@ -171,9 +174,9 @@ def __change_rep_algorithm(address_uid, requester_uid, plused):
     address_reputation = settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child("reputation").get().val()
     reputation = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child("reputation").get().val()
 
-    address_reputation += opposite_modifier * (math.atan(0.1) * reputation / math.pi) + 0.5
+    changes_list[requester_uid] = (math.atan(0.1) * reputation / math.pi) + 0.5
+    address_reputation += opposite_modifier * changes_list[requester_uid]
 
-    changes_list[requester_uid] = address_reputation
     if dict(opposite_changes_list).__contains__(requester_uid):
         address_reputation += opposite_modifier * opposite_changes_list[requester_uid]
         opposite_changes_list.pop(requester_uid)
