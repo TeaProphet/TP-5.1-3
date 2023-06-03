@@ -76,7 +76,7 @@ def get_profile_info(request, nickname):
     responses=models.UserDataSerializer,
     tags=["Users"],
 )
-@api_view(['PATCH'])
+@api_view(['PUT'])
 def change_profile(request, idToken):
     try:
         body_unicode = request.body.decode('utf-8')

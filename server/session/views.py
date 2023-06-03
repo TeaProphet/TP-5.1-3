@@ -48,6 +48,8 @@ def create_session(request):
 
 
 @extend_schema(
+    request=None,
+    responses=None,
     tags=['Sessions'],
     parameters=[OpenApiParameter("idToken", OpenApiTypes.STR, OpenApiParameter.QUERY, required=True)],
 )
@@ -203,7 +205,7 @@ def leave_session(request, session_id):
                 OpenApiParameter("session_id", OpenApiTypes.INT, OpenApiParameter.PATH, required=True),
                 OpenApiParameter("new_name", OpenApiTypes.STR, OpenApiParameter.PATH, required=True)]
 )
-@api_view(['PATCH'])
+@api_view(['PUT'])
 def change_name(request, session_id, new_name):
     try:
         id_token = request.GET.get('idToken')
