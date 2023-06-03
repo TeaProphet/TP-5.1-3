@@ -225,7 +225,7 @@ def change_name(request, session_id, new_name):
         'nickname').get().val()
     owner_nickname = settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('owner').get().val()
     if owner_nickname == requester_nickname or is_admin:
-        settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('name').update(new_name)
+        settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('name').set(new_name)
     else:
         return JsonResponse({'error': 'PERMISSION_DENIED'})
     return Response(status=204)

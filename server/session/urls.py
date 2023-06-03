@@ -8,5 +8,5 @@ urlpatterns = [
     path('get_sessions/', views.get_sessions),
     path('join_session/<int:session_id>', views.join_session),
     path('leave_session/<int:session_id>', views.leave_session),
-    path('change_session_name/<int:session_id>?<str:new_name>', views.change_name)
+    path('change_session_name/s_id:<int:session_id>name:<str:new_name>', views.change_name)
 ]
