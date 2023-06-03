@@ -41,9 +41,7 @@ class UserDataSerializer(serializers.Serializer):
                 'name': "Кемет | ПараDice",
                 'owner': 'Андрей Морозов',
                 'players_max': 4
-            },
-            request_only=True,
-            response_only=True
+            }
         )
     ]
 )

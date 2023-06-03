@@ -74,7 +74,7 @@ def get_profile_info(request, nickname):
 @extend_schema(
     request=models.UserDataSerializer,
     responses=models.UserDataSerializer,
-    tags=["Users"],
+    tags=["Users"]
 )
 @api_view(['PUT'])
 def change_profile(request, idToken):
