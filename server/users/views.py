@@ -1,7 +1,7 @@
 import json
 import math
 from django.http import JsonResponse
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema
 from python_jwt import _JWTError
 from requests import HTTPError
 from rest_framework.decorators import api_view
@@ -9,6 +9,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from onboardProject import settings
 from users import models
+from utils.serializing import complete_serialize
+
 
 # Expiried token: yJhbGciOiJSUzI1NiIsImtpZCI6IjJkM2E0YTllYjY0OTk0YzUxM2YyYzhlMGMwMTY1MzEzN2U5NTg3Y2EiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vb25ib2FyZGFwcC03ZjQ4ZCIsImF1ZCI6Im9uYm9hcmRhcHAtN2Y0OGQiLCJhdXRoX3RpbWUiOjE2ODU1MzQzODUsInVzZXJfaWQiOiJPVDBxRVFORVc3UXh3YzVtWEZpUnpqVDJMbDYyIiwic3ViIjoiT1QwcUVRTkVXN1F4d2M1bVhGaVJ6alQyTGw2MiIsImlhdCI6MTY4NTUzNDM4NSwiZXhwIjoxNjg1NTM3OTg1LCJlbWFpbCI6InF3ZXJ0eUB5YW5kZXgucnUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsicXdlcnR5QHlhbmRleC5ydSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.bdD3bJOsmuZYfrZuwEOiVkaIwaiQok23KByPfjnOgkHs5Wkt4RQs9yZwahJpENxGHIRHnOpIlQSzjUarqrllIBWhC9SZMJ7zuwyN7wsLZy2AJIdMgZgHliBdYIpjgYzoz8YH5tHZWZAPLVsxuJ-3U3l_iHOm-peRf-lX30pnqr0OjRc7CzLhUCqL4bXOoQ8K7OQC3oOAg3XlkobqB5sE5EdylvyDM_4GS3WHK_R5sV-lIhv5Il1oSyztaxUh_5oOxRb6_v-SlLvTLkxM34VJJ3aYmcs2DlIdwn6ODHxc4Jjdot07lT8Abz6dDjACy3h9r1xPbkxp4CF7eeXq3SQ2cg
 
@@ -53,6 +55,8 @@ def credentials_authorize(request):
         auth_user = settings.auth.sign_in_with_email_and_password(body_data['login'], body_data['password'])
     except ValidationError:
         return JsonResponse({'error': 'INVALID_CREDENTIALS'})
+    except HTTPError as exception:
+        return JsonResponse({'error': extract_http_error_message(exception.args[1])})
     return JsonResponse({'idToken': auth_user.get('idToken')})
 
 
@@ -184,19 +188,6 @@ def __change_rep_algorithm(address_uid, requester_uid, plused):
     settings.database.child(settings.REPUTATION_TABLE).child(address_uid).child(changing_name).set(changes_list)
     settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child('reputation').set(address_reputation)
     return address_reputation
-
-
-def remove_null_fields(data: dict):
-    for key, val in data.items():
-        if not val:
-            data.pop(key)
-
-
-def complete_serialize(used_data: dict, serializer):
-    serializing_object = serializer(data=used_data)
-    if not serializing_object.is_valid():
-        raise ValidationError
-    return serializing_object.save()
 
 
 def extract_http_error_message(exception_text):

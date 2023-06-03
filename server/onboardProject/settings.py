@@ -10,17 +10,20 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import json
+import os
 from pathlib import Path
 import firebase
+from dotenv import load_dotenv, find_dotenv
 
 config = json.load(open('onboardProject/onboard_config.json'))
 app = firebase.initialize_app(config)
 auth = app.auth()
 database = app.database()
 
-USERS_TABLE = 'users_test'
-SESSIONS_TABLE = 'sessions_table'
-REPUTATION_TABLE = 'reputation_data'
+load_dotenv(find_dotenv())
+USERS_TABLE = "users"
+SESSIONS_TABLE = "sessions"
+REPUTATION_TABLE = "reputation_data"
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -36,7 +39,7 @@ SECRET_KEY = 'django-insecure-oq7!-%pm4-oz7lm&hq86^37tq3iuz3)4@p_e#+e#y8om_hvh32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

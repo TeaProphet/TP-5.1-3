@@ -6,10 +6,10 @@ from onboardProject import settings
 
 class Session(models.Model):
     session_id = models.IntegerField()
-    city_address = models.CharField(max_length=255)
-    date_time = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    owner = models.CharField(max_length=255)
+    city_address = models.CharField(max_length=256)
+    date_time = models.DateTimeField(format("%Y-%m-%d %H:%M"))
+    name = models.CharField(max_length=256)
+    owner = models.CharField(max_length=256)
     players = models.JSONField(default=None)
     players_max = models.IntegerField()
 
@@ -29,10 +29,10 @@ class Session(models.Model):
 
 class SessionSerializer(serializers.Serializer):
     session_id = serializers.IntegerField()
-    city_address = serializers.CharField(max_length=255)
-    date_time = serializers.CharField(max_length=255)
-    name = serializers.CharField(max_length=255)
-    owner = serializers.CharField(max_length=255)
+    city_address = serializers.CharField(max_length=256)
+    date_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    name = serializers.CharField(max_length=256)
+    owner = serializers.CharField(max_length=256)
     players = serializers.JSONField(default=None)
     players_max = serializers.IntegerField()
 
@@ -58,9 +58,9 @@ class SessionSerializer(serializers.Serializer):
 )
 class SessionRegistrationSerializer(serializers.Serializer):
     session_id = serializers.IntegerField()
-    city_address = serializers.CharField(max_length=255)
-    date_time = serializers.CharField(max_length=255)
-    name = serializers.CharField(max_length=255)
+    city_address = serializers.CharField(max_length=256)
+    date_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    name = serializers.CharField(max_length=256)
     players_max = serializers.IntegerField()
 
     def create(self, validated_data):
@@ -68,32 +68,15 @@ class SessionRegistrationSerializer(serializers.Serializer):
 
 
 class SessionPublicInfoSerializer(serializers.Serializer):
-    city_address = serializers.CharField(max_length=255)
-    date_time = serializers.CharField(max_length=255)
-    name = serializers.CharField(max_length=255)
+    city_address = serializers.CharField(max_length=256)
+    date_time = serializers.CharField(max_length=256)
+    name = serializers.CharField(max_length=256)
     players = serializers.JSONField()
     players_max = serializers.IntegerField()
 
     def create(self, validated_data):
         return Session(**validated_data)
 
-
-@extend_schema_serializer(
-    examples=[
-        OpenApiExample(
-            'Delete game session',
-            summary="Delete",
-            value={
-                'idToken': '...'
-            },
-            request_only=True,
-            response_only=False
-        )
-    ]
-)
-class SessionDeleteSerializer(serializers.Serializer):
-    session_id = serializers.IntegerField()
-    idToken = serializers.CharField(max_length=1024)
 
 
 @extend_schema_serializer(

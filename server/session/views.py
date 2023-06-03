@@ -8,10 +8,12 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from onboardProject import settings
 from session import models
+from utils.serializing import complete_serialize
 
 
 @extend_schema(
     request=models.SessionRegistrationSerializer,
+    responses=None,
     tags=['Sessions']
 )
 @api_view(['POST'])
@@ -46,8 +48,6 @@ def create_session(request):
 
 
 @extend_schema(
-    request=models.SessionDeleteSerializer,
-    responses=models.SessionDeleteSerializer,
     tags=['Sessions'],
     parameters=[OpenApiParameter("idToken", OpenApiTypes.STR, OpenApiParameter.QUERY, required=True)],
 )
@@ -83,9 +83,10 @@ def delete_session(request, session_id):
 
 @extend_schema(
     responses=models.SessionRegistrationSerializer,
+    request=None,
     tags=['Sessions']
 )
-@api_view(['POST'])
+@api_view(['GET'])
 def get_session_info(request, session_id):
     try:
         session_info = settings.database.child(settings.SESSIONS_TABLE).child(session_id).get().val()
@@ -105,9 +106,10 @@ def get_session_info(request, session_id):
 
 @extend_schema(
     responses=models.SessionsListSerializer,
+    request=None,
     tags=['Sessions']
 )
-@api_view(['POST'])
+@api_view(['GET'])
 def get_sessions(request):
     raw_sessions_info = settings.database.child(settings.SESSIONS_TABLE).get().val()
     sessions_info = {}
@@ -116,3 +118,115 @@ def get_sessions(request):
         serialized_raw.is_valid()
         sessions_info[i] = serialized_raw.validated_data
     return JsonResponse(sessions_info)
+
+
+@extend_schema(
+    request=None,
+    responses=None,
+    tags=['Sessions'],
+    parameters=[OpenApiParameter("idToken", OpenApiTypes.STR, OpenApiParameter.QUERY, required=True),
+                OpenApiParameter("session_id", OpenApiTypes.INT, OpenApiParameter.PATH, required=True)]
+)
+@api_view(['POST'])
+def join_session(request, session_id):
+    try:
+        id_token = request.GET.get('idToken')
+        decoded_token = settings.auth.verify_id_token(id_token)
+        requester_uid = decoded_token['user_id']
+        session_info = settings.database.child(settings.SESSIONS_TABLE).child(session_id).get().val()
+        if not session_info:
+            raise ValidationError
+    except _JWTError as token_error:
+        if token_error.args[0] == 'invalid JWT format':
+            return JsonResponse({'error': 'INVALID_TOKEN'})
+        else:
+            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+    except ValidationError:
+        return JsonResponse({'error': 'INVALID_DATA'})
+
+    played_sessions = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').get().val()
+    if played_sessions and played_sessions.__contains__(session_id):
+        return JsonResponse({'error': 'ALREADY_JOINED'})
+    elif played_sessions:
+        played_sessions += session_id
+    else:
+        played_sessions = [session_id]
+    settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').set(played_sessions)
+    session_players = settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('players').get().val()
+    nickname = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('nickname').get().val()
+    session_players.append(nickname)
+    settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('players').set(session_players)
+    return Response(status=204)
+
+
+@extend_schema(
+    request=None,
+    responses=None,
+    tags=['Sessions'],
+    parameters=[OpenApiParameter("idToken", OpenApiTypes.STR, OpenApiParameter.QUERY, required=True),
+                OpenApiParameter("session_id", OpenApiTypes.INT, OpenApiParameter.PATH, required=True)]
+)
+@api_view(['POST'])
+def leave_session(request, session_id):
+    try:
+        id_token = request.GET.get('idToken')
+        decoded_token = settings.auth.verify_id_token(id_token)
+        requester_uid = decoded_token['user_id']
+        session_info = settings.database.child(settings.SESSIONS_TABLE).child(session_id).get().val()
+        if not session_info:
+            raise ValidationError
+    except _JWTError as token_error:
+        if token_error.args[0] == 'invalid JWT format':
+            return JsonResponse({'error': 'INVALID_TOKEN'})
+        else:
+            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+    except ValidationError:
+        return JsonResponse({'error': 'INVALID_DATA'})
+
+    played_sessions = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').get().val()
+    if not played_sessions or not played_sessions.__contains__(session_id):
+        return JsonResponse({'error': 'INVALID_DATA'})
+    played_sessions = list(played_sessions).remove(session_id)
+    settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').set(played_sessions)
+    session_players = settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('players').get().val()
+    nickname = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('nickname').get().val()
+    session_players.remove(nickname)
+    settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('players').set(session_players)
+    return Response(status=204)
+
+
+@extend_schema(
+    request=None,
+    responses=None,
+    tags=['Sessions'],
+    parameters=[OpenApiParameter("idToken", OpenApiTypes.STR, OpenApiParameter.QUERY, required=True),
+                OpenApiParameter("session_id", OpenApiTypes.INT, OpenApiParameter.PATH, required=True),
+                OpenApiParameter("new_name", OpenApiTypes.STR, OpenApiParameter.PATH, required=True)]
+)
+@api_view(['PATCH'])
+def change_name(request, session_id, new_name):
+    try:
+        id_token = request.GET.get('idToken')
+        decoded_token = settings.auth.verify_id_token(id_token)
+        requester_uid = decoded_token['user_id']
+        session_info = settings.database.child(settings.SESSIONS_TABLE).child(session_id).get().val()
+        if not session_info:
+            raise ValidationError
+    except _JWTError as token_error:
+        if token_error.args[0] == 'invalid JWT format':
+            return JsonResponse({'error': 'INVALID_TOKEN'})
+        else:
+            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+    except ValidationError:
+        return JsonResponse({'error': 'INVALID_DATA'})
+    is_admin = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child(
+        'is_admin').get().val()
+    requester_nickname = settings.database.child(settings.USERS_TABLE).child(requester_uid).child(
+        'nickname').get().val()
+    owner_nickname = settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('owner').get().val()
+    if owner_nickname == requester_nickname or is_admin:
+        settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('name').update(new_name)
+    else:
+        return JsonResponse({'error': 'PERMISSION_DENIED'})
+    return Response(status=204)
+

@@ -126,6 +126,7 @@ class RegistrationSerializer(serializers.Serializer):
 
 
 @extend_schema_serializer(
+    component_name='auth',
     examples=[
         OpenApiExample(
             'Auth data',
