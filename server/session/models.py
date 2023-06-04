@@ -7,7 +7,7 @@ from onboardProject import settings
 class Session(models.Model):
     session_id = models.IntegerField()
     city_address = models.CharField(max_length=256)
-    date_time = models.DateTimeField(format("%Y-%m-%d %H:%M"))
+    date_time = models.DateTimeField()
     name = models.CharField(max_length=256)
     owner = models.CharField(max_length=256)
     players = models.JSONField(default=None)
@@ -48,7 +48,7 @@ class SessionSerializer(serializers.Serializer):
             value={
                 'idToken': '...',
                 'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
-                'date_time': "2023.06.3 12:00",
+                'date_time': "2023-06-03 12:00",
                 'name': "Кемет | ПараDice",
                 'players_max': 4
             },
