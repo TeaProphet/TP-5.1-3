@@ -1,5 +1,5 @@
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from python_jwt import _JWTError
@@ -66,21 +66,23 @@ def delete_session(request, session_id):
     requester_nickname = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('nickname').get().val()
     owner_nickname = settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('owner').get().val()
     if owner_nickname == requester_nickname or is_admin:
-        sessions_list = settings.database.child(settings.SESSIONS_TABLE).get().val()
-        sessions_list.pop(session_id)
-        settings.database.child(settings.SESSIONS_TABLE).set(sessions_list)
-        played_sessions = settings.database.child(settings.USERS_TABLE).child(requester_uid)\
-            .child('user_data').child('played_sessions').get().val()
-        played_sessions.sort()
-        id_in_played = played_sessions.index(session_id)
-        for id in range(id_in_played+1, len(played_sessions)):
-            played_sessions[id] -= 1
-        played_sessions.pop(id_in_played)
-        settings.database.child(settings.USERS_TABLE).child(requester_uid) \
-            .child('user_data').child('played_sessions').set(played_sessions)
+        delete_session_algorythm(requester_uid, session_id)
     else:
         return JsonResponse({'error': 'PERMISSION_DENIED'})
     return Response(status=204)
+
+
+def delete_session_algorythm(requester_uid, session_id):
+    session_info = settings.database.child(settings.SESSIONS_TABLE).child(session_id).get().val()
+    settings.database.child(settings.SESSIONS_TABLE).child(session_id).remove()
+    players_list = session_info.get('players')
+    for nickname in players_list:
+        player_uid = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(nickname).get().val().popitem()[0]
+        played_sessions = settings.database.child(settings.USERS_TABLE).child(player_uid).child('user_data').child('played_sessions').get().val()
+        id_in_played = played_sessions.index(session_id)
+        played_sessions.pop(id_in_played)
+        settings.database.child(settings.USERS_TABLE).child(player_uid) \
+            .child('user_data').child('played_sessions').set(played_sessions)
 
 
 @extend_schema(
@@ -156,11 +158,14 @@ def join_session(request, session_id):
         played_sessions.append(session_id)
     else:
         played_sessions = [session_id]
+    session_info = dict(session_info)
+    session_players = session_info.get('players')
+    if session_info.get('players_max') == len(session_players):
+        return JsonResponse({'error': 'ALREADY_FULL'})
     settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').set(played_sessions)
-    session_players = settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('players').get().val()
     nickname = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('nickname').get().val()
     session_players.append(nickname)
-    settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('players').set(session_players)
+    settings.database.child(settings.SESSIONS_TABLE).child(session_id).set(session_info)
     return Response(status=204)
 
 
@@ -188,15 +193,19 @@ def leave_session(request, session_id):
     except ValidationError:
         return JsonResponse({'error': 'INVALID_DATA'})
 
-    played_sessions = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').get().val()
-    if not played_sessions or not played_sessions.__contains__(session_id):
-        return JsonResponse({'error': 'INVALID_DATA'})
-    played_sessions.remove(session_id)
-    settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').set(played_sessions)
-    session_players = settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('players').get().val()
+    session_info = dict(session_info)
+    session_players = session_info.get('players')
     nickname = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('nickname').get().val()
-    session_players.remove(nickname)
-    settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('players').set(session_players)
+    if session_info.get('owner') == nickname:
+        delete_session_algorythm(requester_uid, session_id)
+    else:
+        played_sessions = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').get().val()
+        if not played_sessions or not played_sessions.__contains__(session_id):
+            return JsonResponse({'error': 'INVALID_DATA'})
+        played_sessions.remove(session_id)
+        settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').set(played_sessions)
+        session_players.remove(nickname)
+        settings.database.child(settings.SESSIONS_TABLE).child(session_id).set(session_info)
     return Response(status=204)
 
 
