@@ -32,7 +32,7 @@ def register(request):
         auth_user = settings.auth.create_user_with_email_and_password(credentials.login, credentials.password)
     except HTTPError as exception:
         return JsonResponse({'error': extract_http_error_message(exception.args[1])})
-    user = models.User(uid=auth_user.get('localId'), login=credentials.nickname, user_data=models.UserData(),
+    user = models.User(uid=auth_user.get('localId'), login=credentials.login, user_data=models.UserData(),
                        nickname=credentials.nickname)
     try:
         user.save_data()
