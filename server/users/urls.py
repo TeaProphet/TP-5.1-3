@@ -8,4 +8,6 @@ urlpatterns = [
     path('change_profile/<str:idToken>', views.change_profile),
     path('plus_reputation/', views.plus_reputation),
     path('minus_reputation/', views.minus_reputation),
+    path('ban/', views.ban),
+    path('unban/', views.unban),
 ]

@@ -100,14 +100,14 @@ def change_profile(request, idToken):
 
 
 @extend_schema(
-    request=models.ReputationRequestSerializer,
-    responses=models.ReputationRequestSerializer,
+    request=models.AccessToProfileRequestSerializer,
+    responses=models.AccessToProfileRequestSerializer,
     tags=["Users"],
 )
 @api_view(['POST'])
 def plus_reputation(request):
     try:
-        address_uid, requester_uid = extract_reputation_data(request)
+        address_uid, requester_uid = extract_access_data(request)
     except _JWTError as token_error:
         if token_error.args[0] == 'invalid JWT format':
             return JsonResponse({'error': 'INVALID_TOKEN'})
@@ -123,14 +123,14 @@ def plus_reputation(request):
 
 
 @extend_schema(
-    request=models.ReputationRequestSerializer,
-    responses=models.ReputationRequestSerializer,
+    request=models.AccessToProfileRequestSerializer,
+    responses=models.AccessToProfileRequestSerializer,
     tags=["Users"],
 )
 @api_view(['POST'])
 def minus_reputation(request):
     try:
-        address_uid, requester_uid = extract_reputation_data(request)
+        address_uid, requester_uid = extract_access_data(request)
     except _JWTError as token_error:
         if token_error.args[0] == 'invalid JWT format':
             return JsonResponse({'error': 'INVALID_TOKEN'})
@@ -145,10 +145,68 @@ def minus_reputation(request):
     return JsonResponse({'new_reputation': new_reputation})
 
 
-def extract_reputation_data(request):
+@extend_schema(
+    request=models.AccessToProfileRequestSerializer,
+    responses=models.AccessToProfileRequestSerializer,
+    tags=["Users"],
+)
+@api_view(['POST'])
+def ban(request):
+    try:
+        address_uid, requester_uid = extract_access_data(request)
+    except _JWTError as token_error:
+        if token_error.args[0] == 'invalid JWT format':
+            return JsonResponse({'error': 'INVALID_TOKEN'})
+        else:
+            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+    if requester_uid == address_uid:
+        return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'})
+    is_admin = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child(
+        'is_admin').get().val()
+    if not is_admin:
+        return JsonResponse({'error': 'ACCESS_DENIED'})
+    is_banned = settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child(
+        'is_banned').get().val()
+    if is_banned:
+        return JsonResponse({'error': 'ALREADY_BANNED'})
+    else:
+        settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child('is_banned').set(True)
+    return Response(status=204)
+
+
+@extend_schema(
+    request=models.AccessToProfileRequestSerializer,
+    responses=models.AccessToProfileRequestSerializer,
+    tags=["Users"],
+)
+@api_view(['POST'])
+def unban(request):
+    try:
+        address_uid, requester_uid = extract_access_data(request)
+    except _JWTError as token_error:
+        if token_error.args[0] == 'invalid JWT format':
+            return JsonResponse({'error': 'INVALID_TOKEN'})
+        else:
+            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+    if requester_uid == address_uid:
+        return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'})
+    is_admin = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child(
+        'is_admin').get().val()
+    if not is_admin:
+        return JsonResponse({'error': 'ACCESS_DENIED'})
+    is_banned = settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child(
+        'is_banned').get().val()
+    if not is_banned:
+        return JsonResponse({'error': 'ALREADY_UNBANNED'})
+    else:
+        settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child('is_banned').set(False)
+    return Response(status=204)
+
+
+def extract_access_data(request):
     body_unicode = request.body.decode('utf-8')
     body_data = json.loads(body_unicode)
-    rep_request = complete_serialize(body_data, models.ReputationRequestSerializer)
+    rep_request = complete_serialize(body_data, models.AccessToProfileRequestSerializer)
 
     address_user = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(
         rep_request.requestedNickname).get()

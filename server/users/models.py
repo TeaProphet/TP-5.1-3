@@ -13,7 +13,8 @@ class UserData(models.Model):
     vk = models.CharField(max_length=64, default=None)
     tg = models.CharField(max_length=64, default=None)
     played_sessions = models.JSONField(default=None)
-    is_admin = models.BooleanField(default=None)
+    is_admin = models.BooleanField(default=False)
+    is_banned = models.BooleanField(default=False)
 
 
 class UserDataSerializer(serializers.Serializer):
@@ -23,6 +24,8 @@ class UserDataSerializer(serializers.Serializer):
     vk = serializers.CharField(max_length=64, default=None)
     tg = serializers.CharField(max_length=64, default=None)
     played_sessions = serializers.JSONField(default=None)
+    is_admin = serializers.BooleanField(default=False)
+    is_banned = serializers.BooleanField(default=False)
 
     def create(self, validated_data):
         return UserData(**validated_data)
@@ -181,15 +184,15 @@ class SearchedNicknameSerializer(serializers.Serializer):
     nickname = serializers.CharField(max_length=64, validators=[MinLengthValidator(3)], default=None)
 
 
-class ReputationRequest(models.Model):
+class AccessToProfileRequest(models.Model):
     requestedNickname = models.CharField(max_length=64)
     idToken = models.CharField(max_length=1024)
 
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
-            'Request for change reputation',
-            summary="Changes users reputation if it's possible",
+            'Request for access to change profile info (reputation/ban/unban)',
+            summary="Access request",
             value={
                 'requestedNickname': 'testrep',
                 'idToken': '...'
@@ -199,9 +202,9 @@ class ReputationRequest(models.Model):
         )
     ]
 )
-class ReputationRequestSerializer(serializers.Serializer):
+class AccessToProfileRequestSerializer(serializers.Serializer):
     requestedNickname = serializers.CharField(max_length=64)
     idToken = serializers.CharField(max_length=1024)
 
     def create(self, validated_data):
-        return ReputationRequest(**validated_data)
+        return AccessToProfileRequest(**validated_data)
