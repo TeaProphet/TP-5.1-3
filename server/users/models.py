@@ -47,7 +47,7 @@ class ChangingUserData(models.Model):
                 'age': 20,
                 'games': 'DnD5, Битвы героев',
                 'vk': 'vk.com/id',
-                'tg': 't.me/link'
+                'tg': 't.me/link',
             }
         )
     ]
@@ -173,7 +173,9 @@ class AuthorizationSerializer(serializers.Serializer):
                 'tg': "t.me/test",
                 'age': "256",
                 'reputation': "128",
-                'player_sessions': "[..., ...]"
+                'player_sessions': "[..., ...]",
+                'is_admin': 'false',
+                'is_banned': 'false'
             },
             request_only=False,
             response_only=True
