@@ -114,11 +114,14 @@ def get_session_info(request, session_id):
 @api_view(['GET'])
 def get_sessions(request):
     raw_sessions_info = settings.database.child(settings.SESSIONS_TABLE).get().val()
-    sessions_info = {}
-    for i in range(len(raw_sessions_info)):
-        serialized_raw = models.SessionPublicInfoSerializer(data=raw_sessions_info[i])
-        serialized_raw.is_valid()
-        sessions_info[i] = serialized_raw.validated_data
+    if raw_sessions_info:
+        sessions_info = {}
+        for i in range(len(raw_sessions_info)):
+            serialized_raw = models.SessionPublicInfoSerializer(data=raw_sessions_info[i])
+            serialized_raw.is_valid()
+            sessions_info[i] = serialized_raw.validated_data
+    else:
+        raw_sessions_info = {}
     return JsonResponse(sessions_info)
 
 
