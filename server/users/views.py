@@ -67,13 +67,14 @@ def credentials_authorize(request):
 )
 @api_view(['GET'])
 def get_profile_info(request, nickname):
-    user_data = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(nickname).get()
+    user = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(nickname).get().val()
+    user_data = user.popitem()[1].get('user_data')
     return JsonResponse(models.UserDataSerializer(user_data).data)
 
 
 @extend_schema(
-    request=models.UserDataSerializer,
-    responses=models.UserDataSerializer,
+    request=models.ChangingUserDataSerializer,
+    responses=None,
     tags=["Users"]
 )
 @api_view(['PUT'])
@@ -81,7 +82,7 @@ def change_profile(request, idToken):
     try:
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
-        user_data = models.UserDataSerializer(data=body_data)
+        user_data = models.ChangingUserDataSerializer(data=body_data)
         if not user_data.is_valid():
             raise ValidationError
         user_data = user_data.save()
@@ -94,8 +95,7 @@ def change_profile(request, idToken):
             return JsonResponse({'error': 'INVALID_TOKEN'})
         else:
             return JsonResponse({'error': 'EXPIRED_TOKEN'})
-    print(models.UserDataSerializer(user_data).data)
-    settings.database.child(settings.USERS_TABLE).child(uid).child('user_data').update(dict(models.UserDataSerializer(user_data).data))
+    settings.database.child(settings.USERS_TABLE).child(uid).child('user_data').update(dict(models.ChangingUserDataSerializer(user_data).data))
     return Response(status=204)
 
 

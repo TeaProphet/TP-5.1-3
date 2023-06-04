@@ -13,7 +13,7 @@ class UserData(models.Model):
     vk = models.CharField(max_length=64, default=None)
     tg = models.CharField(max_length=64, default=None)
     played_sessions = models.JSONField(default=None)
-    is_admin = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=None)
 
 
 class UserDataSerializer(serializers.Serializer):
@@ -23,38 +23,40 @@ class UserDataSerializer(serializers.Serializer):
     vk = serializers.CharField(max_length=64, default=None)
     tg = serializers.CharField(max_length=64, default=None)
     played_sessions = serializers.JSONField(default=None)
-    is_admin = serializers.BooleanField(default=False)
 
     def create(self, validated_data):
         return UserData(**validated_data)
+
+
+class ChangingUserData(models.Model):
+    age = models.IntegerField(default=None)
+    games = models.TextField(max_length=1024, default=None)
+    vk = models.CharField(max_length=64, default=None)
+    tg = models.CharField(max_length=64, default=None)
 
 
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
-            'Game session',
-            summary="Game session template",
+            'Profile info',
+            summary="Profile info template",
             value={
-                'idToken': '...',
-                'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
-                'date_time': "2023.06.3 12:00",
-                'name': "Кемет | ПараDice",
-                'owner': 'Андрей Морозов',
-                'players_max': 4
+                'age': 20,
+                'games': 'DnD5, Битвы героев',
+                'vk': 'vk.com/id',
+                'tg': 't.me/link'
             }
         )
     ]
 )
-class UserDataSerializer(serializers.Serializer):
-    reputation = serializers.IntegerField(default=0)
+class ChangingUserDataSerializer(serializers.Serializer):
     age = serializers.IntegerField(default=None)
     games = serializers.CharField(max_length=1024, default=None)
     vk = serializers.CharField(max_length=64, default=None)
     tg = serializers.CharField(max_length=64, default=None)
-    played_sessions = serializers.JSONField(default=None)
 
     def create(self, validated_data):
-        return UserData(**validated_data)
+        return ChangingUserData(**validated_data)
 
 
 class User(models.Model):
