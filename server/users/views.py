@@ -67,8 +67,10 @@ def credentials_authorize(request):
 )
 @api_view(['GET'])
 def get_profile_info(request, nickname):
-    user = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(nickname).get().val()
-    user_data = user.popitem()[1].get('user_data')
+    user = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(nickname).get()
+    if len(user.each()) == 0:
+        return JsonResponse({'error': 'INVALID_DATA'})
+    user_data = user.val().popitem()[1].get('user_data')
     return JsonResponse(models.UserDataSerializer(user_data).data)
 
 
