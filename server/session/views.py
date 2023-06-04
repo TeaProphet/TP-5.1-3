@@ -121,7 +121,7 @@ def get_sessions(request):
             serialized_raw.is_valid()
             sessions_info[i] = serialized_raw.validated_data
     else:
-        raw_sessions_info = {}
+        sessions_info = {}
     return JsonResponse(sessions_info)
 
 
