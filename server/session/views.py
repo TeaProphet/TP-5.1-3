@@ -153,7 +153,7 @@ def join_session(request, session_id):
     if played_sessions and played_sessions.__contains__(session_id):
         return JsonResponse({'error': 'ALREADY_JOINED'})
     elif played_sessions:
-        played_sessions += session_id
+        played_sessions.append(session_id)
     else:
         played_sessions = [session_id]
     settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').set(played_sessions)
@@ -191,7 +191,7 @@ def leave_session(request, session_id):
     played_sessions = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').get().val()
     if not played_sessions or not played_sessions.__contains__(session_id):
         return JsonResponse({'error': 'INVALID_DATA'})
-    played_sessions = list(played_sessions).remove(session_id)
+    played_sessions.remove(session_id)
     settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').set(played_sessions)
     session_players = settings.database.child(settings.SESSIONS_TABLE).child(session_id).child('players').get().val()
     nickname = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('nickname').get().val()

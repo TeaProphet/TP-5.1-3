@@ -64,7 +64,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Onboard'
+    'TITLE': 'Onboard',
+    'AUTHENTICATION_WHITELIST': []
 }
 
 MIDDLEWARE = [

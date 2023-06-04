@@ -28,7 +28,6 @@ class Session(models.Model):
 
 
 class SessionSerializer(serializers.Serializer):
-    session_id = serializers.IntegerField()
     city_address = serializers.CharField(max_length=256)
     date_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
     name = serializers.CharField(max_length=256)
