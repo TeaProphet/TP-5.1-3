@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.auth.service.AuthService
+import vsu.tp53.onboardapplication.auth.service.Errors
 import vsu.tp53.onboardapplication.databinding.SignInBinding
 import vsu.tp53.onboardapplication.model.domain.User
 
@@ -36,21 +37,45 @@ class SignInFragment : Fragment() {
         Log.i("messageSignIn", "SignIn!")
         binding.signInButton.setOnClickListener {
             lifecycleScope.launch {
-                authUser()
-                it.findNavController().navigate(R.id.profileFragment)
+                try {
+                    if (authUser())
+                        it.findNavController().navigate(R.id.profileFragment)
+                } catch (_: Exception) {
+
+                }
             }
         }
 
         return binding.root
     }
 
-    private suspend fun authUser() {
+    private suspend fun authUser(): Boolean {
         val login = binding.loginSignIn.text.toString()
         val password = binding.passwordSignIn.text.toString()
         Log.i("signIn-login", login)
         Log.i("signIn-password", password)
 
-        authService.authorizeUser(User(null, "", login, password))
+        try {
+            val resp = authService.authorizeUser(User(null, "", login, password))
+            return if (resp.error != null) {
+                Log.w("SignIn-Frag", resp.error.toString())
+                if (Errors.getByName(resp.error.toString()) != "") {
+                    binding.signInError.text = Errors.getByName(resp.error.toString())
+                } else {
+                    binding.signInError.text = "Произошла ошибка"
+                }
+                false
+            } else {
+                true
+            }
+        } catch (e: Exception) {
+            Log.e("SignIn-Frag-ex", e.message.toString())
+            if (Errors.getByName(e.message.toString()) != "") {
+                binding.signInError.text = Errors.getByName(e.message.toString())
+            } else {
+                binding.signInError.text = "Произошла ошибка"
+            }
+            return false
+        }
     }
-
 }

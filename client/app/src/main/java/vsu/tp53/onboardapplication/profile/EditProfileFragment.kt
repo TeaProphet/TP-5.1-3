@@ -1,15 +1,20 @@
 package vsu.tp53.onboardapplication.profile
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
+import android.content.Intent
+import android.content.res.AssetManager
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.text.InputFilter
 import android.text.Spanned
 import android.util.Log
@@ -19,6 +24,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -75,10 +81,25 @@ class EditProfileFragment : Fragment() {
             it.findNavController().navigate(R.id.homeFragment)
         }
 
+        binding.chooseAvatarButton.setOnClickListener {
+//            val assetManager: AssetManager = requireActivity().assets
+//            val fileList: Array<String> = assetManager.list("/avatars") ?: arrayOf()
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                type = "image/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_LOCAL_ONLY, true)
+                putExtra(
+                    DocumentsContract.EXTRA_INITIAL_URI,
+                    Uri.parse("content://com.android.externalstorage.documents/tree/assets/avatars")
+                )
+            }
+            startActivityForResult(intent, 1)
+        }
+
         return binding.root
     }
 
-    private suspend fun init(){
+    private suspend fun init() {
         val profileInfo = profileService.getProfileInfo()
         if (profileInfo != null) {
             Log.i("ProfileFragment", "Init profile")
@@ -104,11 +125,15 @@ class EditProfileFragment : Fragment() {
             dialog.show()
         }
         val changeProfileEntity = ChangeProfile(
-            binding.ageInput.text.toString().toInt(),
+            0,
             binding.editFavGames.text.toString(),
             binding.userVk.text.toString(),
             binding.userTg.text.toString()
         )
+        if (binding.ageInput.text.toString() != "") {
+            changeProfileEntity.age = binding.ageInput.text.toString().toInt()
+        }
+
         Log.i("EditProfFragment", binding.ageInput.text.toString() + " age")
 
         lifecycleScope.launch {
@@ -121,6 +146,16 @@ class EditProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val imageview = binding.profileImage
         imageview.setImageResource(R.drawable.profile_kitten)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            val uri = data?.data
+            val fileName = uri?.lastPathSegment
+            Toast.makeText(requireContext(), "Выбран файл $fileName", Toast.LENGTH_SHORT).show()
+        }
     }
 
     // extension function to filter edit text number range

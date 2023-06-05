@@ -13,6 +13,7 @@ object UserTokenContract {
         const val COLUMN_LOGIN = "login"
         const val COLUMN_TOKEN = "token"
         const val COLUMN_EXPIRE = "expire"
+        const val COLUMN_AVATAR = "avatar"
     }
 }
 
@@ -21,7 +22,8 @@ private const val SQL_CREATE_ENTRIES =
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${UserTokenContract.UserTokenEntry.COLUMN_NICKNAME} TEXT UNIQUE," +
             "${UserTokenContract.UserTokenEntry.COLUMN_LOGIN} TEXT UNIQUE," +
-            "${UserTokenContract.UserTokenEntry.COLUMN_TOKEN} TEXT)"
+            "${UserTokenContract.UserTokenEntry.COLUMN_TOKEN} TEXT," +
+            "${UserTokenContract.UserTokenEntry.COLUMN_AVATAR} TEXT)"
 
 private const val SQL_DELETE_TABLE =
     "DROP TABLE IF EXISTS ${UserTokenContract.UserTokenEntry.TABLE_NAME}"
