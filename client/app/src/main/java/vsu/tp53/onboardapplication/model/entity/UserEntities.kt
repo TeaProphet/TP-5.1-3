@@ -6,19 +6,23 @@ import vsu.tp53.onboardapplication.model.domain.Token
 import vsu.tp53.onboardapplication.model.domain.User
 
 @Serializable
-data class UserRegAuthorize(
+data class UserRegisterResponse(
     @JsonProperty("error")
     var error: String? = null,
+    @JsonProperty("nickname")
+    var nickname: String = "",
     @JsonProperty("login")
     var login: String = "",
     @JsonProperty("password")
     var password: String = ""
 ) {
-    fun mapToDomain() = User(login, password)
+    fun mapToDomain() = User(error, nickname, login, password)
 }
 
 @Serializable
-data class UserRegAuthorizePost(
+data class UserRegisterPost(
+    @JsonProperty("nickname")
+    var nickname: String = "",
     @JsonProperty("login")
     var login: String = "",
     @JsonProperty("password")
@@ -26,13 +30,21 @@ data class UserRegAuthorizePost(
 )
 
 @Serializable
-data class UserToken(
+data class UserAuthorize(
+    @JsonProperty("login")
+    var login: String = "",
+    @JsonProperty("password")
+    var password: String = ""
+)
+
+@Serializable
+data class UserTokenResponse(
     @JsonProperty("error")
     var error: String? = null,
     @JsonProperty("idToken")
     var idToken: String = ""
 ) {
-    fun mapToDomain() = Token(idToken)
+    fun mapToDomain() = Token(error, idToken)
 }
 
 @Serializable

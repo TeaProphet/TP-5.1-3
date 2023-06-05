@@ -9,6 +9,7 @@ import android.util.Log
 object UserTokenContract {
     object UserTokenEntry : BaseColumns {
         const val TABLE_NAME = "user_token"
+        const val COLUMN_NICKNAME = "nickname"
         const val COLUMN_LOGIN = "login"
         const val COLUMN_TOKEN = "token"
         const val COLUMN_EXPIRE = "expire"
@@ -18,6 +19,7 @@ object UserTokenContract {
 private const val SQL_CREATE_ENTRIES =
     "CREATE TABLE IF  NOT EXISTS ${UserTokenContract.UserTokenEntry.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
+            "${UserTokenContract.UserTokenEntry.COLUMN_NICKNAME} TEXT UNIQUE," +
             "${UserTokenContract.UserTokenEntry.COLUMN_LOGIN} TEXT UNIQUE," +
             "${UserTokenContract.UserTokenEntry.COLUMN_TOKEN} TEXT)"
 
@@ -43,7 +45,7 @@ class UserTokenDbHelper(context: Context) :
     }
 
     companion object {
-        const val DATABASE_VERSION = 5
+        const val DATABASE_VERSION = 7
         const val DATABASE_NAME = "UserToken.db"
     }
 }
