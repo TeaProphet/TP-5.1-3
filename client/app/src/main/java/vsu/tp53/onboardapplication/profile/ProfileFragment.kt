@@ -1,20 +1,34 @@
 package vsu.tp53.onboardapplication.profile
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
+import vsu.tp53.onboardapplication.MainActivity
 import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.auth.service.AuthService
+import vsu.tp53.onboardapplication.auth.service.Errors
 import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentProfileBinding
+import vsu.tp53.onboardapplication.model.domain.UserLogInInfo
 import vsu.tp53.onboardapplication.model.entity.ChangeReputationEntity
+import vsu.tp53.onboardapplication.model.entity.ProfileBanEntity
+import vsu.tp53.onboardapplication.model.entity.ProfileInfoEntity
 
 class ProfileFragment : Fragment() {
 
@@ -36,57 +50,89 @@ class ProfileFragment : Fragment() {
         }
 
         if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()) {
-            this.findNavController().navigate(R.id.pageUnauthorizedFragment)
+            Log.i("ProfileFragment", "Inside check if user is logged or token is expired")
+            this@ProfileFragment.findNavController().navigate(R.id.pageUnauthorizedFragment)
         } else {
-            initProfile()
-
-            binding.openUserSessions.setOnClickListener {
-                it.findNavController().navigate(R.id.userSessionsFragment)
+            onStart().apply {
+                lifecycleScope.launch {
+                    initProfile()
+                }
             }
+        }
 
-            binding.blockUser.setOnClickListener {
-                binding.userBlockedInfo.text = "Учётная запись заблокирована"
+        binding.openUserSessions.setOnClickListener {
+            it.findNavController().navigate(R.id.userSessionsFragment)
+        }
+
+        binding.blockUser.setOnClickListener {
+            lifecycleScope.launch {
+                val resp =
+                    profileService.banUser(
+                        ProfileBanEntity(
+                            binding.profileName.text.toString(),
+                            ""
+                        )
+                    )
+
+                if (resp.error != null) {
+                    val toast: Toast =
+                        Toast.makeText(
+                            this@ProfileFragment.context,
+                            Errors.getByName(resp.error.toString()),
+                            Toast.LENGTH_LONG
+                        )
+                    toast.show()
+                } else {
+                    binding.userBlockedInfo.text = "Учётная запись заблокирована"
+                }
             }
+        }
 
-            binding.unblockUser.setOnClickListener {
-                binding.userBlockedInfo.text = ""
+        binding.unblockUser.setOnClickListener {
+            binding.userBlockedInfo.text = ""
+            lifecycleScope.launch {
+                val resp =
+                    profileService.unbanUser(
+                        ProfileBanEntity(
+                            binding.profileName.text.toString(),
+                            ""
+                        )
+                    )
+                if (resp.error != null) {
+                    val toast: Toast =
+                        Toast.makeText(
+                            this@ProfileFragment.context,
+                            Errors.getByName(resp.error.toString()),
+                            Toast.LENGTH_LONG
+                        )
+                    toast.show()
+                } else {
+                    binding.userBlockedInfo.text = "Учётная запись заблокирована"
+                }
             }
+        }
 
-            binding.editProfileButton.setOnClickListener {
-                it.findNavController().navigate(R.id.editProfileFragment)
-            }
+        binding.editProfileButton.setOnClickListener {
+            it.findNavController().navigate(R.id.editProfileFragment)
+        }
 
-            var isChangedPositive = false
-            var isChangedNegative = false
-            binding.increaseRep.setOnClickListener {
-//                var rep: Int = binding.playerReputation.text.toString().toInt()
-//                if (!isChangedPositive) {
-//                    rep += 1
-//                    isChangedPositive = true
-//                    if (isChangedNegative) {
-//                        isChangedNegative = false
-//                        rep += 1
-//                    }
-//                }
-//                binding.playerReputation.text = rep.toString()
+        binding.increaseRep.setOnClickListener {
+            lifecycleScope.launch {
                 changeRepPlus()
                 initProfile()
             }
+        }
 
-            binding.decreaseRep.setOnClickListener {
-//                var rep: Int = binding.playerReputation.text.toString().toInt()
-//                if (!isChangedNegative) {
-//                    rep -= 1
-//                    isChangedNegative = true
-//                    if (isChangedPositive) {
-//                        isChangedPositive = false
-//                        rep -= 1
-//                    }
-//                }
-//                binding.playerReputation.text = rep.toString()
+        binding.decreaseRep.setOnClickListener {
+            lifecycleScope.launch {
                 changeRepMinus()
                 initProfile()
             }
+        }
+
+//        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner,this)
+        activity?.onBackPressedDispatcher?.addCallback {
+            NavHostFragment.findNavController(this@ProfileFragment).navigateUp()
         }
         return binding.root
     }
@@ -98,37 +144,75 @@ class ProfileFragment : Fragment() {
         imageview.setImageResource(R.drawable.profile_kitten)
     }
 
-    private fun initProfile() {
+    private suspend fun initProfile() {
         val profileInfo = profileService.getProfileInfo()
         if (profileInfo != null) {
+            if (profileInfo.is_banned) {
+                this.findNavController().navigate(R.id.fragmentBanned)
+                return
+            }
             Log.i("ProfileFragment", "Init profile")
-            binding.profileName.text = profileService.getUserLogin()
+            binding.profileName.text = profileService.getUserNickname()
             binding.playerReputation.text = profileInfo.reputation.toString()
+            Log.i("ProfileFragment", "rep: ${profileInfo.reputation}")
             binding.userAge.text = profileInfo.age?.toString()
             binding.userGames.text = profileInfo.games
             binding.vkUrl.text = profileInfo.vk
             binding.tgUrl.text = profileInfo.tg
+
+            if (!profileInfo.is_admin) {
+                binding.blockUser.isVisible = false
+                binding.unblockUser.isVisible = false
+            }
         }
     }
 
-    private fun changeRepPlus() {
+    private suspend fun changeRepPlus() {
         val changeRepEntity = ChangeReputationEntity(
             authService.getRowByLogin(profileService.getUserLogin())!!.tokenId,
             binding.profileName.text.toString()
         )
-        profileService.increaseReputation(changeRepEntity)
+        val rep = profileService.increaseReputation(changeRepEntity)
+
+        if (rep != null) {
+            if (rep.error != null) {
+                val toast: Toast =
+                    Toast.makeText(this.context, Errors.getByName(rep.error!!), Toast.LENGTH_LONG)
+                toast.show()
+            } else {
+                binding.playerReputation.text = rep.new_reputation.toString()
+            }
+        }
     }
 
-    private fun changeRepMinus() {
+    private suspend fun changeRepMinus() {
         val changeRepEntity = ChangeReputationEntity(
             authService.getRowByLogin(profileService.getUserLogin())!!.tokenId,
             binding.profileName.text.toString()
         )
-        profileService.decreaseReputation(changeRepEntity)
+        val rep = profileService.decreaseReputation(changeRepEntity)
+
+        if (rep != null) {
+            if (rep.error != null) {
+                val toast: Toast =
+                    Toast.makeText(this.context, Errors.getByName(rep.error!!), Toast.LENGTH_LONG)
+                toast.show()
+            } else {
+                binding.playerReputation.text = rep.new_reputation.toString()
+            }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    fun handleOnBackPressed() {
+        //Do your job here
+        //use next line if you just need navigate up
+        NavHostFragment.findNavController(this).navigateUp()
+        //Log.e(getClass().getSimpleName(), "handleOnBackPressed");
+        return
     }
 }

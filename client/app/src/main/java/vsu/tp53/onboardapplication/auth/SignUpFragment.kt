@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.auth.service.AuthService
@@ -17,7 +19,6 @@ class SignUpFragment : Fragment() {
     private var _binding: SignUpBinding? = null
     private val binding get() = _binding!!
 
-    //    @Autowired
     private lateinit var _authService: AuthService
     private val authService get() = _authService
 
@@ -32,18 +33,43 @@ class SignUpFragment : Fragment() {
 
         Log.i("messageSignUp", "SignUp!")
         binding.signUpButton.setOnClickListener {
-            registerUser()
-            it.findNavController().navigate(R.id.profileFragment)
+            lifecycleScope.launch {
+                if (registerUser()) {
+                    Log.i("SignUp-Frag", "Success")
+                    it.findNavController().navigate(R.id.profileFragment)
+                }
+            }
         }
         return binding.root
     }
 
-    private fun registerUser() {
+    private suspend fun registerUser(): Boolean {
+        val nickname = binding.nicknameSignUp.text.toString()
         val login = binding.loginSignUp.text.toString()
         val password = binding.passwordSignUp.text.toString()
         Log.i("signUp-login", login)
         Log.i("signUp-password", password)
 
-        authService.registerUser(User(login, password))
+        if (nickname.length < 4) {
+            binding.signUpError.text = "Никнейм должен содержать не менее 4 символов."
+            return false
+        }
+
+        if (!authService.checkEmail(login)) {
+            binding.signUpError.text = "Неверный формат логина"
+            return false
+        }
+
+        if (password.length < 6) {
+            binding.signUpError.text = "Пароль должен содержать не менее 6 символов"
+            return false
+        }
+
+        val tokenResp = authService.registerUser(User(null, nickname, login, password))
+        if (tokenResp.error != null) {
+            binding.signUpError.text = tokenResp.error
+            return false
+        }
+        return true
     }
 }

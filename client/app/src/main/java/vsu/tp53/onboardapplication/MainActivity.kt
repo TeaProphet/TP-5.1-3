@@ -7,12 +7,14 @@ import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.auth.service.AuthService
 import vsu.tp53.onboardapplication.databinding.ActivityMainBinding
@@ -51,7 +53,9 @@ class MainActivity : AppCompatActivity() {
 
         runnable = Runnable {
             Log.i("MainActivity", "Auth service checks token not to be expired.")
-            authService.checkTokenIsNotExpired()
+            lifecycleScope.launch {
+                authService.checkTokenIsNotExpired()
+            }
             handler.postDelayed(runnable, interval)
         }
     }

@@ -6,7 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.auth.service.AuthService
@@ -32,20 +35,22 @@ class SignInFragment : Fragment() {
 
         Log.i("messageSignIn", "SignIn!")
         binding.signInButton.setOnClickListener {
-            authUser()
-            it.findNavController().navigate(R.id.profileFragment)
+            lifecycleScope.launch {
+                authUser()
+                it.findNavController().navigate(R.id.profileFragment)
+            }
         }
 
         return binding.root
     }
 
-    private fun authUser() {
+    private suspend fun authUser() {
         val login = binding.loginSignIn.text.toString()
         val password = binding.passwordSignIn.text.toString()
         Log.i("signIn-login", login)
         Log.i("signIn-password", password)
 
-        authService.authorizeUser(User(login, password))
+        authService.authorizeUser(User(null, "", login, password))
     }
 
 }
