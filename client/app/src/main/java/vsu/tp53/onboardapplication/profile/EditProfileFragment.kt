@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
-import android.content.DialogInterface
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.Color
@@ -21,8 +20,9 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.auth.service.AuthService
@@ -58,22 +58,16 @@ class EditProfileFragment : Fragment() {
             _profileService = ProfileService(RestTemplate(), container.context)
         }
 
+        lifecycleScope.launch {
+            init()
+        }
+
         editText = binding.ageInput
         editText.inputFilterNumberRange(12..100)
         binding.saveChangesButton.setOnClickListener {
             Log.i("EditProfileFrag", "Save changes button is clicked...")
             changeProfile()
             it.findNavController().navigate(R.id.profileFragment)
-        }
-        binding.changePasswordButton.setOnClickListener {
-            val taskEditText = EditText(this.context)
-            val dialog: AlertDialog = AlertDialog.Builder(this.context)
-                .setTitle("Смена пароля")
-                .setView(taskEditText)
-                .setPositiveButton("Изменить", null)
-                .setNegativeButton("Отменить", null)
-                .create()
-            dialog.show()
         }
 
         binding.quitSystem.setOnClickListener {
@@ -84,14 +78,42 @@ class EditProfileFragment : Fragment() {
         return binding.root
     }
 
+    private suspend fun init(){
+        val profileInfo = profileService.getProfileInfo()
+        if (profileInfo != null) {
+            Log.i("ProfileFragment", "Init profile")
+            binding.profileName.text = profileService.getUserNickname()
+            Log.i("ProfileFragment", "rep: ${profileInfo.reputation}")
+            binding.ageInput.setText(profileInfo.age?.toString())
+            binding.editFavGames.setText(profileInfo.games)
+            binding.userVk.setText(profileInfo.vk)
+            binding.userTg.setText(profileInfo.tg)
+        }
+    }
+
     private fun changeProfile() {
+        var dialog: AlertDialog
+        binding.changePasswordButton.setOnClickListener {
+            val taskEditText = EditText(this.context)
+            dialog = AlertDialog.Builder(this.context)
+                .setTitle("Смена пароля")
+                .setView(taskEditText)
+                .setPositiveButton("Изменить", null)
+                .setNegativeButton("Отменить", null)
+                .create()
+            dialog.show()
+        }
         val changeProfileEntity = ChangeProfile(
             binding.ageInput.text.toString().toInt(),
             binding.editFavGames.text.toString(),
             binding.userVk.text.toString(),
             binding.userTg.text.toString()
         )
-        profileService.changeProfile(changeProfileEntity)
+        Log.i("EditProfFragment", binding.ageInput.text.toString() + " age")
+
+        lifecycleScope.launch {
+            profileService.changeProfile(changeProfileEntity)
+        }
     }
 
     @SuppressLint("ResourceType")
@@ -102,7 +124,7 @@ class EditProfileFragment : Fragment() {
     }
 
     // extension function to filter edit text number range
-    fun EditText.inputFilterNumberRange(range: IntRange) {
+    private fun EditText.inputFilterNumberRange(range: IntRange) {
         filterMin(range.first)
         filters = arrayOf<InputFilter>(InputFilterMax(range.last))
     }
@@ -128,7 +150,7 @@ class EditProfileFragment : Fragment() {
 
 
     // extension function to filter edit text minimum number
-    fun EditText.filterMin(min: Int) {
+    private fun EditText.filterMin(min: Int) {
         onFocusChangeListener = View.OnFocusChangeListener { view, b ->
             if (!b) {
                 // set minimum number if inputted number less than minimum
@@ -152,7 +174,7 @@ class EditProfileFragment : Fragment() {
 
 
     // extension function to set edit text minimum number
-    fun EditText.setTextMin(min: Int) {
+    private fun EditText.setTextMin(min: Int) {
         try {
             val value = text.toString().toInt()
             setUnderlineColor(Color.GREEN)
@@ -167,7 +189,7 @@ class EditProfileFragment : Fragment() {
     }
 
     // extension function to hide soft keyboard programmatically
-    fun Context.hideSoftKeyboard(editText: EditText) {
+    private fun Context.hideSoftKeyboard(editText: EditText) {
         (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).apply {
             hideSoftInputFromWindow(editText.windowToken, 0)
         }
@@ -175,7 +197,7 @@ class EditProfileFragment : Fragment() {
 
 
     // extension function to set/change edit text underline color
-    fun EditText.setUnderlineColor(color: Int) {
+    private fun EditText.setUnderlineColor(color: Int) {
         background.mutate().apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 colorFilter = BlendModeColorFilter(color, BlendMode.SRC_IN)
