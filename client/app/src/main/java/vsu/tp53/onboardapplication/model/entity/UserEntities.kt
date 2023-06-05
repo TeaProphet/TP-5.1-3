@@ -22,7 +22,7 @@ data class UserRegisterResponse(
 @Serializable
 data class UserRegisterPost(
     @JsonProperty("nickname")
-    var nickname: String = "",
+    var nickname: String? = "",
     @JsonProperty("login")
     var login: String = "",
     @JsonProperty("password")
@@ -41,10 +41,12 @@ data class UserAuthorize(
 data class UserTokenResponse(
     @JsonProperty("error")
     var error: String? = null,
+    @JsonProperty("nickname")
+    var nickname: String = "",
     @JsonProperty("idToken")
     var idToken: String = ""
 ) {
-    fun mapToDomain() = Token(error, idToken)
+    fun mapToDomain() = Token(error, nickname, idToken)
 }
 
 @Serializable
