@@ -25,11 +25,14 @@ def register(request):
     try:
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
+        if not body_data.keys().__contains__('password'):
+            raise ValidationError
+        password = body_data['password']
         credentials = complete_serialize(body_data, models.RegistrationSerializer)
     except ValidationError:
         return JsonResponse({'error': 'INVALID_CREDENTIALS'})
     try:
-        auth_user = settings.auth.create_user_with_email_and_password(credentials.login, credentials.password)
+        auth_user = settings.auth.create_user_with_email_and_password(credentials.login, password)
     except HTTPError as exception:
         return JsonResponse({'error': extract_http_error_message(exception.args[1])})
     user = models.User(uid=auth_user.get('localId'), login=credentials.login, user_data=models.UserData(),
@@ -209,13 +212,14 @@ def unban(request):
 def extract_access_data(request):
     body_unicode = request.body.decode('utf-8')
     body_data = json.loads(body_unicode)
-    rep_request = complete_serialize(body_data, models.AccessToProfileRequestSerializer)
+    requested_nickname = body_data['requestedNickname']
+    id_token = body_data['idToken']
 
     address_user = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(
-        rep_request.requestedNickname).get()
+        requested_nickname).get()
     address_uid = address_user.val().popitem()[0]
 
-    decoded_token = settings.auth.verify_id_token(rep_request.idToken)
+    decoded_token = settings.auth.verify_id_token(id_token)
     requester_uid = decoded_token['user_id']
     return address_uid, requester_uid
 

@@ -17,6 +17,21 @@ class UserData(models.Model):
     is_banned = models.BooleanField(default=False)
 
 
+class User(models.Model):
+    uid = models.CharField(max_length=1024, default=None)
+    login = models.CharField(max_length=64)
+    nickname = models.CharField(max_length=64)
+    user_data = models.OneToOneField(UserData, on_delete=models.CASCADE, default=UserData())
+
+    def save_data(self):
+        user_data = dict(UserDataSerializer(self.user_data).data)
+        if len(settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(self.nickname).get().each()) > 0:
+            raise ValueError('NICKNAME_EXISTS')
+        settings.database.child(settings.USERS_TABLE).child(self.uid).child('user_data').update(user_data)
+        settings.database.child(settings.USERS_TABLE).child(self.uid).child('login').set(self.login)
+        settings.database.child(settings.USERS_TABLE).child(self.uid).child('nickname').set(self.nickname)
+
+
 class UserDataSerializer(serializers.Serializer):
     reputation = serializers.IntegerField(default=0)
     age = serializers.IntegerField(default=None)
@@ -29,14 +44,6 @@ class UserDataSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return UserData(**validated_data)
-
-
-class ChangingUserData(models.Model):
-    age = models.IntegerField(default=None)
-    games = models.TextField(max_length=1024, default=None)
-    vk = models.CharField(max_length=64, default=None)
-    tg = models.CharField(max_length=64, default=None)
-
 
 @extend_schema_serializer(
     examples=[
@@ -53,28 +60,13 @@ class ChangingUserData(models.Model):
     ]
 )
 class ChangingUserDataSerializer(serializers.Serializer):
-    age = serializers.IntegerField(default=None)
-    games = serializers.CharField(max_length=1024, default=None)
-    vk = serializers.CharField(max_length=64, default=None)
-    tg = serializers.CharField(max_length=64, default=None)
+    age = serializers.IntegerField(allow_null=True)
+    games = serializers.CharField(max_length=1024, allow_null=True)
+    vk = serializers.CharField(max_length=64, allow_null=True)
+    tg = serializers.CharField(max_length=64, allow_null=True)
 
     def create(self, validated_data):
-        return ChangingUserData(**validated_data)
-
-
-class User(models.Model):
-    uid = models.CharField(max_length=1024, default=None)
-    login = models.CharField(max_length=64)
-    nickname = models.CharField(max_length=64)
-    user_data = models.OneToOneField(UserData, on_delete=models.CASCADE, default=UserData())
-
-    def save_data(self):
-        user_data = dict(UserDataSerializer(self.user_data).data)
-        if len(settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(self.nickname).get().each()) > 0:
-            raise ValueError('NICKNAME_EXISTS')
-        settings.database.child(settings.USERS_TABLE).child(self.uid).child('user_data').update(user_data)
-        settings.database.child(settings.USERS_TABLE).child(self.uid).child('login').set(self.login)
-        settings.database.child(settings.USERS_TABLE).child(self.uid).child('nickname').set(self.nickname)
+        return UserData(**validated_data)
 
 
 class UserSerializer(serializers.Serializer):
@@ -83,12 +75,6 @@ class UserSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return User(**validated_data)
-
-
-class Credentials(models.Model):
-    login = models.CharField(max_length=64, default=None, unique=True)
-    nickname = models.CharField(max_length=64, validators=[MinLengthValidator(4)], default=None)
-    password = models.CharField(max_length=64, validators=[MinLengthValidator(6)], default=None)
 
 
 @extend_schema_serializer(
@@ -121,11 +107,10 @@ class Credentials(models.Model):
 )
 class RegistrationSerializer(serializers.Serializer):
     login = serializers.CharField(max_length=64, validators=[MinLengthValidator(3)], default=None)
-    password = serializers.CharField(max_length=64, validators=[MinLengthValidator(6)], default=None)
     nickname = serializers.CharField(max_length=64, default=None)
 
     def create(self, validated_data):
-        return Credentials(**validated_data)
+        return User(**validated_data)
 
 
 @extend_schema_serializer(
@@ -161,7 +146,7 @@ class AuthorizationSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=64, validators=[MinLengthValidator(6)], default=None)
 
     def create(self, validated_data):
-        return Credentials(**validated_data)
+        return User(**validated_data)
 
 
 @extend_schema_serializer(
@@ -186,11 +171,6 @@ class AuthorizationSerializer(serializers.Serializer):
 class SearchedNicknameSerializer(serializers.Serializer):
     nickname = serializers.CharField(max_length=64, validators=[MinLengthValidator(3)], default=None)
 
-
-class AccessToProfileRequest(models.Model):
-    requestedNickname = models.CharField(max_length=64)
-    idToken = models.CharField(max_length=1024)
-
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
@@ -208,6 +188,3 @@ class AccessToProfileRequest(models.Model):
 class AccessToProfileRequestSerializer(serializers.Serializer):
     requestedNickname = serializers.CharField(max_length=64)
     idToken = serializers.CharField(max_length=1024)
-
-    def create(self, validated_data):
-        return AccessToProfileRequest(**validated_data)
