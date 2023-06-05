@@ -190,7 +190,7 @@
                             android:src="@drawable/vk_icon" />
 
                         <EditText
-                            android:id="@+id/editTextText"
+                            android:id="@+id/user_vk"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="vk./com/id"
@@ -213,7 +213,7 @@
                             android:src="@drawable/telegram_icon" />
 
                         <EditText
-                            android:id="@+id/editTextText3"
+                            android:id="@+id/user_tg"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -259,9 +259,22 @@
                 android:layout_height="wrap_content"
                 android:text="Сохранить изменения"
                 android:textColor="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/quit_system"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
+
+            <Button
+                android:id="@+id/quit_system"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Выйти"
+                android:backgroundTint="@color/white"
+                android:shadowColor="#FF0000"
+                android:textColor="#FF0000"
+                app:layout_constraintBottom_toBottomOf="@+id/save_changes_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

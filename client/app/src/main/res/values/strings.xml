@@ -1,6 +1,57 @@
 <resources>
     <string name="app_name">OnBoardApplication</string>
-    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+
+    <string name="add_button_text">Add</string>
+    <string name="action_home_item">Игровые сессии</string>
+    <string name="action_dice_item">Бросок кубиков</string>
+    <string name="action_profile_item">Профиль</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="games">Список игр: </string>
+    <string name="id">ID: </string>
+    <string name="address">Город, адрес: </string>
+    <string name="address_hint">Город, улица, номер дома </string>
+    <string name="date_and_time">Дата и время: </string>
+    <string name="players">Кол-во игроков: </string>
+    <string name="reputation">Значение репутации: </string>
+    <string name="change_session_name">Изменить название</string>
+    <string name="remove_session">Удалить</string>
+    <string name="join_session">Записаться</string>
+    <string name="session_name">Название игровой сессии:</string>
+    <string name="session_name_hint">Название</string>
+    <string name="games_hint">Список игр игровой сессии</string>
+    <string name="date_hint">DD/MM/YYYY</string>
+    <string name="time_hint">HH/MM</string>
+    <string name="players_num">Кол-во недостающих игроков:</string>
+    <string name="create">Создать</string>
+    <string name="dice_sides">Кол-во граней</string>
+    <string name="dice_num">Кол-во кубов</string>
+    <string name="dice_mod">Модификатор</string>
+    <string name="dice_throw">Бросить кубы</string>
+    <string name="dice_result">Результат броска:</string>
+    <string name="dice_fill_error">Ошибка: заполните все поля</string>
+    <string name="games_list_example">        Игра
+        Игра
+        Игра
+        Игра</string>
+    <string name="signUpButtonText">Зарегистрироваться</string>
+    <string name="passwordHint">Пароль</string>
+    <string name="loginHint">name@mail.com</string>
+    <string name="nicknameHint">Никнейм</string>
+    <string name="banInfo">Ваша учётная запись заблокирована администратором. Причиной могли послужить: нарушение УК РФ, оскорбительные названия игровых сессий/учётной записи и иные нарушения. Обратитесь по следующему адресу электронной почты за дополнительными разъяснениями: e-mail</string>
+    <string name="chooseAvatarButton">Выбрать аватар</string>
+    <string name="aboutUser">О себе</string>
+    <string name="ageLabel">Возраст:</string>
+    <string name="favGamesLabel">Любимые игры:</string>
+    <string name="mediaLinks">Список соцсетей:</string>
+    <string name="openSessionsButton">Открыть список игровых сессий</string>
+    <string name="blockButton">Заблокировать</string>
+    <string name="unblockButton">Разблокировать</string>
+    <string name="agePlaceholder">Не указано</string>
+    <string name="gamesPlaceholder">Не указано</string>
+    <string name="vkPlaceholder">Не указано</string>
+    <string name="tgPlaceholder">Не задано</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
@@ -43,42 +94,4 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
-    <string name="add_button_text">Add</string>
-    <string name="action_home_item">Игровые сессии</string>
-    <string name="action_dice_item">Бросок кубиков</string>
-    <string name="action_profile_item">Профиль</string>
-    <string name="title_activity_base_with_bottom_nav_bar">BaseActivityWithBottomNavBar</string>
-    <string name="button_first_fragment">Кнопочка</string>
-    <string name="second_fragment_text">Второй фрагмент - кубик</string>
-    <string name="third_fragment_text">Третий фрагмент - профиль</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="games">Список игр: </string>
-    <string name="id">ID: </string>
-    <string name="address">Город, адрес: </string>
-    <string name="address_hint">Город, улица, номер дома </string>
-    <string name="date_and_time">Дата и время: </string>
-    <string name="players">Кол-во игроков: </string>
-    <string name="reputation">Значение репутации: </string>
-    <string name="change_session_name">Изменить название</string>
-    <string name="remove_session">Удалить</string>
-    <string name="join_session">Записаться</string>
-    <string name="leave_session">Отписаться</string>
-    <string name="session_name">Название игровой сессии:</string>
-    <string name="session_name_hint">Название</string>
-    <string name="games_hint">Список игр игровой сессии</string>
-    <string name="date_hint">DD/MM/YYYY</string>
-    <string name="time_hint">HH/MM</string>
-    <string name="players_num">Кол-во недостающих игроков:</string>
-    <string name="create">Создать</string>
-    <string name="dice_sides">Кол-во граней</string>
-    <string name="dice_num">Кол-во кубов</string>
-    <string name="dice_mod">Модификатор</string>
-    <string name="dice_throw">Бросить кубы</string>
-    <string name="dice_result">Результат броска:</string>
-    <string name="dice_fill_error">Ошибка: заполните все поля</string>
-    <string name="games_list_example">        Игра
-        Игра
-        Игра
-        Игра</string>
 </resources>

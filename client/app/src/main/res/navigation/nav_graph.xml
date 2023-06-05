@@ -55,4 +55,9 @@
         android:id="@+id/signUpFragment"
         android:name="vsu.tp53.onboardapplication.auth.SignUpFragment"
         android:label="Регистрация" />
+    <fragment
+        android:id="@+id/fragmentBanned"
+        android:name="vsu.tp53.onboardapplication.profile.FragmentBanned"
+        android:label="fragment_banned"
+        tools:layout="@layout/fragment_banned" />
 </navigation>

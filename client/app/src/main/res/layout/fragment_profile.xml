@@ -53,7 +53,6 @@
                                 android:layout_height="30dp"
                                 android:layout_marginEnd="5dp"
                                 android:lineSpacingExtra="8sp"
-                                android:text="Князь Тьмы Котофей"
                                 android:textAlignment="center"
                                 android:textColor="#000000"
                                 android:textSize="20sp"
@@ -89,7 +88,6 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="5dp"
                                 android:layout_weight="2.5"
-                                android:text="1"
                                 android:textAlignment="center"
                                 android:textSize="16sp" />
 
@@ -150,7 +148,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="О себе"
+                android:text="@string/aboutUser"
                 android:textColor="#000000"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -183,14 +181,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="5dp"
-                            android:text="Возраст:"
+                            android:text="@string/ageLabel"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/user_age"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="4567 лет" />
+                            android:hint="@string/agePlaceholder"/>
                     </LinearLayout>
 
                     <TextView
@@ -198,22 +196,22 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
-                        android:text="Любимые игры:"
+                        android:text="@string/favGamesLabel"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/textView5"
+                        android:id="@+id/user_games"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
-                        android:text="@string/games_list_example" />
+                        android:hint="@string/gamesPlaceholder"/>
 
                     <TextView
                         android:id="@+id/textView8"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
-                        android:text="Список соцсетей:"
+                        android:text="@string/mediaLinks"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -230,10 +228,10 @@
                             android:src="@drawable/vk_icon" />
 
                         <TextView
-                            android:id="@+id/textView9"
+                            android:id="@+id/vk_url"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="http://vk.com/july_cezzar" />
+                            android:hint="@string/vkPlaceholder" />
 
                     </LinearLayout>
 
@@ -251,11 +249,11 @@
                             android:src="@drawable/telegram_icon" />
 
                         <TextView
-                            android:id="@+id/textView"
+                            android:id="@+id/tg_url"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="http://vk.com/july_cezzar" />
+                            android:hint="@string/tgPlaceholder" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -266,7 +264,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:text="Открыть список игровых сессий"
+                android:text="@string/openSessionsButton"
                 android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -279,7 +277,7 @@
                 android:layout_marginTop="15dp"
                 android:backgroundTint="@color/white"
                 android:shadowColor="#FF0000"
-                android:text="Заблокировать"
+                android:text="@string/blockButton"
                 android:textColor="#FF0000"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -292,7 +290,7 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/white"
                 android:shadowColor="#1AFF00"
-                android:text="Разблокировать"
+                android:text="@string/unblockButton"
                 android:textColor="#1AFF00"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
