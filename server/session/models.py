@@ -83,20 +83,22 @@ class SessionPublicInfoSerializer(serializers.Serializer):
         OpenApiExample(
             'Session info',
             summary='Info',
-            value={
-                0: {
+            value=[
+                {
+                    "session_id": 0,
                     'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
                     'date_time': "2023.06.3 12:00",
                     'name': "Кемет | ПараDice",
                     'players_max': 4
                 },
-                1: {
+                {
+                    "session_id": 1,
                     'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
                     'date_time': "2023.06.3 12:00",
                     'name': "DnD5 | ПараDice",
                     'players_max': 4
                 }
-            },
+            ],
             request_only=False,
             response_only=True
         )
