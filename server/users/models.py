@@ -145,10 +145,11 @@ class RegistrationSerializer(serializers.Serializer):
             response_only=False
         ),
         OpenApiExample(
-            'Response with idToken',
-            summary='Returns idToken of user',
+            'Returns idToken and nickname of user',
+            summary='Auth response',
             value={
-                'idToken': "...",
+                'nickname': 'qwerty',
+                'idToken': '...'
             },
             request_only=False,
             response_only=True

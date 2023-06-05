@@ -57,7 +57,8 @@ def credentials_authorize(request):
         return JsonResponse({'error': 'INVALID_CREDENTIALS'})
     except HTTPError as exception:
         return JsonResponse({'error': extract_http_error_message(exception.args[1])})
-    return JsonResponse({'idToken': auth_user.get('idToken')})
+    nickname = settings.database.child(settings.USERS_TABLE).child(auth_user.get('localId')).child('nickname').get().val()
+    return JsonResponse({'idToken': auth_user.get('idToken'), 'nickname': nickname})
 
 
 @extend_schema(
