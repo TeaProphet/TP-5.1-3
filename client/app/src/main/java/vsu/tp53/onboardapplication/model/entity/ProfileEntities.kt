@@ -28,10 +28,10 @@ data class ChangeProfileEntity(
 
 @Serializable
 data class ChangeProfile(
-    var age: Int,
-    var games: String,
-    var vk: String,
-    var tg: String,
+    var age: Int = 0,
+    var games: String = "",
+    var vk: String = "",
+    var tg: String = "",
     var password: String? = null
 )
 

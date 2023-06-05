@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 @Serializable
 data class User(
     var error: String?,
-    var nickname: String,
+    var nickname: String?,
     var login: String,
     var password: String
 ) {
@@ -20,13 +20,14 @@ data class User(
 @Serializable
 data class Token(
     var error: String?,
+    var nickname: String,
     var idToken: String
 ) {
     fun mapToEntity() = UserTokenPost(idToken)
 }
 
 data class UserLogInInfo(
-    val nickname: String,
+    val nickname: String?,
     val login: String,
     val tokenId: String,
     val expire: LocalDateTime
