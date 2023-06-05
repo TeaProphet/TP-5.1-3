@@ -51,20 +51,20 @@ class SignUpFragment : Fragment() {
         Log.i("signUp-login", login)
         Log.i("signUp-password", password)
 
-//        if (nickname.length < 4) {
-//            binding.signUpError.text = "Никнейм должен содержать не менее 4 символов."
-//            return false
-//        }
-//
-//        if (!authService.checkEmail(login)) {
-//            binding.signUpError.text = "Неверный формат логина"
-//            return false
-//        }
-//
-//        if (password.length < 6) {
-//            binding.signUpError.text = "Пароль должен содержать не менее 6 символов"
-//            return false
-//        }
+        if (nickname.length < 4) {
+            binding.signUpError.text = "Никнейм должен содержать не менее 4 символов."
+            return false
+        }
+
+        if (!authService.checkEmail(login)) {
+            binding.signUpError.text = "Неверный формат логина"
+            return false
+        }
+
+        if (password.length < 6) {
+            binding.signUpError.text = "Пароль должен содержать не менее 6 символов"
+            return false
+        }
 
         try {
             val tokenResp = authService.registerUser(User(null, nickname, login, password))
