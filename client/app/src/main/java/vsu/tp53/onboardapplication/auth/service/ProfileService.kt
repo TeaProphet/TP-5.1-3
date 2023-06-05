@@ -41,124 +41,151 @@ class ProfileService(
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     suspend fun getProfileInfo(login: String = ""): ProfileInfoEntity? {
+        try {
+            return withContext(Dispatchers.IO) {
+                Log.i("Profile-last", login)
 
-        return withContext(Dispatchers.IO) {
-            Log.i("Profile-last", login)
+                if (login != "") {
+                    return@withContext null
+                }
 
-            if (login != "") {
-                return@withContext null
+                val lastNickname = prefs.getString(LAST_NICKNAME_KEY, "")
+                Log.i("Profile-lasLogin", lastNickname!!)
+
+                var params: MutableMap<String, String> = HashMap()
+                params["nickname"] = lastNickname
+
+                val searchedProfile = SearchProfile(lastNickname)
+                Log.i("Profile-searchLogin", searchedProfile.toString())
+                restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
+                restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
+                restTemplate.messageConverters.add(GsonHttpMessageConverter())
+
+                val profResp = restTemplate.getForObject(
+                    "http://193.233.49.112/get_profile_info/$lastNickname",
+                    ProfileInfoEntity::class.java,
+                )
+
+                Log.i("ProfileServ", profResp.toString())
+
+                val profileInfo = restTemplate.getForObject(
+                    getProfileUrl,
+                    ProfileInfoEntity::class.java,
+                    params
+                )
+
+                Log.i("ProfileService", profileInfo.error.toString())
+
+                Log.i("Profile-info", profileInfo.toString())
+
+                profileInfo
             }
-
-            val lastNickname = prefs.getString(LAST_NICKNAME_KEY, "")
-            Log.i("Profile-lasLogin", lastNickname!!)
-
-            var params: MutableMap<String, String> = HashMap()
-            params["nickname"] = lastNickname
-
-            val searchedProfile = SearchProfile(lastNickname)
-            Log.i("Profile-searchLogin", searchedProfile.toString())
-            restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
-            restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
-            restTemplate.messageConverters.add(GsonHttpMessageConverter())
-
-            val profResp = restTemplate.getForObject(
-                "http://193.233.49.112/get_profile_info/$lastNickname",
-                ProfileInfoEntity::class.java,
-            )
-
-            Log.i("ProfileServ", profResp.toString())
-
-            val profileInfo = restTemplate.getForObject(
-                getProfileUrl,
-                ProfileInfoEntity::class.java,
-                params
-            )
-
-            Log.i("ProfileService", profileInfo.error.toString())
-
-            Log.i("Profile-info", profileInfo.toString())
-
-            profileInfo
+        } catch (e: Exception) {
+            throw e
         }
     }
 
-    suspend fun changeProfile(userInfo: ChangeProfile) {
-        withContext(Dispatchers.IO) {
-            val lastLogin = prefs.getString(LAST_LOGIN_KEY, "")!!
-            val token = authService.getRowByLogin(lastLogin)?.tokenId
-            val changeProfileEntity = ChangeProfileEntity(
-                token!!,
-                userInfo.age,
-                userInfo.games,
-                userInfo.vk,
-                userInfo.tg
-            )
+    suspend fun changeProfile(userInfo: ChangeProfile): ErrorEntity? {
+        try {
+            return withContext(Dispatchers.IO) {
+                val lastLogin = prefs.getString(LAST_LOGIN_KEY, "")!!
+                val token = authService.getRowByLogin(lastLogin)?.tokenId
+                val changeProfileEntity = ChangeProfileEntity(
+                    token!!,
+                    userInfo.age,
+                    userInfo.games,
+                    userInfo.vk,
+                    userInfo.tg
+                )
 
-            val entity: HttpEntity<ChangeProfileEntity> = HttpEntity(changeProfileEntity)
+                val entity: HttpEntity<ChangeProfileEntity> = HttpEntity(changeProfileEntity)
 
-            val params: MutableMap<String, String> = HashMap()
-            params["idToken"] = token
+                val params: MutableMap<String, String> = HashMap()
+                params["idToken"] = token
 
-            Log.i("Profile-info", "Change profile to $userInfo")
+                Log.i("Profile-info", "Change profile to $userInfo")
 
-            restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
-            val profileInfoError: ResponseEntity<ErrorEntity>? = restTemplate.exchange(
-                editProfileUrl,
-                HttpMethod.PUT,
-                entity,
-                ErrorEntity::class.java,
-                params
-            )
+                restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
+                val profileInfoError: ResponseEntity<ErrorEntity>? = restTemplate.exchange(
+                    editProfileUrl,
+                    HttpMethod.PUT,
+                    entity,
+                    ErrorEntity::class.java,
+                    params
+                )
+
+                Log.i("Profile-serv", profileInfoError?.body.toString())
+
+                profileInfoError?.body
+            }
+        } catch (e: Exception) {
+            throw e
         }
     }
 
     suspend fun increaseReputation(changeRep: ChangeReputationEntity): ReputationEntity? {
-        return withContext(Dispatchers.IO) {
-            Log.i("Profile-repInc", changeRep.toString())
-            restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
+        try {
+            return withContext(Dispatchers.IO) {
+                Log.i("Profile-repInc", changeRep.toString())
+                restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
 
-            restTemplate.postForObject(
-                increaseRepUrl,
-                changeRep,
-                ReputationEntity::class.java
-            )
+                restTemplate.postForObject(
+                    increaseRepUrl,
+                    changeRep,
+                    ReputationEntity::class.java
+                )
+            }
+        } catch (e: Exception) {
+            throw e
         }
     }
 
     suspend fun decreaseReputation(changeRep: ChangeReputationEntity): ReputationEntity? {
-        return withContext(Dispatchers.IO) {
-            Log.i("Profile-repDec", changeRep.toString())
-            restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
+        try {
+            return withContext(Dispatchers.IO) {
+                Log.i("Profile-repDec", changeRep.toString())
+                restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
 
-            restTemplate.postForObject(
-                decreaseRepUrl,
-                changeRep,
-                ReputationEntity::class.java
-            )
+                restTemplate.postForObject(
+                    decreaseRepUrl,
+                    changeRep,
+                    ReputationEntity::class.java
+                )
+            }
+        } catch (e: Exception) {
+            throw e
         }
     }
 
     suspend fun banUser(banUser: ProfileBanEntity): ProfileBanEntityResponse {
-        return withContext(Dispatchers.IO) {
-            Log.i("ProfileService-BanBef",  banUser.toString())
-            banUser.idToken = getUserToken()
-            Log.i("ProfileService-BanAft",  banUser.toString())
-            restTemplate.postForObject(
-                banUserUrl,
-                banUser,
-                ProfileBanEntityResponse::class.java
-            )
+        try {
+            return withContext(Dispatchers.IO) {
+                Log.i("ProfileService-BanBef", banUser.toString())
+                banUser.idToken = getUserToken()
+                Log.i("ProfileService-BanAft", banUser.toString())
+                restTemplate.postForObject(
+                    banUserUrl,
+                    banUser,
+                    ProfileBanEntityResponse::class.java
+                )
+            }
+        } catch (e: Exception) {
+            throw e
         }
     }
 
     suspend fun unbanUser(unbanUser: ProfileBanEntity): ProfileBanEntityResponse {
-        return withContext(Dispatchers.IO) {
-            unbanUser.idToken = getUserToken()
-            restTemplate.postForObject(
-                unbanUserUrl,
-                unbanUser,
-                ProfileBanEntityResponse::class.java
-            )
+        try {
+            return withContext(Dispatchers.IO) {
+                unbanUser.idToken = getUserToken()
+                restTemplate.postForObject(
+                    unbanUserUrl,
+                    unbanUser,
+                    ProfileBanEntityResponse::class.java
+                )
+            }
+        } catch (e: Exception) {
+            throw e
         }
     }
 

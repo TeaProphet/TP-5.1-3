@@ -227,11 +227,7 @@ class AuthService(
     fun checkIfUserLoggedIn(): Boolean {
         Log.i(
             "AuthServ",
-            prefs.getBoolean(IS_LOGIN_KEY, false).toString() + " from checkIfUserLoggedIn 1"
-        )
-        Log.i(
-            "AuthServ",
-            prefs.getBoolean(IS_LOGIN_KEY, false).toString() + " from checkIfUserLoggedIn 2"
+            prefs.getBoolean(IS_LOGIN_KEY, false).toString() + " from checkIfUserLoggedIn"
         )
         return prefs.getBoolean(IS_LOGIN_KEY, false)
     }

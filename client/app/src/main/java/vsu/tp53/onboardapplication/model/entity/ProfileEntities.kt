@@ -19,20 +19,19 @@ data class ReputationEntity(
 @Serializable
 data class ChangeProfileEntity(
     var idToken: String,
-    var age: Int,
-    var games: String,
-    var vk: String,
-    var tg: String,
+    var age: Int?,
+    var games: String?,
+    var vk: String?,
+    var tg: String?,
     var password: String? = null
 )
 
 @Serializable
 data class ChangeProfile(
-    var age: Int = 0,
-    var games: String = "",
-    var vk: String = "",
-    var tg: String = "",
-    var password: String? = null
+    var age: Int? = null,
+    var games: String? = null,
+    var vk: String? = null,
+    var tg: String? = null,
 )
 
 @Serializable
@@ -43,6 +42,7 @@ data class ErrorEntity(
 @Serializable
 data class ProfileInfoEntity @JsonCreator constructor(
     @JsonProperty("error") var error: String? = "",
+    @JsonProperty("nickname") var nickname: String? = "",
     @JsonProperty("age") var age: Int? = 0,
     @JsonProperty("games") var games: String? = "",
     @JsonProperty("vk") var vk: String? = "",

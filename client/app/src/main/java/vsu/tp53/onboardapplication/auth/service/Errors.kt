@@ -23,7 +23,6 @@ enum class Errors(var text: String) {
                     return error.text
                 }
             }
-
             return ""
         }
     }
