@@ -39,4 +39,12 @@
     <string name="loginHint">name@mail.com</string>
     <string name="nicknameHint">Никнейм</string>
     <string name="banInfo">Ваша учётная запись заблокирована администратором. Причиной могли послужить: нарушение УК РФ, оскорбительные названия игровых сессий/учётной записи и иные нарушения. Обратитесь по следующему адресу электронной почты за дополнительными разъяснениями: e-mail</string>
+    <string name="chooseAvatarButton">Выбрать аватар</string>
+    <string name="aboutUser">О себе</string>
+    <string name="ageLabel">Возраст:</string>
+    <string name="favGamesLabel">Любимые игры:</string>
+    <string name="mediaLinks">Список соцсетей:</string>
+    <string name="openSessionsButton">Открыть список игровых сессий</string>
+    <string name="blockButton">Заблокировать</string>
+    <string name="unblockButton">Разблокировать</string>
 </resources>

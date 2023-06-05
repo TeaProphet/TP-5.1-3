@@ -49,8 +49,13 @@ class ProfileFragment : Fragment() {
             _profileService = ProfileService(RestTemplate(), container.context)
         }
 
+        Log.i("ProfileFragment", "Before check if user is logged or token is expired")
+        Log.i("ProfileFragment", authService.checkIfUserLoggedIn().toString() + " log in")
+        Log.i("ProfileFragment", authService.checkTokenIsNotExpired().toString() + " token exp")
         if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()) {
             Log.i("ProfileFragment", "Inside check if user is logged or token is expired")
+            Log.i("ProfileFragment", authService.checkIfUserLoggedIn().toString() + " log in")
+            Log.i("ProfileFragment", authService.checkTokenIsNotExpired().toString() + " token exp")
             this@ProfileFragment.findNavController().navigate(R.id.pageUnauthorizedFragment)
         } else {
             onStart().apply {
