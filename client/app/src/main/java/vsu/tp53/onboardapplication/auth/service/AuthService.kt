@@ -4,121 +4,178 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import android.provider.BaseColumns
 import android.util.Log
 import androidx.preference.PreferenceManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
 import org.springframework.web.client.RestTemplate
+import vsu.tp53.onboardapplication.model.domain.Token
 import vsu.tp53.onboardapplication.model.domain.User
 import vsu.tp53.onboardapplication.model.domain.UserLogInInfo
-import vsu.tp53.onboardapplication.model.entity.UserRegAuthorize
-import vsu.tp53.onboardapplication.model.entity.UserRegAuthorizePost
-import vsu.tp53.onboardapplication.model.entity.UserToken
+import vsu.tp53.onboardapplication.model.entity.UserAuthorize
+import vsu.tp53.onboardapplication.model.entity.UserRegisterPost
+import vsu.tp53.onboardapplication.model.entity.UserRegisterResponse
 import vsu.tp53.onboardapplication.model.entity.UserTokenPost
+import vsu.tp53.onboardapplication.model.entity.UserTokenResponse
 import vsu.tp53.onboardapplication.sqlitedb.UserTokenContract
 import vsu.tp53.onboardapplication.sqlitedb.UserTokenDbHelper
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.regex.Pattern
+
 
 const val IS_LOGIN_KEY = "IsLogin"
-const val LAST_LOGIN = "LastLogin"
+const val LAST_LOGIN_KEY = "LastLogin"
+const val LAST_NICKNAME_KEY = "LastNickname"
 
 class AuthService(
     private val restTemplate: RestTemplate,
     val context: Context
 ) {
-    private val regUrl: String = "http://192.168.0.101:8000/register/"
-    private val authUrl: String = "http://192.168.0.101:8000/authorize/"
-    private val tokenAuthUrl: String = "http://192.168.0.101:8000/token_authorize/"
+    private val regUrl: String = "http://193.233.49.112/register/"
+    private val authUrl: String = "http://193.233.49.112/authorize/"
+    private val tokenAuthUrl: String = "http://193.233.49.112/token_authorize/"
     private val dbHelper = UserTokenDbHelper(context)
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    fun registerUser(user: User) {
+    suspend fun registerUser(user: User): Token {
 //        dropTable()
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
-        val userRegAuthorizePost: UserRegAuthorizePost = user.mapToEntity()
-        Log.i("AuthServ-regObjPost", userRegAuthorizePost.toString())
+        return withContext(Dispatchers.IO) {
+            val userRegisterPost: UserRegisterPost = user.mapToUserRegEntity()
+            Log.i("AuthServ-regObjPost", userRegisterPost.toString())
 
-        restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
-        val userToken = restTemplate.postForObject(
-            regUrl,
-            userRegAuthorizePost,
-            UserToken::class.java
-        )!!
+            restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
 
-        Log.i("Auth-regSuc", userToken.toString())
+            val userTokenResponse =
+                restTemplate.postForObject(
+                    regUrl,
+                    userRegisterPost,
+                    UserTokenResponse::class.java
+                )!!
 
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply {
-            put(UserTokenContract.UserTokenEntry.COLUMN_LOGIN, user.login)
-            put(UserTokenContract.UserTokenEntry.COLUMN_TOKEN, userToken.idToken)
-            put(
-                UserTokenContract.UserTokenEntry.COLUMN_EXPIRE,
-                formatter.format(LocalDateTime.now()).toString()
-            )
+            Log.i("AuthServ", "Before check if error is null")
+            if (userTokenResponse.error == null) {
+                Log.i("Auth-regSuc", userTokenResponse.toString())
+
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                val db = dbHelper.writableDatabase
+                val values = ContentValues().apply {
+                    put(UserTokenContract.UserTokenEntry.COLUMN_NICKNAME, user.nickname)
+                    put(UserTokenContract.UserTokenEntry.COLUMN_LOGIN, user.login)
+                    put(UserTokenContract.UserTokenEntry.COLUMN_TOKEN, userTokenResponse.idToken)
+                    put(
+                        UserTokenContract.UserTokenEntry.COLUMN_EXPIRE,
+                        formatter.format(LocalDateTime.now()).toString()
+                    )
+                }
+                val newRowId =
+                    db?.insert(
+                        UserTokenContract.UserTokenEntry.TABLE_NAME,
+                        null,
+                        values
+                    )
+
+                Log.i("Auth-newRowId", newRowId.toString())
+
+                prefs.edit().putBoolean(IS_LOGIN_KEY, true).apply()
+                prefs.edit().putString(LAST_LOGIN_KEY, user.login).apply()
+                prefs.edit().putString(LAST_NICKNAME_KEY, user.nickname).apply()
+                Log.i("Auth-ServReg", "Last login is \"${prefs.getString(LAST_LOGIN_KEY, "")}\"")
+                Log.i(
+                    "Auth-ServReg",
+                    "Last nickname is \"${prefs.getString(LAST_NICKNAME_KEY, "")}\""
+                )
+
+                readData()
+
+            }
+            userTokenResponse.mapToDomain()
         }
-        val newRowId = db?.insert(UserTokenContract.UserTokenEntry.TABLE_NAME, null, values)
-        Log.i("Auth-newRowId", newRowId.toString())
-
-        prefs.edit().putBoolean(IS_LOGIN_KEY, true).apply()
-        prefs.edit().putString(LAST_LOGIN, user.login).apply()
-        Log.i("Auth-ServReg", "Last login is \"${prefs.getString(LAST_LOGIN, "")}\"")
-        readData()
     }
 
-    fun authorizeUser(user: User) {
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
-        val userRegAuthorizePost: UserRegAuthorizePost = user.mapToEntity()
-        Log.i("AuthServ-authObj", userRegAuthorizePost.toString())
+    suspend fun authorizeUser(user: User) {
+        withContext(Dispatchers.IO) {
+            Log.i("Auth-authBefore", user.toString())
+            user.nickname = prefs.getString(LAST_NICKNAME_KEY, "").toString()
+            Log.i("Auth-authNicknamePref", prefs.getString(LAST_NICKNAME_KEY, "").toString())
+            Log.i("Auth-authBeforeAfter", user.toString())
+            val userAuthorizePost: UserAuthorize = user.mapToUserAuthEntity()
+            Log.i("AuthServ-authObj", userAuthorizePost.toString())
 
-        restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
-        val userToken = restTemplate.postForObject(
-            authUrl,
-            userRegAuthorizePost,
-            UserToken::class.java
-        )!!
+            restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
 
-        Log.i("Auth-authSuc", userToken.toString())
-        Log.i("Auth-authSuc", user.login)
+            val userTokenResponse =
+                restTemplate.postForObject(
+                    authUrl,
+                    userAuthorizePost,
+                    UserTokenResponse::class.java
+                )!!
 
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply {
-            put(UserTokenContract.UserTokenEntry.COLUMN_LOGIN, user.login)
-            put(UserTokenContract.UserTokenEntry.COLUMN_TOKEN, userToken.idToken)
-            put(
-                UserTokenContract.UserTokenEntry.COLUMN_EXPIRE,
-                formatter.format(LocalDateTime.now()).toString()
+            Log.i("Auth-authSuc", userTokenResponse.toString())
+            Log.i("Auth-authSuc", user.login)
+
+            readData()
+
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            val db = dbHelper.writableDatabase
+            val row = getRowByLogin(user.login)
+            val values = ContentValues().apply {
+                put(
+                    UserTokenContract.UserTokenEntry.COLUMN_LOGIN,
+                    prefs.getString(LAST_NICKNAME_KEY, "")
+                )
+                put(UserTokenContract.UserTokenEntry.COLUMN_LOGIN, user.login)
+                put(UserTokenContract.UserTokenEntry.COLUMN_TOKEN, userTokenResponse.idToken)
+                put(
+                    UserTokenContract.UserTokenEntry.COLUMN_EXPIRE,
+                    formatter.format(LocalDateTime.now()).toString()
+                )
+            }
+
+            val selection = "${UserTokenContract.UserTokenEntry.COLUMN_LOGIN} LIKE ?"
+            val selectionArgs = arrayOf(user.login)
+
+            var newRowId = 0
+            if (row != null) {
+                newRowId =
+                    db?.update(
+                        UserTokenContract.UserTokenEntry.TABLE_NAME,
+                        values,
+                        selection,
+                        selectionArgs
+                    )!!
+            }
+
+            Log.i("Auth-updatedRowId", newRowId.toString())
+
+            prefs.edit().putBoolean(IS_LOGIN_KEY, true).apply()
+            prefs.edit().putString(LAST_LOGIN_KEY, user.login).apply()
+            prefs.edit().putString(LAST_NICKNAME_KEY, user.nickname).apply()
+            Log.i("Auth-ServAuth", "nickname to insert is ${user.nickname}")
+            Log.i("Auth-ServAuth", "Last login is \"${prefs.getString(LAST_LOGIN_KEY, "")}\"")
+            Log.i(
+                "Auth-ServAuth",
+                "Last login is logged? \"${prefs.getBoolean(IS_LOGIN_KEY, false)}\""
+            )
+            Log.i(
+                "Auth-ServAuth",
+                "Last nickname is  \"${prefs.getString(LAST_NICKNAME_KEY, "")}\""
             )
         }
-        readData()
-        val selection = "${UserTokenContract.UserTokenEntry.COLUMN_LOGIN} LIKE ?"
-        val selectionArgs = arrayOf(user.login)
-        val newRowId = db?.update(
-            UserTokenContract.UserTokenEntry.TABLE_NAME,
-            values,
-            selection,
-            selectionArgs
-        )
-        Log.i("Auth-updatedRowId", newRowId.toString())
-
-        prefs.edit().putBoolean(IS_LOGIN_KEY, true).apply()
-        prefs.edit().putString(LAST_LOGIN, user.login).apply()
-        Log.i("Auth-ServAuth", "Last login is \"${prefs.getString(LAST_LOGIN, "")}\"")
     }
 
-    fun authToken() {
-        val lastUserToken: String? = getRowByLogin(prefs.getString(LAST_LOGIN, "")!!)?.tokenId
+    suspend fun authToken() {
+        val lastUserToken: String? = getRowByLogin(prefs.getString(LAST_LOGIN_KEY, "")!!)?.tokenId
         if (lastUserToken != null) {
             val userTokenPost = UserTokenPost(lastUserToken)
             restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
             val userRegAuth = restTemplate.postForObject(
                 tokenAuthUrl,
                 userTokenPost,
-                UserRegAuthorize::class.java
+                UserRegisterResponse::class.java
             )!!
 
             //TODO: finish function
@@ -126,7 +183,7 @@ class AuthService(
     }
 
     fun checkTokenIsNotExpired(): Boolean {
-        val lastUser: UserLogInInfo? = getRowByLogin(prefs.getString(LAST_LOGIN, "")!!)
+        val lastUser: UserLogInInfo? = getRowByLogin(prefs.getString(LAST_LOGIN_KEY, "")!!)
         return if (lastUser == null) {
             prefs.edit().putBoolean(IS_LOGIN_KEY, false).apply()
             false
@@ -147,13 +204,14 @@ class AuthService(
     fun logOut() {
         prefs.edit().putBoolean(IS_LOGIN_KEY, false).apply()
         Log.i("Auth-ServLogOut", "Log out from system")
-        Log.i("Auth-ServLogOut", "Last login is \"${prefs.getString(LAST_LOGIN, "")}\"")
+        Log.i("Auth-ServLogOut", "Last login is \"${prefs.getString(LAST_LOGIN_KEY, "")}\"")
     }
 
     fun getRowByLogin(login: String): UserLogInInfo? {
         val db = dbHelper.readableDatabase
         val projection = arrayOf(
             BaseColumns._ID,
+            UserTokenContract.UserTokenEntry.COLUMN_NICKNAME,
             UserTokenContract.UserTokenEntry.COLUMN_LOGIN,
             UserTokenContract.UserTokenEntry.COLUMN_TOKEN,
             UserTokenContract.UserTokenEntry.COLUMN_EXPIRE
@@ -176,6 +234,8 @@ class AuthService(
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         with(cursor) {
             while (moveToNext()) {
+                val nickname =
+                    getString(getColumnIndexOrThrow(UserTokenContract.UserTokenEntry.COLUMN_NICKNAME))
                 val loginU =
                     getString(getColumnIndexOrThrow(UserTokenContract.UserTokenEntry.COLUMN_LOGIN))
                 val token =
@@ -184,6 +244,7 @@ class AuthService(
                     getString(getColumnIndexOrThrow(UserTokenContract.UserTokenEntry.COLUMN_EXPIRE))
                 items.add(
                     UserLogInInfo(
+                        nickname,
                         loginU,
                         token,
                         LocalDateTime.parse(expire, formatter).plusMinutes(10)
@@ -204,11 +265,18 @@ class AuthService(
         }
     }
 
+    fun checkEmail(email: String): Boolean {
+        val regex: Pattern =
+            Pattern.compile("^[a-z0-9.]+@([a-z0-9]+-?[a-z0-9]+)+\\.([a-z0-9]+-?[a-z0-9]+)+\$")
+        return regex.matcher(email).find()
+    }
+
     //TODO: remove when dev to be ended
     private fun readData() {
         val db = dbHelper.readableDatabase
         val projection = arrayOf(
             BaseColumns._ID,
+            UserTokenContract.UserTokenEntry.COLUMN_NICKNAME,
             UserTokenContract.UserTokenEntry.COLUMN_LOGIN,
             UserTokenContract.UserTokenEntry.COLUMN_TOKEN,
             UserTokenContract.UserTokenEntry.COLUMN_EXPIRE
@@ -229,6 +297,8 @@ class AuthService(
             while (moveToNext()) {
                 val itemId = getLong(getColumnIndexOrThrow(BaseColumns._ID))
                 itemIds.add(itemId)
+                val nickname =
+                    getString(getColumnIndexOrThrow(UserTokenContract.UserTokenEntry.COLUMN_NICKNAME))
                 val login =
                     getString(getColumnIndexOrThrow(UserTokenContract.UserTokenEntry.COLUMN_LOGIN))
                 val token =
@@ -237,6 +307,7 @@ class AuthService(
                     getString(getColumnIndexOrThrow(UserTokenContract.UserTokenEntry.COLUMN_EXPIRE))
                 items.add(
                     UserLogInInfo(
+                        nickname,
                         login,
                         token,
                         LocalDateTime.parse(expire, formatter).plusMinutes(10)
@@ -251,7 +322,7 @@ class AuthService(
         }
     }
 
-    private fun dropTable() {
+    private suspend fun dropTable() {
         Log.i("AuthServ-drop", "Table dropped")
         dbHelper.writableDatabase.execSQL("DROP TABLE IF EXISTS ${UserTokenContract.UserTokenEntry.TABLE_NAME}")
     }

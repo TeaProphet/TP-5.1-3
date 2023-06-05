@@ -87,7 +87,14 @@ dependencies {
     implementation 'org.codehaus.jackson:jackson-core-asl:1.9.13'
     implementation 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
     implementation "androidx.preference:preference-ktx:1.2.0"
+//    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    implementation "androidx.core:core-splashscreen:1.0.1"
 
+//    implementation 'org.apache.httpcomponents:httpclient-android:4.3.5.1'
+    implementation 'org.apache.httpcomponents:httpmime:4.5.6'
+//    implementation 'org.apache.httpcomponents:httpcore:4.4.15'
+
+    implementation 'com.google.code.gson:gson:2.9.0'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20180813'
