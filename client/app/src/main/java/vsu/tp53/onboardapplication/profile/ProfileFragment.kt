@@ -1,34 +1,28 @@
 package vsu.tp53.onboardapplication.profile
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
-import vsu.tp53.onboardapplication.MainActivity
 import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.auth.service.AuthService
 import vsu.tp53.onboardapplication.auth.service.Errors
 import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentProfileBinding
-import vsu.tp53.onboardapplication.model.domain.UserLogInInfo
 import vsu.tp53.onboardapplication.model.entity.ChangeReputationEntity
 import vsu.tp53.onboardapplication.model.entity.ProfileBanEntity
-import vsu.tp53.onboardapplication.model.entity.ProfileInfoEntity
 
 class ProfileFragment : Fragment() {
 
@@ -166,6 +160,11 @@ class ProfileFragment : Fragment() {
             binding.tgUrl.text = profileInfo.tg
 
             if (!profileInfo.is_admin) {
+                binding.blockUser.isVisible = false
+                binding.unblockUser.isVisible = false
+            }
+
+            if (profileInfo.nickname == profileService.getUserNickname()) {
                 binding.blockUser.isVisible = false
                 binding.unblockUser.isVisible = false
             }

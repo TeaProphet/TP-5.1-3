@@ -187,7 +187,8 @@
                         <TextView
                             android:id="@+id/user_age"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:hint="@string/agePlaceholder"/>
                     </LinearLayout>
 
                     <TextView
@@ -202,7 +203,8 @@
                         android:id="@+id/user_games"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="10dp" />
+                        android:layout_margin="10dp"
+                        android:hint="@string/gamesPlaceholder"/>
 
                     <TextView
                         android:id="@+id/textView8"
@@ -228,7 +230,8 @@
                         <TextView
                             android:id="@+id/vk_url"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:hint="@string/vkPlaceholder" />
 
                     </LinearLayout>
 
@@ -249,7 +252,8 @@
                             android:id="@+id/tg_url"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1" />
+                            android:layout_weight="1"
+                            android:hint="@string/tgPlaceholder" />
                     </LinearLayout>
 
                 </LinearLayout>

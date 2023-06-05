@@ -23,6 +23,7 @@ private const val SQL_CREATE_ENTRIES =
             "${UserTokenContract.UserTokenEntry.COLUMN_NICKNAME} TEXT UNIQUE," +
             "${UserTokenContract.UserTokenEntry.COLUMN_LOGIN} TEXT UNIQUE," +
             "${UserTokenContract.UserTokenEntry.COLUMN_TOKEN} TEXT," +
+            "${UserTokenContract.UserTokenEntry.COLUMN_EXPIRE} TEXT," +
             "${UserTokenContract.UserTokenEntry.COLUMN_AVATAR} TEXT)"
 
 private const val SQL_DELETE_TABLE =
