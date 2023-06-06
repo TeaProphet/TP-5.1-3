@@ -12,13 +12,23 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.json.GsonHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
 import org.springframework.web.client.RestTemplate
+import vsu.tp53.onboardapplication.auth.service.IS_LOGIN_KEY
+import vsu.tp53.onboardapplication.auth.service.LAST_LOGIN_KEY
+import vsu.tp53.onboardapplication.auth.service.LAST_NICKNAME_KEY
+import vsu.tp53.onboardapplication.model.domain.Token
+import vsu.tp53.onboardapplication.model.domain.User
 import vsu.tp53.onboardapplication.model.entity.SessionBody
 import vsu.tp53.onboardapplication.model.entity.SessionInfoBody
+import vsu.tp53.onboardapplication.model.entity.UserRegisterPost
+import vsu.tp53.onboardapplication.model.entity.UserTokenResponse
+import vsu.tp53.onboardapplication.sqlitedb.UserTokenContract
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -46,22 +56,21 @@ class SessionService    (
         converter.objectMapper = objectMapper
         restTemplate.messageConverters.add(converter)
     }
+    suspend fun getSessions(): List<SessionBody> {
+        return withContext(Dispatchers.IO) {
+            val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+            StrictMode.setThreadPolicy(policy)
 
-        suspend fun getSessions(): List<SessionBody> {
-            return withContext(Dispatchers.IO) {
-                val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-                StrictMode.setThreadPolicy(policy)
+            val url = baseUrl + sessionsUrl;
+            val sessionList: ResponseEntity<Array<SessionBody>> = restTemplate.getForEntity(
+                url,
+                //тип должен быть сущностью, с json properties, чтобы корректно парситься, насколько я поняла
+                Array<SessionBody>::class.java
+            )
 
-                val url = baseUrl + sessionsUrl;
-                val sessionList: ResponseEntity<Array<SessionBody>> = restTemplate.getForEntity(
-                    url,
-                    //тип должен быть сущностью, с json properties, чтобы корректно парситься, насколько я поняла
-                    Array<SessionBody>::class.java
-                )
-
-                sessionList.body!!.toList()
-            }
+            sessionList.body!!.toList()
         }
+    }
 
     suspend fun getSessionInfo(sessionId : Int): SessionInfoBody? {
         return withContext(Dispatchers.IO) {
