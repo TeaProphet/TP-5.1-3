@@ -85,7 +85,7 @@ class SessionFragment : Fragment() {
 
     private suspend fun setSessionData(sessionInfo: SessionInfoBody){
         binding.inSessionName.setText(sessionInfo.name)
-        binding.inSessionDate.setText(sessionInfo.date_time.toString())
+        binding.inSessionDate.setText(sessionInfo.date_time.toString().replace('T',' '))
         binding.inSessionCity.setText(sessionInfo.city_address)
         binding.inSessionGames.setText(sessionInfo.games)
         binding.inSessionPlayers.setText(sessionInfo.players_max.toString())

@@ -26,13 +26,14 @@ data class SessionBody(
     var date_time: LocalDateTime,
     var players_max: Int){
 
-    constructor() : this(0, "", "", LocalDateTime.now(), 0)
+    constructor() : this(0, "",  "", LocalDateTime.now(), 0)
 }
 
 @Serializable
 data class SessionInfoBody(
     var name: String,
     var city_address: String,
+    var owner: String,
     var games: String,
     @Serializable(with = LocalDateTimeSerializer::class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
@@ -41,22 +42,13 @@ data class SessionInfoBody(
     var players: Array<String>
 ) {
     fun mapToDomain(id: Int) = Session(id, name, city_address, date_time, players_max)
-    constructor() : this("", "", "", LocalDateTime.now(), 0, emptyArray())
+    constructor() : this("", "", "", "", LocalDateTime.now(), 0, emptyArray())
 }
 
 @Serializable
 data class SessionIdPost(
     var sessionId: Int
 )
-//TODO json property + datetimeserializer ???
-//@Serializable
-//data class SessionInfoEntity @JsonCreator constructor(
-//    @JsonProperty("name") var name: String? = "",
-//    @JsonProperty("city_address") var city_address: String? = "",
-//    @JsonProperty("date_time") var date_time: String? = "",
-//    @JsonProperty("players_max") var players_max: Int? = 0,
-//    @JsonProperty("players") var players: Map<String, PlayerBody>? = null
-//)
 
 @Serializable
 data class PlayerBody(

@@ -28,6 +28,7 @@ data class SessionId(
 data class SessionInfo(
     var sessionId: Int,
     var name: String,
+    var owner: String,
     var city_address: String,
     var games: String,
     @Serializable(LocalDateTimeSerializer::class)
@@ -35,5 +36,5 @@ data class SessionInfo(
     var players_max: Int,
     var players: Array<String>
 ) {
-    fun mapToEntity() = SessionInfoBody(name, city_address, games, date_time, players_max, players)
+    fun mapToEntity() = SessionInfoBody(name, city_address, owner, games, date_time, players_max, players)
 }
