@@ -37,9 +37,15 @@ class SignInFragment : Fragment() {
         Log.i("messageSignIn", "SignIn!")
         binding.signInButton.setOnClickListener {
             lifecycleScope.launch {
+                binding.progressContent.visibility = View.VISIBLE
+                binding.pageContent.visibility = View.INVISIBLE
                 try {
                     if (authUser())
                         it.findNavController().navigate(R.id.profileFragment)
+                    else{
+                        binding.progressContent.visibility = View.INVISIBLE
+                        binding.pageContent.visibility = View.VISIBLE
+                    }
                 } catch (_: Exception) {
 
                 }

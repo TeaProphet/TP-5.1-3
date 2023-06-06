@@ -35,9 +35,14 @@ class SignUpFragment : Fragment() {
         Log.i("messageSignUp", "SignUp!")
         binding.signUpButton.setOnClickListener {
             lifecycleScope.launch {
+                binding.progressContent.visibility = View.VISIBLE
+                binding.pageContent.visibility = View.INVISIBLE
                 if (registerUser()) {
                     Log.i("SignUp-Frag", "Success")
                     it.findNavController().navigate(R.id.profileFragment)
+                } else{
+                    binding.progressContent.visibility = View.INVISIBLE
+                    binding.pageContent.visibility = View.VISIBLE
                 }
             }
         }

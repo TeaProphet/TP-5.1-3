@@ -106,7 +106,7 @@
         android:layout_height="match_parent">
 
         <Button
-            android:id="@+id/join_session_button"
+            android:id="@+id/create_session_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:foregroundGravity="center"

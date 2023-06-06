@@ -8,13 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.launch
+import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
+import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentSessionBinding
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import vsu.tp53.onboardapplication.home.service.SessionService
+import vsu.tp53.onboardapplication.model.entity.ProfileInfoEntity
+import vsu.tp53.onboardapplication.model.entity.SessionInfoBody
 
 
 class SessionFragment : Fragment() {
@@ -22,25 +27,28 @@ class SessionFragment : Fragment() {
     private lateinit var binding: FragmentSessionBinding
     private lateinit var playersRecyclerView: RecyclerView
     private lateinit var playersAdapter: PlayerAdapter
+    private lateinit var _sessionService: SessionService
+    private lateinit var _profileService: ProfileService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSessionBinding.inflate(inflater, container, false)
-        println(requireArguments().getString("id"))
-        binding.inSessionID.setText(requireArguments().getString("id"))
-        binding.inSessionName.setText(requireArguments().getString("session_name"))
-        binding.inSessionDate.setText(requireArguments().getString("date"))
-        binding.inSessionCity.setText(requireArguments().getString("city"))
-        binding.inSessionGames.setText("DnD")
-        binding.inSessionPlayers.setText(requireArguments().getString("players"))
-
-        playersRecyclerView = binding.recyclerPlayersPlayer
-        playersRecyclerView.layoutManager = LinearLayoutManager(activity)
-
-        playersAdapter = PlayerAdapter(getDataPlayer() as MutableList<PlayerModel>)
-        playersRecyclerView.adapter = playersAdapter
+        if (container != null) {
+            _sessionService = SessionService(RestTemplate(), container.context)
+            _profileService = ProfileService(RestTemplate(), container.context)
+        }
+        lifecycleScope.launch {
+            val sessionId = requireArguments().getInt("id")
+            val sessionInfo: SessionInfoBody? = _sessionService.getSessionInfo(sessionId)
+            if (sessionInfo != null){
+                binding.inSessionID.setText(sessionId.toString())
+                setSessionData(sessionInfo)
+            }
+            binding.progressContent.visibility = View.GONE
+            binding.pageContent.visibility = View.VISIBLE
+        }
 
         binding.joinSessionButton.setOnClickListener {
             if (binding.joinSessionButton.text == "Записаться"){
@@ -75,12 +83,24 @@ class SessionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
-    private fun getDataPlayer(): List<PlayerModel> {
+    private suspend fun setSessionData(sessionInfo: SessionInfoBody){
+        binding.inSessionName.setText(sessionInfo.name)
+        binding.inSessionDate.setText(sessionInfo.date_time.toString())
+        binding.inSessionCity.setText(sessionInfo.city_address)
+        binding.inSessionGames.setText(sessionInfo.games)
+        binding.inSessionPlayers.setText(sessionInfo.players_max.toString())
         val listPlayers: MutableList<PlayerModel> = java.util.ArrayList()
+        val players: Array<String> = sessionInfo.players
+        for (nickname in players){
+            val profileInfo: ProfileInfoEntity? = _profileService.getProfileInfo(nickname)
+            if (profileInfo != null) {
+                listPlayers.add(PlayerModel(nickname, profileInfo.reputation))
+            }
+        }
+        playersRecyclerView = binding.recyclerPlayersPlayer
+        playersRecyclerView.layoutManager = LinearLayoutManager(activity)
 
-        listPlayers.add(PlayerModel("Владислав", 1))
-        listPlayers.add(PlayerModel("Юлия", 1))
-        listPlayers.add(PlayerModel("Екатерина", 1))
-        return listPlayers
+        playersAdapter = PlayerAdapter(listPlayers)
+        playersRecyclerView.adapter = playersAdapter
     }
 }
