@@ -45,6 +45,8 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             sessionAdapter = SessionAdapter(_sessionService.getSessions() as MutableList<SessionBody>)
             recyclerView.adapter = sessionAdapter
+            binding.progressContent.visibility = View.GONE
+            binding.pageContent.visibility = View.VISIBLE
        }
 
         binding.addButton.setOnClickListener {

@@ -52,6 +52,8 @@ class ProfileFragment : Fragment() {
         if (nickname != null){
             lifecycleScope.launch {
                 initProfile(nickname)
+                binding.progressContent.visibility = View.GONE
+                binding.pageContent.visibility = View.VISIBLE
             }
         } else {
             nickname = profileService.getUserNickname()
@@ -70,6 +72,8 @@ class ProfileFragment : Fragment() {
                 onStart().apply {
                     lifecycleScope.launch {
                         initProfile(nickname)
+                        binding.progressContent.visibility = View.GONE
+                        binding.pageContent.visibility = View.VISIBLE
                     }
                 }
             }
