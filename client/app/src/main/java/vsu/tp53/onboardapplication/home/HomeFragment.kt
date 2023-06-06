@@ -41,6 +41,7 @@ class HomeFragment : Fragment() {
 
         recyclerView = binding.recyclerSessionsSession
         recyclerView.layoutManager = LinearLayoutManager(activity)
+
         lifecycleScope.launch {
             sessionAdapter = SessionAdapter(_sessionService.getSessions() as MutableList<SessionBody>)
             recyclerView.adapter = sessionAdapter
@@ -55,22 +56,5 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-    }
-    private fun getDataSession(): List<SessionModel> {
-        val listSession: MutableList<SessionModel> = java.util.ArrayList()
-        val date: LocalDate = LocalDate.now()
-        val cur_time = LocalTime.now()
-        val t_formatter = DateTimeFormatter.ofPattern("HH:mm")
-        val dateString = date.year.toString()+ "." + date.month.value.toString() + "." + date.dayOfMonth.toString() + " " + cur_time.format(t_formatter)
-        Log.i("Sessions", "response")
-
-//        val response = sessionService.getSessions()
-//        Log.i("Sessions", response.toString())
-
-        listSession.add(SessionModel(1,"Битвы героев", dateString, "Воронеж", "1/4"))
-        listSession.add(SessionModel(2,"DnD: Затерянный город", dateString, "Подольск", "3/4"))
-        listSession.add(SessionModel(3,"Компания Затерянный рудник Фандельвера", dateString, "Омск", "2/4"))
-        listSession.add(SessionModel(4,"Играем в Бэнг", dateString, "Энск", "3/8"))
-        return listSession
     }
 }
