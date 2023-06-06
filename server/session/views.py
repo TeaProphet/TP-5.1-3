@@ -119,7 +119,7 @@ def get_sessions(request):
     if raw_sessions_info:
         sessions_info = []
         for i in range(len(raw_sessions_info)):
-            serialized_raw = models.SessionPublicInfoSerializer(data=raw_sessions_info[i])
+            serialized_raw = models.SessionPublicShortInfoSerializer(data=raw_sessions_info[i])
             serialized_raw.is_valid()
             serialized = serialized_raw.validated_data
             serialized['sessionId'] = i

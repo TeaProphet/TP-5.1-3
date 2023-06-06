@@ -77,6 +77,16 @@ class SessionPublicInfoSerializer(serializers.Serializer):
         return Session(**validated_data)
 
 
+class SessionPublicShortInfoSerializer(serializers.Serializer):
+    city_address = serializers.CharField(max_length=256)
+    date_time = serializers.CharField(max_length=256)
+    name = serializers.CharField(max_length=256)
+    players_max = serializers.IntegerField()
+
+    def create(self, validated_data):
+        return Session(**validated_data)
+
+
 
 @extend_schema_serializer(
     examples=[
