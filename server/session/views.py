@@ -86,7 +86,7 @@ def delete_session_algorythm(requester_uid, session_id):
 
 
 @extend_schema(
-    responses=models.SessionRegistrationSerializer,
+    responses=models.SessionPublicInfoSerializer,
     request=None,
     tags=['Sessions']
 )

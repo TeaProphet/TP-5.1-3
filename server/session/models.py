@@ -52,6 +52,7 @@ class SessionSerializer(serializers.Serializer):
                 'games': "Кемет",
                 'date_time': "2023-06-03 12:00",
                 'name': "Кемет | ПараDice",
+                'players': ['nickname', 'nickname', '...'],
                 'players_max': 4
             },
             request_only=True
@@ -70,6 +71,24 @@ class SessionRegistrationSerializer(serializers.Serializer):
         return Session(**validated_data)
 
 
+
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            'Game session',
+            summary="Game session template",
+            value={
+                'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
+                'games': "Кемет",
+                'date_time': "2023-06-03 12:00",
+                'name': "Кемет | ПараDice",
+                'players': ["nickname", "nickname", "..."],
+                'players_max': 4
+            },
+            response_only=True
+        )
+    ]
+)
 class SessionPublicInfoSerializer(serializers.Serializer):
     city_address = serializers.CharField(max_length=256)
     games = serializers.CharField(max_length=256)
