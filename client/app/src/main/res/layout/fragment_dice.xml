@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
             android:text="@string/dice_result"
-            android:textColor="@color/white"
+            android:textColor="@color/primary_text"
             android:textSize="@dimen/session_headings"
             android:visibility="invisible" />
 
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="TextView"
-            android:textColor="@color/white"
+            android:textColor="@color/primary_text"
             android:textSize="@dimen/session_headings"
             android:visibility="invisible" />
     </LinearLayout>
