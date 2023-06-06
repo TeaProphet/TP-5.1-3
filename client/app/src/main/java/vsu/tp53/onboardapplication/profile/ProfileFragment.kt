@@ -43,22 +43,38 @@ class ProfileFragment : Fragment() {
             _authService = AuthService(RestTemplate(), container.context)
             _profileService = ProfileService(RestTemplate(), container.context)
         }
+        var nickname: String? = null
 
-        Log.i("ProfileFragment", "Before check if user is logged or token is expired")
-        Log.i("ProfileFragment", authService.checkIfUserLoggedIn().toString() + " log in")
-        Log.i("ProfileFragment", authService.checkTokenIsNotExpired().toString() + " token exp")
-        if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()) {
-            Log.i("ProfileFragment", "Inside check if user is logged or token is expired")
+        try {
+            nickname = requireArguments().getString("nickname")
+        } catch (e: IllegalStateException){}
+
+        if (nickname != null){
+            lifecycleScope.launch {
+                initProfile(nickname)
+            }
+        } else {
+            nickname = profileService.getUserNickname()
+            Log.i("ProfileFragment", "Before check if user is logged or token is expired")
             Log.i("ProfileFragment", authService.checkIfUserLoggedIn().toString() + " log in")
             Log.i("ProfileFragment", authService.checkTokenIsNotExpired().toString() + " token exp")
-            this@ProfileFragment.findNavController().navigate(R.id.pageUnauthorizedFragment)
-        } else {
-            onStart().apply {
-                lifecycleScope.launch {
-                    initProfile()
+            if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()) {
+                Log.i("ProfileFragment", "Inside check if user is logged or token is expired")
+                Log.i("ProfileFragment", authService.checkIfUserLoggedIn().toString() + " log in")
+                Log.i(
+                    "ProfileFragment",
+                    authService.checkTokenIsNotExpired().toString() + " token exp"
+                )
+                this@ProfileFragment.findNavController().navigate(R.id.pageUnauthorizedFragment)
+            } else {
+                onStart().apply {
+                    lifecycleScope.launch {
+                        initProfile(nickname)
+                    }
                 }
             }
         }
+
 
         binding.openUserSessions.setOnClickListener {
             it.findNavController().navigate(R.id.userSessionsFragment)
@@ -112,21 +128,23 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        binding.editProfileButton.setOnClickListener {
-            it.findNavController().navigate(R.id.editProfileFragment)
+        if (!authService.checkIfUserLoggedIn() || nickname != profileService.getUserNickname()){
+            binding.editProfileButton.visibility = View.GONE
+        } else {
+            binding.editProfileButton.setOnClickListener {
+                it.findNavController().navigate(R.id.editProfileFragment)
+            }
         }
 
         binding.increaseRep.setOnClickListener {
             lifecycleScope.launch {
-                changeRepPlus()
-                initProfile()
+                changeRepPlus(nickname)
             }
         }
 
         binding.decreaseRep.setOnClickListener {
             lifecycleScope.launch {
-                changeRepMinus()
-                initProfile()
+                changeRepMinus(nickname)
             }
         }
 
@@ -140,19 +158,22 @@ class ProfileFragment : Fragment() {
     @SuppressLint("ResourceType")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val imageview = binding.profileImage
-        imageview.setImageResource(R.drawable.profile_kitten)
     }
 
-    private suspend fun initProfile() {
-        val profileInfo = profileService.getProfileInfo()
+    private suspend fun initProfile(nickname: String?) {
+        var is_admin = false
+        if (authService.checkIfUserLoggedIn() && authService.checkTokenIsNotExpired()){
+            val currentUserInfo = profileService.getProfileInfo(profileService.getUserNickname())
+            is_admin = currentUserInfo!!.is_admin
+        }
+        val profileInfo = profileService.getProfileInfo(nickname)
         if (profileInfo != null) {
             if (profileInfo.is_banned) {
                 this.findNavController().navigate(R.id.fragmentBanned)
                 return
             }
             Log.i("ProfileFragment", "Init profile")
-            binding.profileName.text = profileService.getUserNickname()
+            binding.profileName.text = nickname
             binding.playerReputation.text = profileInfo.reputation.toString()
             Log.i("ProfileFragment", "rep: ${profileInfo.reputation}")
             binding.userAge.text = profileInfo.age?.toString()
@@ -160,7 +181,7 @@ class ProfileFragment : Fragment() {
             binding.vkUrl.text = profileInfo.vk
             binding.tgUrl.text = profileInfo.tg
 
-            if (!profileInfo.is_admin) {
+            if (!is_admin) {
                 binding.blockUser.isVisible = false
                 binding.unblockUser.isVisible = false
             }
@@ -172,7 +193,10 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private suspend fun changeRepPlus() {
+    private suspend fun changeRepPlus(nickname: String?) {
+        if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()){
+            findNavController().navigate(R.id.pageUnauthorizedFragment)
+        }
         val changeRepEntity = ChangeReputationEntity(
             authService.getRowByLogin(profileService.getUserLogin())!!.tokenId,
             binding.profileName.text.toString()
@@ -190,7 +214,10 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private suspend fun changeRepMinus() {
+    private suspend fun changeRepMinus(nickname: String?) {
+        if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()){
+            findNavController().navigate(R.id.pageUnauthorizedFragment)
+        }
         val changeRepEntity = ChangeReputationEntity(
             authService.getRowByLogin(profileService.getUserLogin())!!.tokenId,
             binding.profileName.text.toString()

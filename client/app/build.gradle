@@ -95,6 +95,7 @@ dependencies {
 //    implementation 'org.apache.httpcomponents:httpcore:4.4.15'
 
     implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.1'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20180813'

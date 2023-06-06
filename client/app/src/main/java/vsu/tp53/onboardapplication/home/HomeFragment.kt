@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.databinding.FragmentHomeBinding
 import vsu.tp53.onboardapplication.home.service.SessionService
+import vsu.tp53.onboardapplication.model.entity.SessionBody
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -40,11 +41,10 @@ class HomeFragment : Fragment() {
 
         recyclerView = binding.recyclerSessionsSession
         recyclerView.layoutManager = LinearLayoutManager(activity)
-
-//        lifecycleScope.launch {
-            sessionAdapter = SessionAdapter(getDataSession() as MutableList<SessionModel>)
+        lifecycleScope.launch {
+            sessionAdapter = SessionAdapter(_sessionService.getSessions() as MutableList<SessionBody>)
             recyclerView.adapter = sessionAdapter
-//        }
+       }
 
         binding.addButton.setOnClickListener {
             it.findNavController().navigate(R.id.createSessionFragment)
