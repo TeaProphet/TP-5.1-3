@@ -7,6 +7,7 @@ from onboardProject import settings
 class Session(models.Model):
     session_id = models.IntegerField()
     city_address = models.CharField(max_length=256)
+    games = models.CharField(max_length=256)
     date_time = models.DateTimeField()
     name = models.CharField(max_length=256)
     owner = models.CharField(max_length=256)
@@ -29,6 +30,7 @@ class Session(models.Model):
 
 class SessionSerializer(serializers.Serializer):
     city_address = serializers.CharField(max_length=256)
+    games = serializers.CharField(max_length=256)
     date_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
     name = serializers.CharField(max_length=256)
     owner = serializers.CharField(max_length=256)
@@ -47,6 +49,7 @@ class SessionSerializer(serializers.Serializer):
             value={
                 'idToken': '...',
                 'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
+                'games': "Кемет",
                 'date_time': "2023-06-03 12:00",
                 'name': "Кемет | ПараDice",
                 'players_max': 4
@@ -58,6 +61,7 @@ class SessionSerializer(serializers.Serializer):
 class SessionRegistrationSerializer(serializers.Serializer):
     session_id = serializers.IntegerField()
     city_address = serializers.CharField(max_length=256)
+    games = serializers.CharField(max_length=256)
     date_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
     name = serializers.CharField(max_length=256)
     players_max = serializers.IntegerField()
@@ -68,6 +72,7 @@ class SessionRegistrationSerializer(serializers.Serializer):
 
 class SessionPublicInfoSerializer(serializers.Serializer):
     city_address = serializers.CharField(max_length=256)
+    games = serializers.CharField(max_length=256)
     date_time = serializers.CharField(max_length=256)
     name = serializers.CharField(max_length=256)
     players = serializers.JSONField()
@@ -97,6 +102,7 @@ class SessionPublicShortInfoSerializer(serializers.Serializer):
                 {
                     "session_id": 0,
                     'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
+                    'games': "Кемет",
                     'date_time': "2023.06.3 12:00",
                     'name': "Кемет | ПараDice",
                     'players_max': 4
@@ -104,6 +110,7 @@ class SessionPublicShortInfoSerializer(serializers.Serializer):
                 {
                     "session_id": 1,
                     'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
+                    'games': "DnD5",
                     'date_time': "2023.06.3 12:00",
                     'name': "DnD5 | ПараDice",
                     'players_max': 4
