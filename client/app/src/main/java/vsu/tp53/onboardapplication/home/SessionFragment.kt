@@ -46,6 +46,8 @@ class SessionFragment : Fragment() {
                 binding.inSessionID.setText(sessionId.toString())
                 setSessionData(sessionInfo)
             }
+            binding.progressContent.visibility = View.GONE
+            binding.pageContent.visibility = View.VISIBLE
         }
 
         binding.joinSessionButton.setOnClickListener {

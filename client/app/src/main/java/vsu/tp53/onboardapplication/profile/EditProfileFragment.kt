@@ -65,12 +65,16 @@ class EditProfileFragment : Fragment() {
 
         lifecycleScope.launch {
             init()
+            binding.progressContent.visibility = View.GONE
+            binding.pageContent.visibility = View.VISIBLE
         }
 
         editText = binding.ageInput
         editText.inputFilterNumberRange(12..100)
         binding.saveChangesButton.setOnClickListener {
             Log.i("EditProfileFrag", "Save changes button is clicked...")
+            binding.progressContent.visibility = View.VISIBLE
+            binding.pageContent.visibility = View.GONE
             lifecycleScope.launch {
                 if (changeProfile())
                     it.findNavController().navigate(R.id.profileFragment)
@@ -78,6 +82,8 @@ class EditProfileFragment : Fragment() {
         }
 
         binding.quitSystem.setOnClickListener {
+            binding.progressContent.visibility = View.VISIBLE
+            binding.pageContent.visibility = View.GONE
             authService.logOut()
             it.findNavController().navigate(R.id.homeFragment)
         }
@@ -154,18 +160,6 @@ class EditProfileFragment : Fragment() {
     @SuppressLint("ResourceType")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val imageview = binding.profileImage
-        imageview.setImageResource(R.drawable.profile_kitten)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-            val uri = data?.data
-            val fileName = uri?.lastPathSegment
-            Toast.makeText(requireContext(), "Выбран файл $fileName", Toast.LENGTH_SHORT).show()
-        }
     }
 
     // extension function to filter edit text number range
