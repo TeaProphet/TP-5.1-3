@@ -8,10 +8,12 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import vsu.tp53.onboardapplication.R
+import vsu.tp53.onboardapplication.model.entity.SessionBody
+import java.io.Serializable
 
-class SessionAdapter (_newSessions: MutableList<SessionModel>) : RecyclerView.Adapter<SessionAdapter.SessionViewHolder>() {
+class SessionAdapter (_newSessions: MutableList<SessionBody>) : RecyclerView.Adapter<SessionAdapter.SessionViewHolder>() {
 
-    private var newSessions: MutableList<SessionModel> = _newSessions
+    private var newSessions: MutableList<SessionBody> = _newSessions
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionViewHolder {
         val sessionsItems: View = LayoutInflater.from(parent.context).inflate(R.layout.session_item, parent, false)
@@ -19,19 +21,16 @@ class SessionAdapter (_newSessions: MutableList<SessionModel>) : RecyclerView.Ad
     }
 
     override fun onBindViewHolder(holder: SessionViewHolder, position: Int) {
-        holder.sessionID.text = newSessions[position].getId().toString()
-        holder.sessionName.text = newSessions[position].getName()
-        holder.sessionDate.text = newSessions[position].getDate()
-        holder.sessionCity.text = newSessions[position].getCity()
-        holder.sessionPlayers.text = newSessions[position].getPlayers()
+        holder.sessionID.text = newSessions[position].sessionId.toString()
+        holder.sessionName.text = newSessions[position].name
+        holder.sessionDate.text = newSessions[position].date_time.toString()
+        holder.sessionCity.text = newSessions[position].city_address
+        holder.sessionPlayers.text = newSessions[position].players_max.toString()
+        holder.sessionPlayers.text = newSessions[position].players_max.toString()
 
         val bundle = Bundle()
 
-        bundle.putInt("id", newSessions[position].getId())
-        bundle.putString("session_name", newSessions[position].getName())
-        bundle.putString("date", newSessions[position].getDate())
-        bundle.putString("city", newSessions[position].getCity())
-        bundle.putString("players", newSessions[position].getPlayers())
+        bundle.putInt("id", newSessions[position].sessionId)
         holder.itemView.setOnClickListener {
             it.findNavController().navigate(R.id.sessionFragment, bundle)
         }

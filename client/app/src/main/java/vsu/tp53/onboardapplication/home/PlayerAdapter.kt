@@ -1,9 +1,11 @@
 package vsu.tp53.onboardapplication.home
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import vsu.tp53.onboardapplication.R
 
@@ -20,13 +22,12 @@ class PlayerAdapter (_newPlayers: MutableList<PlayerModel>) : RecyclerView.Adapt
         holder.playerName.text = newPlayers[position].getName()
         holder.playerReputation.text = newPlayers[position].getReputation().toString()
 
-//        val bundle = Bundle()
-//
-//        bundle.putInt("player_reputation", newPlayers[position].getReputation())
-//        bundle.putString("player_name", newPlayers[position].getName())
-//        holder.itemView.setOnClickListener {
-//            it.findNavController().navigate(R.id.sessionFragment, bundle)
-//        }
+        val bundle = Bundle()
+
+        bundle.putString("nickname", newPlayers[position].getName())
+        holder.itemView.setOnClickListener {
+            it.findNavController().navigate(R.id.profileFragment, bundle)
+        }
     }
 
     override fun getItemCount(): Int {

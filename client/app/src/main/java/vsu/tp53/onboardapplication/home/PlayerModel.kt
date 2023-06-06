@@ -1,13 +1,13 @@
 package vsu.tp53.onboardapplication.home
 
-class PlayerModel(_name: String, _reputation: Int) {
-    private var reputation: Int = _reputation
+class PlayerModel(_name: String, _reputation: Double) {
+    private var reputation: Double = _reputation
     private var name: String = _name
-    fun getReputation(): Int {
+    fun getReputation(): Double {
         return reputation
     }
 
-    fun setReputation(reputation: Int) {
+    fun setReputation(reputation: Double) {
         this.reputation = reputation
     }
 

@@ -2,10 +2,8 @@ package vsu.tp53.onboardapplication.auth.service
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.StrictMode
 import android.util.Log
 import androidx.preference.PreferenceManager
-import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.http.HttpEntity
@@ -40,29 +38,29 @@ class ProfileService(
     private val authService = AuthService(restTemplate, context)
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    suspend fun getProfileInfo(login: String = ""): ProfileInfoEntity? {
+    suspend fun getProfileInfo(login: String? = null): ProfileInfoEntity? {
         try {
             return withContext(Dispatchers.IO) {
-                Log.i("Profile-last", login)
-
-                if (login != "") {
-                    return@withContext null
+                var searchedLogin = ""
+                if (login == null){
+                    searchedLogin = prefs.getString(LAST_NICKNAME_KEY, "").toString()
+                } else {
+                    searchedLogin = login
                 }
+                Log.i("Profile-last", searchedLogin)
+                Log.i("Profile-lasLogin", searchedLogin)
 
-                val lastNickname = prefs.getString(LAST_NICKNAME_KEY, "")
-                Log.i("Profile-lasLogin", lastNickname!!)
+                val params: MutableMap<String, String> = HashMap()
+                params["nickname"] = searchedLogin
 
-                var params: MutableMap<String, String> = HashMap()
-                params["nickname"] = lastNickname
-
-                val searchedProfile = SearchProfile(lastNickname)
+                val searchedProfile = SearchProfile(searchedLogin)
                 Log.i("Profile-searchLogin", searchedProfile.toString())
                 restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
                 restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
                 restTemplate.messageConverters.add(GsonHttpMessageConverter())
 
                 val profResp = restTemplate.getForObject(
-                    "http://193.233.49.112/get_profile_info/$lastNickname",
+                    "http://193.233.49.112/get_profile_info/$searchedLogin",
                     ProfileInfoEntity::class.java,
                 )
 
