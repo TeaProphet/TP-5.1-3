@@ -82,6 +82,7 @@ class SessionRegistrationSerializer(serializers.Serializer):
                 'games': "Кемет",
                 'date_time': "2023-06-03 12:00",
                 'name': "Кемет | ПараDice",
+                "owner": "nickname",
                 'players': ["nickname", "nickname", "..."],
                 'players_max': 4
             },
@@ -94,6 +95,7 @@ class SessionPublicInfoSerializer(serializers.Serializer):
     games = serializers.CharField(max_length=256)
     date_time = serializers.CharField(max_length=256)
     name = serializers.CharField(max_length=256)
+    owner = serializers.CharField(max_length=256)
     players = serializers.JSONField()
     players_max = serializers.IntegerField()
 
