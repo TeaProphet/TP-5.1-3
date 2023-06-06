@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Session name"
-                android:textColor="@color/primary_text"
+                android:textColor="@color/white"
                 android:textSize="20sp" />
 
             <TextView
