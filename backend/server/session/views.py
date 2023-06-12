@@ -79,10 +79,11 @@ def delete_session_algorythm(requester_uid, session_id):
     for nickname in players_list:
         player_uid = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(nickname).get().val().popitem()[0]
         played_sessions = settings.database.child(settings.USERS_TABLE).child(player_uid).child('user_data').child('played_sessions').get().val()
-        id_in_played = played_sessions.index(session_id)
-        played_sessions.pop(id_in_played)
-        settings.database.child(settings.USERS_TABLE).child(player_uid) \
-            .child('user_data').child('played_sessions').set(played_sessions)
+        if played_sessions.__contains__(session_id):
+            id_in_played = played_sessions.index(session_id)
+            played_sessions.pop(id_in_played)
+            settings.database.child(settings.USERS_TABLE).child(player_uid) \
+                .child('user_data').child('played_sessions').set(played_sessions)
 
 
 @extend_schema(
@@ -119,11 +120,12 @@ def get_sessions(request):
     if raw_sessions_info:
         sessions_info = []
         for i in range(len(raw_sessions_info)):
-            serialized_raw = models.SessionPublicShortInfoSerializer(data=raw_sessions_info[i])
-            serialized_raw.is_valid()
-            serialized = serialized_raw.validated_data
-            serialized['sessionId'] = i
-            sessions_info.append(serialized)
+            if raw_sessions_info[i]:
+                serialized_raw = models.SessionPublicShortInfoSerializer(data=raw_sessions_info[i])
+                serialized_raw.is_valid()
+                serialized = serialized_raw.validated_data
+                serialized['sessionId'] = i
+                sessions_info.append(serialized)
     else:
         sessions_info = []
     return JsonResponse(sessions_info, safe=False)
