@@ -1,4 +1,6 @@
 import json
+from collections import OrderedDict
+
 from django.http import JsonResponse, HttpRequest
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -119,6 +121,8 @@ def get_sessions(request):
     raw_sessions_info = settings.database.child(settings.SESSIONS_TABLE).get().val()
     if raw_sessions_info:
         sessions_info = []
+        if type(raw_sessions_info) == list:
+            raw_sessions_info = OrderedDict((index, item) for index, item in enumerate(raw_sessions_info) if item is not None)
         for key, val in raw_sessions_info.items():
             serialized_raw = models.SessionPublicShortInfoSerializer(data=val)
             serialized_raw.is_valid()
