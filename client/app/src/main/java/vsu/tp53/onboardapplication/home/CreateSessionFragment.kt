@@ -1,11 +1,14 @@
 package vsu.tp53.onboardapplication.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
@@ -15,6 +18,9 @@ import vsu.tp53.onboardapplication.databinding.FragmentCreateSessionBinding
 import vsu.tp53.onboardapplication.databinding.FragmentHomeBinding
 import vsu.tp53.onboardapplication.databinding.FragmentProfileBinding
 import vsu.tp53.onboardapplication.home.service.SessionService
+import vsu.tp53.onboardapplication.model.entity.SessionEntity
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class CreateSessionFragment : Fragment() {
 
@@ -36,14 +42,37 @@ class CreateSessionFragment : Fragment() {
             _sessionService = SessionService(RestTemplate(), container.context)
         }
         lifecycleScope.launch {
-            if (!_authService.checkIfUserLoggedIn() || !profileService.getProfileInfo(null)!!.is_admin){
-                _binding!!.createSessionButton.visibility = View.GONE
-            } else {
-                _binding!!.createSessionButton.setOnClickListener({
-                    _sessionService
-                })
+            if (!_authService.checkIfUserLoggedIn()) {
+                _binding!!.createSessionButton.isVisible = false
             }
         }
-        return inflater.inflate(R.layout.fragment_create_session, container, false)
+
+        _binding!!.createSessionButton.setOnClickListener {
+            Log.i("CreateSession", "ButtonPressed")
+            lifecycleScope.launch {
+                Log.i("CreateSession", "Insude scope")
+                createSession()
+                it.findNavController().navigate(R.id.homeFragment)
+            }
+        }
+        return _binding!!.root
+    }
+
+    private suspend fun createSession() {
+        Log.i("CreateSession", "Creact session method")
+        val df: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+        val localDate: LocalDateTime =
+            LocalDateTime.parse("${_binding!!.dateInput.text} ${_binding!!.timeInput.text}", df)
+        val sessionEntity = SessionEntity(
+            "",
+            _binding!!.nameInput.text.toString(),
+            _binding!!.addressInput.text.toString(),
+            _binding!!.gamesInput.text.toString(),
+            localDate,
+            arrayOf(profileService.getUserNickname()),
+            _binding!!.playersNumberInput.text.toString().toInt()
+        )
+
+        _sessionService.createSession(sessionEntity)
     }
 }

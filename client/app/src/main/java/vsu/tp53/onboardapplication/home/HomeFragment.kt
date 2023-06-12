@@ -43,11 +43,18 @@ class HomeFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(activity)
 
         lifecycleScope.launch {
-            sessionAdapter = SessionAdapter(_sessionService.getSessions() as MutableList<SessionBody>)
+            val sessions = _sessionService.getSessions()
+            sessionAdapter = if (sessions.isNotEmpty()) {
+                SessionAdapter(_sessionService.getSessions() as MutableList<SessionBody>)
+            } else {
+                SessionAdapter(mutableListOf())
+            }
+//            sessionAdapter =
+//                SessionAdapter(_sessionService.getSessions() as MutableList<SessionBody>)
             recyclerView.adapter = sessionAdapter
             binding.progressContent.visibility = View.GONE
             binding.pageContent.visibility = View.VISIBLE
-       }
+        }
 
         binding.addButton.setOnClickListener {
             it.findNavController().navigate(R.id.createSessionFragment)
