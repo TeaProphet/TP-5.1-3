@@ -17,6 +17,7 @@
         android:textSize="@dimen/session_headings" />
 
     <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/nameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/session_name_hint"
@@ -31,7 +32,7 @@
         android:textSize="@dimen/session_headings" />
 
     <EditText
-        android:id="@+id/editTextNumber"
+        android:id="@+id/playersNumberInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -48,7 +49,7 @@
         android:textSize="@dimen/session_headings" />
 
     <EditText
-        android:id="@+id/editTextTextMultiLine"
+        android:id="@+id/gamesInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -66,7 +67,7 @@
         android:textSize="@dimen/session_headings" />
 
     <EditText
-        android:id="@+id/editTextDate"
+        android:id="@+id/dateInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -75,7 +76,7 @@
         android:padding="15dp" />
 
     <EditText
-        android:id="@+id/editTextTime"
+        android:id="@+id/timeInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -92,14 +93,14 @@
         android:textSize="@dimen/session_headings" />
 
     <EditText
-        android:id="@+id/user_vk"
+        android:id="@+id/addressInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="text"
-        android:hint="@string/address_hint"
         android:autofillHints="postalAddress"
-        android:padding="15dp"/>
+        android:ems="10"
+        android:hint="@string/address_hint"
+        android:inputType="text"
+        android:padding="15dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

@@ -195,7 +195,7 @@ class ProfileService(
         return prefs.getString(LAST_NICKNAME_KEY, "").toString()
     }
 
-    private fun getUserToken(): String {
+    fun getUserToken(): String {
         return authService.getRowByLogin(getUserLogin())?.tokenId.toString()
     }
 }
