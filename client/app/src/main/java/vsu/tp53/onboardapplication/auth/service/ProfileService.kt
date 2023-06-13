@@ -41,12 +41,7 @@ class ProfileService(
     suspend fun getProfileInfo(login: String? = null): ProfileInfoEntity? {
         try {
             return withContext(Dispatchers.IO) {
-                var searchedLogin = ""
-                if (login == null){
-                    searchedLogin = prefs.getString(LAST_NICKNAME_KEY, "").toString()
-                } else {
-                    searchedLogin = login
-                }
+                var searchedLogin: String = login ?: prefs.getString(LAST_NICKNAME_KEY, "").toString()
                 Log.i("Profile-last", searchedLogin)
                 Log.i("Profile-lasLogin", searchedLogin)
 

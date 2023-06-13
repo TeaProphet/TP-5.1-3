@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -15,8 +14,6 @@ import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.auth.service.AuthService
 import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentCreateSessionBinding
-import vsu.tp53.onboardapplication.databinding.FragmentHomeBinding
-import vsu.tp53.onboardapplication.databinding.FragmentProfileBinding
 import vsu.tp53.onboardapplication.home.service.SessionService
 import vsu.tp53.onboardapplication.model.entity.SessionEntity
 import java.time.LocalDateTime
@@ -41,11 +38,6 @@ class CreateSessionFragment : Fragment() {
             _profileService = ProfileService(RestTemplate(), container.context)
             _sessionService = SessionService(RestTemplate(), container.context)
         }
-        lifecycleScope.launch {
-            if (!_authService.checkIfUserLoggedIn()) {
-                _binding!!.createSessionButton.isVisible = false
-            }
-        }
 
         _binding!!.createSessionButton.setOnClickListener {
             Log.i("CreateSession", "ButtonPressed")
@@ -68,7 +60,7 @@ class CreateSessionFragment : Fragment() {
             _binding!!.nameInput.text.toString(),
             _binding!!.addressInput.text.toString(),
             _binding!!.gamesInput.text.toString(),
-            localDate,
+            localDate.toString(),
             arrayOf(profileService.getUserNickname()),
             _binding!!.playersNumberInput.text.toString().toInt()
         )
