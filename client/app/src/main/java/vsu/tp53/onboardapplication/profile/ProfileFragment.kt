@@ -1,7 +1,6 @@
 package vsu.tp53.onboardapplication.profile
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,12 +17,12 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.auth.service.AuthService
-import vsu.tp53.onboardapplication.auth.service.Errors
-import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentProfileBinding
-import vsu.tp53.onboardapplication.model.entity.ChangeReputationEntity
-import vsu.tp53.onboardapplication.model.entity.ProfileBanEntity
+import vsu.tp53.onboardapplication.model.ChangeReputationEntity
+import vsu.tp53.onboardapplication.model.ProfileBanEntity
+import vsu.tp53.onboardapplication.service.AuthService
+import vsu.tp53.onboardapplication.service.Errors
+import vsu.tp53.onboardapplication.service.ProfileService
 
 class ProfileFragment : Fragment() {
 

@@ -1,7 +1,6 @@
 package vsu.tp53.onboardapplication.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,13 +13,10 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.auth.service.AuthService
 import vsu.tp53.onboardapplication.databinding.FragmentHomeBinding
-import vsu.tp53.onboardapplication.home.service.SessionService
-import vsu.tp53.onboardapplication.model.entity.SessionBody
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import vsu.tp53.onboardapplication.model.SessionBody
+import vsu.tp53.onboardapplication.service.AuthService
+import vsu.tp53.onboardapplication.service.SessionService
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.

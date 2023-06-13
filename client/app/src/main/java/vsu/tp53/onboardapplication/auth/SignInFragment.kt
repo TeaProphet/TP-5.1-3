@@ -8,21 +8,19 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.auth.service.AuthService
-import vsu.tp53.onboardapplication.auth.service.Errors
 import vsu.tp53.onboardapplication.databinding.SignInBinding
-import vsu.tp53.onboardapplication.model.domain.User
+import vsu.tp53.onboardapplication.model.User
+import vsu.tp53.onboardapplication.service.AuthService
+import vsu.tp53.onboardapplication.service.Errors
 
 class SignInFragment : Fragment() {
     private var _binding: SignInBinding? = null
     private val binding get() = _binding!!
     private lateinit var _authService: AuthService
     private val authService get() = _authService
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

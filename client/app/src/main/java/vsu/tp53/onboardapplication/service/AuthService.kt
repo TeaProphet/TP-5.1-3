@@ -1,10 +1,8 @@
-package vsu.tp53.onboardapplication.auth.service
+package vsu.tp53.onboardapplication.service
 
 import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.StrictMode
-import android.os.StrictMode.ThreadPolicy
 import android.provider.BaseColumns
 import android.util.Log
 import androidx.preference.PreferenceManager
@@ -12,20 +10,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
 import org.springframework.web.client.RestTemplate
-import vsu.tp53.onboardapplication.model.domain.Token
-import vsu.tp53.onboardapplication.model.domain.User
-import vsu.tp53.onboardapplication.model.domain.UserLogInInfo
-import vsu.tp53.onboardapplication.model.entity.UserAuthorize
-import vsu.tp53.onboardapplication.model.entity.UserRegisterPost
-import vsu.tp53.onboardapplication.model.entity.UserRegisterResponse
-import vsu.tp53.onboardapplication.model.entity.UserTokenPost
-import vsu.tp53.onboardapplication.model.entity.UserTokenResponse
+import vsu.tp53.onboardapplication.model.Token
+import vsu.tp53.onboardapplication.model.User
+import vsu.tp53.onboardapplication.model.UserAuthorize
+import vsu.tp53.onboardapplication.model.UserLogInInfo
+import vsu.tp53.onboardapplication.model.UserRegisterPost
+import vsu.tp53.onboardapplication.model.UserRegisterResponse
+import vsu.tp53.onboardapplication.model.UserTokenPost
+import vsu.tp53.onboardapplication.model.UserTokenResponse
 import vsu.tp53.onboardapplication.sqlitedb.UserTokenContract
 import vsu.tp53.onboardapplication.sqlitedb.UserTokenDbHelper
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
-import kotlin.math.exp
 
 
 const val IS_LOGIN_KEY = "IsLogin"

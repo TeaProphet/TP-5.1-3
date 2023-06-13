@@ -11,10 +11,10 @@ import androidx.navigation.findNavController
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.auth.service.AuthService
-import vsu.tp53.onboardapplication.auth.service.Errors
 import vsu.tp53.onboardapplication.databinding.SignUpBinding
-import vsu.tp53.onboardapplication.model.domain.User
+import vsu.tp53.onboardapplication.model.User
+import vsu.tp53.onboardapplication.service.AuthService
+import vsu.tp53.onboardapplication.service.Errors
 
 class SignUpFragment : Fragment() {
     private var _binding: SignUpBinding? = null

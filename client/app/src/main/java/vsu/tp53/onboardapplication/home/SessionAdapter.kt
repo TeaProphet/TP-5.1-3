@@ -8,8 +8,7 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.model.entity.SessionBody
-import java.io.Serializable
+import vsu.tp53.onboardapplication.model.SessionBody
 
 class SessionAdapter (_newSessions: MutableList<SessionBody>) : RecyclerView.Adapter<SessionAdapter.SessionViewHolder>() {
 

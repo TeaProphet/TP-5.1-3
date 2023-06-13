@@ -11,11 +11,11 @@ import androidx.navigation.findNavController
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.auth.service.AuthService
-import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentCreateSessionBinding
-import vsu.tp53.onboardapplication.home.service.SessionService
-import vsu.tp53.onboardapplication.model.entity.SessionEntity
+import vsu.tp53.onboardapplication.model.SessionEntity
+import vsu.tp53.onboardapplication.service.AuthService
+import vsu.tp53.onboardapplication.service.ProfileService
+import vsu.tp53.onboardapplication.service.SessionService
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

@@ -1,4 +1,4 @@
-package vsu.tp53.onboardapplication.auth.service
+package vsu.tp53.onboardapplication.service
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -13,15 +13,15 @@ import org.springframework.http.converter.json.GsonHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
 import org.springframework.web.client.RestTemplate
-import vsu.tp53.onboardapplication.model.entity.ChangeProfile
-import vsu.tp53.onboardapplication.model.entity.ChangeProfileEntity
-import vsu.tp53.onboardapplication.model.entity.ChangeReputationEntity
-import vsu.tp53.onboardapplication.model.entity.ErrorEntity
-import vsu.tp53.onboardapplication.model.entity.ProfileBanEntity
-import vsu.tp53.onboardapplication.model.entity.ProfileBanEntityResponse
-import vsu.tp53.onboardapplication.model.entity.ProfileInfoEntity
-import vsu.tp53.onboardapplication.model.entity.ReputationEntity
-import vsu.tp53.onboardapplication.model.entity.SearchProfile
+import vsu.tp53.onboardapplication.model.ChangeProfile
+import vsu.tp53.onboardapplication.model.ChangeProfileEntity
+import vsu.tp53.onboardapplication.model.ChangeReputationEntity
+import vsu.tp53.onboardapplication.model.ErrorEntity
+import vsu.tp53.onboardapplication.model.ProfileBanEntity
+import vsu.tp53.onboardapplication.model.ProfileBanEntityResponse
+import vsu.tp53.onboardapplication.model.ProfileInfoEntity
+import vsu.tp53.onboardapplication.model.ReputationEntity
+import vsu.tp53.onboardapplication.model.SearchProfile
 import vsu.tp53.onboardapplication.sqlitedb.UserTokenDbHelper
 
 class ProfileService(
