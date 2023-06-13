@@ -41,7 +41,8 @@ class ProfileService(
     suspend fun getProfileInfo(login: String? = null): ProfileInfoEntity? {
         try {
             return withContext(Dispatchers.IO) {
-                var searchedLogin: String = login ?: prefs.getString(LAST_NICKNAME_KEY, "").toString()
+                var searchedLogin: String =
+                    login ?: prefs.getString(LAST_NICKNAME_KEY, "").toString()
                 Log.i("Profile-last", searchedLogin)
                 Log.i("Profile-lasLogin", searchedLogin)
 
@@ -117,36 +118,37 @@ class ProfileService(
     }
 
     suspend fun increaseReputation(changeRep: ChangeReputationEntity): ReputationEntity? {
-        try {
-            return withContext(Dispatchers.IO) {
-                Log.i("Profile-repInc", changeRep.toString())
-                restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
+        return withContext(Dispatchers.IO) {
+            Log.i("Profile-repInc", changeRep.toString())
+            restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
 
-                restTemplate.postForObject(
-                    increaseRepUrl,
-                    changeRep,
-                    ReputationEntity::class.java
-                )
-            }
-        } catch (e: Exception) {
-            throw e
+            val requestEntity = HttpEntity(changeRep)
+
+            val responseEntity = restTemplate.exchange(
+                increaseRepUrl,
+                HttpMethod.POST,
+                requestEntity,
+                ReputationEntity::class.java
+            )
+            Log.i("ProfileService-increase", responseEntity.toString())
+            responseEntity.body
         }
     }
 
     suspend fun decreaseReputation(changeRep: ChangeReputationEntity): ReputationEntity? {
-        try {
-            return withContext(Dispatchers.IO) {
-                Log.i("Profile-repDec", changeRep.toString())
-                restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
-
-                restTemplate.postForObject(
-                    decreaseRepUrl,
-                    changeRep,
-                    ReputationEntity::class.java
-                )
-            }
-        } catch (e: Exception) {
-            throw e
+        return withContext(Dispatchers.IO) {
+            Log.i("Profile-repDec", changeRep.toString())
+            restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
+            val requestEntity = HttpEntity(changeRep)
+            val responseEntity = restTemplate.exchange(
+                decreaseRepUrl,
+                HttpMethod.POST,
+                requestEntity,
+                ReputationEntity::class.java
+            )
+            Log.i("ProfileService-increase", responseEntity.toString())
+            Log.i("ProfileService-body", responseEntity.body.toString())
+            responseEntity.body
         }
     }
 

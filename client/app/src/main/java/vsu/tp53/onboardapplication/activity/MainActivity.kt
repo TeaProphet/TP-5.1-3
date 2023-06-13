@@ -1,12 +1,10 @@
-package vsu.tp53.onboardapplication
+package vsu.tp53.onboardapplication.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.View
-import android.view.ViewTreeObserver
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -19,8 +17,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
-import vsu.tp53.onboardapplication.auth.service.AuthService
+import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.databinding.ActivityMainBinding
+import vsu.tp53.onboardapplication.service.AuthService
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var runnable: Runnable
     private var handler = Handler(Looper.getMainLooper())
-    private val interval: Long = 60_000
+    private val interval: Long = 1_000
 
     @SuppressLint("AppCompatMethod")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +59,7 @@ class MainActivity : AppCompatActivity() {
             Log.i("MainActivity", "Auth service checks token not to be expired.")
             lifecycleScope.launch {
                 authService.checkTokenIsNotExpired()
+                authService.checkIfUserLoggedIn()
             }
             handler.postDelayed(runnable, interval)
         }

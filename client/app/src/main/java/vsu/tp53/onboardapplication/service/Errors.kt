@@ -9,12 +9,13 @@ enum class Errors(var text: String) {
     ACCESS_DENIED("Доступ запрещён"),
     ALREADY_BANNED("Уже заблокирован"),
     ALREADY_UNBANNED("Уже разблокирован"),
-    ALREADY_CHANGED("Репутация уже изменена"),
+    ALREADY_PLUSED("Репутация уже изменена"),
     INVALID_EMAIL("Недействительная почта"),
     EMAIL_EXISTS("Такой логин уже существует"),
     NICKNAME_EXISTS("Такой никнейм уже существует"),
     EMAIL_NOT_FOUND("Пользователь с таким логином не найден"),
-    WEAK_PASSWORD("Пароль должен быть не менее 6  символов");
+    WEAK_PASSWORD("Пароль должен быть не менее 6  символов"),
+    ALREADY_CHANGED("Репутация уже изменена");
 
     companion object {
         fun getByName(name: String): String {

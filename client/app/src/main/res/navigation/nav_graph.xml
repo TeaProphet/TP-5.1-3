@@ -13,7 +13,7 @@
     </fragment>
     <fragment
         android:id="@+id/diceFragment"
-        android:name="vsu.tp53.onboardapplication.DiceFragment"
+        android:name="vsu.tp53.onboardapplication.home.DiceFragment"
         android:label="Бросок кубиков"
         tools:layout="@layout/fragment_dice" >
     </fragment>
