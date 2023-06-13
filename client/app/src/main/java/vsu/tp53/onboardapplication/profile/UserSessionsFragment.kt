@@ -40,7 +40,7 @@ class UserSessionsFragment : Fragment() {
 
         lifecycleScope.launch {
             val sessions = sessionService.getSessions()
-            val profileInfo = profileService.getProfileInfo(null)
+            val profileInfo = profileService.getProfileInfo(requireArguments().getString("nickname"))
             val userSessionIds = profileInfo!!.played_sessions
             val listOfSessions = mutableListOf<SessionBody>()
 
