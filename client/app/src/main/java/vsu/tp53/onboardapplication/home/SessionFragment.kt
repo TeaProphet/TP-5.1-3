@@ -62,14 +62,21 @@ class SessionFragment : Fragment() {
                 "SessionFragment-owner",
                 (_profileService.getUserNickname() != sessionInfo!!.owner).toString()
             )
-            if (res) {
-                binding.changeSessionNameButton.isVisible = false
-                binding.removeSessionButton.isVisible = false
-            }
 
             if (!authService.checkIfUserLoggedIn()) {
                 binding.joinSessionButton.isVisible = false
+                binding.changeSessionNameButton.isVisible = false
+                binding.removeSessionButton.isVisible = false
             }
+            if (authService.checkIfUserLoggedIn()) {
+                val isOwner = _profileService.getUserNickname() == sessionInfo.owner
+                val isAdmin = profileInfo!!.is_admin
+                if (!(isOwner || isAdmin)) {
+                    binding.changeSessionNameButton.isVisible = false
+                    binding.removeSessionButton.isVisible = false
+                }
+            }
+
             if (authService.checkIfUserLoggedIn()) {
                 if (profileInfo!!.played_sessions != null) {
                     if (profileInfo.played_sessions!!.contains(
@@ -96,6 +103,11 @@ class SessionFragment : Fragment() {
                 } else {
                     _sessionService.leaveSession(binding.inSessionID.text.toString().toInt())
                     binding.joinSessionButton.text = "Записаться"
+                }
+                val sessionInfo: SessionInfoBody? = _sessionService.getSessionInfo(binding.inSessionID.text.toString().toInt())
+                if (sessionInfo != null) {
+                    binding.inSessionID.setText(binding.inSessionID.text.toString())
+                    setSessionData(sessionInfo)
                 }
             }
         }

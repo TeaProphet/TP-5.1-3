@@ -48,17 +48,15 @@ data class SessionInfoBody(
 
 @Serializable
 data class SessionEntity(
-    var idToken: String,
-    var name: String,
-    var city_address: String,
-    var games: String,
-    @Serializable(with = LocalDateTimeSerializer::class)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    var date_time: LocalDateTime,
-    var players: Array<String>,
-    var players_max: Int
+    var idToken: String?,
+    var name: String?,
+    var city_address: String?,
+    var games: String?,
+    var date_time: String?,
+    var players: Array<String>?,
+    var players_max: Int?
 ) {
-    constructor() : this("", "", "", "", LocalDateTime.now(), emptyArray(), 0)
+    constructor() : this("", "", "", "", LocalDateTime.now().toString(), emptyArray(), 0)
 }
 
 @Serializable

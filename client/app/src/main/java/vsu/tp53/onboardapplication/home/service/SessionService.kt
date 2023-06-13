@@ -16,6 +16,7 @@ import org.springframework.http.converter.json.MappingJacksonHttpMessageConverte
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.auth.service.AuthService
 import vsu.tp53.onboardapplication.auth.service.ProfileService
+import vsu.tp53.onboardapplication.model.entity.ErrorEntity
 import vsu.tp53.onboardapplication.model.entity.SessionBody
 import vsu.tp53.onboardapplication.model.entity.SessionEntity
 import vsu.tp53.onboardapplication.model.entity.SessionInfoBody
@@ -91,26 +92,24 @@ class SessionService(
 
     suspend fun createSession(sessionEntity: SessionEntity) {
         withContext(Dispatchers.IO) {
-            if (authService.checkIfUserLoggedIn() && authService.checkTokenIsNotExpired()) {
-                Log.i("SessionService", "Create")
-                restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
-                restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
-                restTemplate.messageConverters.add(GsonHttpMessageConverter())
+            Log.i("SessionService", "Create")
+            restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
+            restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
+            restTemplate.messageConverters.add(GsonHttpMessageConverter())
 
-                val url = "$baseUrl$createSessionUrl"
+            val url = "$baseUrl$createSessionUrl"
 
-                Log.i("SessionSeervice", "url: $url")
+            Log.i("SessionSeervice", "url: $url")
 
-                sessionEntity.idToken = profileService.getUserToken()
+            sessionEntity.idToken = profileService.getUserToken()
 
-                Log.i("SessionSeervice", sessionEntity.toString())
-                val resp = restTemplate.postForObject(
-                    url,
-                    sessionEntity,
-                    Void::class.java
-                )
-//                Log.i("SessionSeervice-create", resp.statusCode.toString())
-            }
+            Log.i("SessionSeervice", sessionEntity.toString())
+            val resp = restTemplate.postForEntity(
+                url,
+                sessionEntity,
+                ErrorEntity::class.java
+            )
+                Log.i("SessionSeervice-create", resp.toString())
         }
     }
 
@@ -136,9 +135,12 @@ class SessionService(
     suspend fun changeSessionName(newName: String, oldName: String, sessionId: Int) {
         withContext(Dispatchers.IO) {
             Log.i("SessionService", "Change name")
+            Log.i("SessionService", "New name: $newName")
 
-            val url = "$baseUrl$changeSessionUrl$sessionId/$newName?idToken={idToken}"
+            val url = "$baseUrl${changeSessionUrl}s_id:{sessionId}name:{newName}?idToken={idToken}"
             val params = HashMap<String, String>()
+            params["sessionId"] = "$sessionId"
+            params["newName"] = newName
             params["idToken"] = profileService.getUserToken()
 
             val resp = restTemplate.exchange(
