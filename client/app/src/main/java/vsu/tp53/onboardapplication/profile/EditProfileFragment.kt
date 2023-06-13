@@ -34,6 +34,7 @@ import vsu.tp53.onboardapplication.auth.service.Errors
 import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentEditProfileBinding
 import vsu.tp53.onboardapplication.model.entity.ChangeProfile
+import java.util.regex.Pattern
 
 /**
  * A simple [Fragment] subclass.
@@ -76,8 +77,12 @@ class EditProfileFragment : Fragment() {
             binding.progressContent.visibility = View.VISIBLE
             binding.pageContent.visibility = View.GONE
             lifecycleScope.launch {
-                if (changeProfile())
+                if (changeProfile()) {
                     it.findNavController().navigate(R.id.profileFragment)
+                } else {
+                    binding.progressContent.visibility = View.GONE
+                    binding.pageContent.visibility = View.VISIBLE
+                }
             }
         }
 
@@ -114,10 +119,28 @@ class EditProfileFragment : Fragment() {
             changeProfileEntity.games = binding.editFavGames.text.toString()
         }
         if (binding.userVk.text.toString() != "") {
-            changeProfileEntity.vk = binding.userVk.text.toString()
+            if (checkVk(binding.userVk.text.toString())) {
+                changeProfileEntity.vk = binding.userVk.text.toString()
+            } else {
+                Toast.makeText(
+                    this.context,
+                    "Адрес Vk должен начинаться с vk.com/",
+                    Toast.LENGTH_LONG
+                ).show()
+                return false
+            }
         }
         if (binding.userTg.text.toString() != "") {
-            changeProfileEntity.tg = binding.userTg.text.toString()
+            if (checkTg(binding.userTg.text.toString())) {
+                changeProfileEntity.tg = binding.userTg.text.toString()
+            } else {
+                Toast.makeText(
+                    this.context,
+                    "Адрес telegram должен начинаться с t.me/",
+                    Toast.LENGTH_LONG
+                ).show()
+                return false
+            }
         }
 
         Log.i("EditProfFragment", binding.ageInput.text.toString() + " age")
@@ -160,6 +183,16 @@ class EditProfileFragment : Fragment() {
     @SuppressLint("ResourceType")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    fun checkVk(vk: String): Boolean {
+        val regex = Pattern.compile("^vk.com/.+\$")
+        return regex.matcher(vk).find()
+    }
+
+    fun checkTg(tg: String): Boolean {
+        val regex = Pattern.compile("^t.me/.+\$")
+        return regex.matcher(tg).find()
     }
 
     // extension function to filter edit text number range

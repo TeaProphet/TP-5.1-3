@@ -222,54 +222,29 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:id="@+id/textView10"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="30dp"
-                android:text="Безопасность:"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardView2" />
-
-            <Button
-                android:id="@+id/change_password_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_marginBottom="20dp"
-                android:text="Изменить пароль"
-                android:textColor="@color/white"
-                app:layout_constraintBottom_toTopOf="@+id/save_changes_button"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView10" />
-
             <Button
                 android:id="@+id/save_changes_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:text="Сохранить изменения"
                 android:textColor="@color/white"
-                app:layout_constraintBottom_toTopOf="@+id/quit_system"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardView2" />
 
             <Button
                 android:id="@+id/quit_system"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Выйти"
+                android:layout_marginTop="20dp"
                 android:backgroundTint="@color/white"
                 android:shadowColor="#FF0000"
+                android:text="Выйти"
                 android:textColor="#FF0000"
-                app:layout_constraintBottom_toBottomOf="@+id/save_changes_button"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/save_changes_button" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
