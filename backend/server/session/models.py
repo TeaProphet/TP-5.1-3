@@ -1,6 +1,10 @@
 from django.db import models
 from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 from rest_framework import serializers
+
+import swagger_errors_examples.user_errors
+import swagger_errors_examples.common_errors
+import swagger_errors_examples.session_errors
 from onboardProject import settings
 
 
@@ -44,19 +48,28 @@ class SessionSerializer(serializers.Serializer):
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
-            'Game session',
-            summary="Game session template",
+            'Создание игровой сессии',
+            summary="Создание игровой сессии",
+            description="Вводимые значения:\n"
+                        "1. idToken - токен создателя сессии.\n"
+                        "2. city_address - адрес проведения игровой сессии (валидации нет).\n"
+                        "3. games - игры, в которые будут/могут сыграть пользователи на игровой сессии.\n"
+                        "4. date_time - время проведения игровой сессии формата %Y-%m-%d %H:%M.\n"
+                        "5. name - название игровой сессии.\n"
+                        "6. players_max - максимальное число участников игровой сессии.\n",
             value={
                 'idToken': '...',
                 'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
                 'games': "Кемет",
                 'date_time': "2023-06-03 12:00",
                 'name': "Кемет | ПараDice",
-                'players': ['nickname', 'nickname', '...'],
                 'players_max': 4
             },
-            request_only=True
-        )
+            request_only=True,
+        ),
+        swagger_errors_examples.common_errors.invalid_data,
+        swagger_errors_examples.user_errors.invalid_token,
+        swagger_errors_examples.user_errors.expired_token
     ]
 )
 class SessionRegistrationSerializer(serializers.Serializer):
@@ -75,8 +88,16 @@ class SessionRegistrationSerializer(serializers.Serializer):
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
-            'Game session',
-            summary="Game session template",
+            'Информация об игровой сессии',
+            summary="Информация об игровой сессии",
+            description="Выводимые значения:\n"
+                        "1. city_address - адрес проведения игровой сессии (валидации нет).\n"
+                        "2. games - игры, в которые будут/могут сыграть пользователи на игровой сессии.\n"
+                        "3. date_time - время проведения игровой сессии формата %Y-%m-%d %H:%M.\n"
+                        "4. name - название игровой сессии.\n"
+                        "5. owner - владелец игровой сессии.\n"
+                        "6. players - массив никнеймов участников игровой сессии.\n"
+                        "6. players_max - максимальное число участников игровой сессии.",
             value={
                 'city_address': "Ул. Фридриха Энгельса, 24б, 2 этаж, Воронеж",
                 'games': "Кемет",
@@ -87,7 +108,8 @@ class SessionRegistrationSerializer(serializers.Serializer):
                 'players_max': 4
             },
             response_only=True
-        )
+        ),
+        swagger_errors_examples.common_errors.invalid_data
     ]
 )
 class SessionPublicInfoSerializer(serializers.Serializer):
@@ -113,12 +135,18 @@ class SessionPublicShortInfoSerializer(serializers.Serializer):
         return Session(**validated_data)
 
 
-
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
-            'Session info',
-            summary='Info',
+            'Список игровых сессий',
+            summary='Список игровых сессий',
+            description="Выводит массив информации об игровых сессиях. Каждый элемент массива включает в себя:\n"
+                        "1. session_id - идентификатор игровой сессии.\n"
+                        "2. city_address - адрес проведения игровой сессии (валидации нет).\n"
+                        "3. games - игры, в которые будут/могут сыграть пользователи на игровой сессии.\n"
+                        "4. date_time - время проведения игровой сессии формата %Y-%m-%d %H:%M.\n"
+                        "5. name - название игровой сессии.\n"
+                        "6. players_max - максимальное число участников игровой сессии.",
             value=[
                 {
                     "session_id": 0,
@@ -143,5 +171,54 @@ class SessionPublicShortInfoSerializer(serializers.Serializer):
     ]
 )
 class SessionsListSerializer(serializers.Serializer):
+    session_id = serializers.IntegerField()
+
+
+@extend_schema_serializer(examples=[
+    swagger_errors_examples.common_errors.invalid_data,
+    swagger_errors_examples.user_errors.access_denied,
+    swagger_errors_examples.session_errors.session_not_found,
+    swagger_errors_examples.user_errors.expired_token,
+    swagger_errors_examples.user_errors.invalid_token
+])
+class SessionDeleteSerializer(serializers.Serializer):
+    idToken = serializers.IntegerField()
+    session_id = serializers.IntegerField()
+
+
+@extend_schema_serializer(examples=[
+    swagger_errors_examples.common_errors.invalid_data,
+    swagger_errors_examples.session_errors.session_not_found,
+    swagger_errors_examples.session_errors.already_joined,
+    swagger_errors_examples.user_errors.expired_token,
+    swagger_errors_examples.user_errors.invalid_token
+])
+class SessionJoinSerializer(serializers.Serializer):
+    idToken = serializers.IntegerField()
+    session_id = serializers.IntegerField()
+
+
+@extend_schema_serializer(examples=[
+    swagger_errors_examples.common_errors.invalid_data,
+    swagger_errors_examples.session_errors.session_not_found,
+    swagger_errors_examples.session_errors.already_left,
+    swagger_errors_examples.user_errors.expired_token,
+    swagger_errors_examples.user_errors.invalid_token
+])
+class SessionLeftSerializer(serializers.Serializer):
+    idToken = serializers.IntegerField()
+    session_id = serializers.IntegerField()
+
+
+@extend_schema_serializer(examples=[
+    swagger_errors_examples.common_errors.invalid_data,
+    swagger_errors_examples.session_errors.session_not_found,
+    swagger_errors_examples.user_errors.access_denied,
+    swagger_errors_examples.user_errors.expired_token,
+    swagger_errors_examples.user_errors.invalid_token
+])
+class ChangeSessionNameSerializer(serializers.Serializer):
+    idToken = serializers.IntegerField()
+    new_name = serializers.CharField(max_length=256)
     session_id = serializers.IntegerField()
 

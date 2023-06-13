@@ -4,9 +4,12 @@ from django.http import JsonResponse
 from drf_spectacular.utils import extend_schema
 from python_jwt import _JWTError
 from requests import HTTPError
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+
+import swagger_errors_examples.user_errors
 from onboardProject import settings
 from users import models
 from utils.serializing import complete_serialize
@@ -17,7 +20,9 @@ from utils.serializing import complete_serialize
 
 @extend_schema(
     request=models.RegistrationSerializer,
-    responses=models.RegistrationSerializer,
+    responses={status.HTTP_200_OK: models.RegistrationSerializer,
+               status.HTTP_400_BAD_REQUEST: models.RegistrationSerializer},
+    description="Метод для регистрации пользователя.",
     tags=["Users"]
 )
 @api_view(['POST'])
@@ -30,7 +35,7 @@ def register(request):
         password = body_data['password']
         credentials = complete_serialize(body_data, models.RegistrationSerializer)
     except ValidationError:
-        return JsonResponse({'error': 'INVALID_CREDENTIALS'})
+        return JsonResponse({'error': 'INVALID_CREDENTIALS'}, status=400)
     try:
         auth_user = settings.auth.create_user_with_email_and_password(credentials.login, password)
     except HTTPError as exception:
@@ -47,7 +52,9 @@ def register(request):
 
 @extend_schema(
     request=models.AuthorizationSerializer,
-    responses=models.AuthorizationSerializer,
+    responses={status.HTTP_200_OK: models.AuthorizationSerializer,
+               status.HTTP_400_BAD_REQUEST:models.AuthorizationSerializer},
+    description="Метод для авторизации пользователя.",
     tags=["Users"]
 )
 @api_view(['POST'])
@@ -57,7 +64,7 @@ def credentials_authorize(request):
         body_data = json.loads(body_unicode)
         auth_user = settings.auth.sign_in_with_email_and_password(body_data['login'], body_data['password'])
     except ValidationError:
-        return JsonResponse({'error': 'INVALID_CREDENTIALS'})
+        return JsonResponse({'error': 'INVALID_CREDENTIALS'}, status=400)
     except HTTPError as exception:
         return JsonResponse({'error': extract_http_error_message(exception.args[1])})
     nickname = settings.database.child(settings.USERS_TABLE).child(auth_user.get('localId')).child('nickname').get().val()
@@ -66,14 +73,17 @@ def credentials_authorize(request):
 
 @extend_schema(
     request=models.SearchedNicknameSerializer,
-    responses=models.SearchedNicknameSerializer,
-    tags=["Users"],
+    description='Метод, возвращающий публичную информацию о пользователе по его Предоставляются:\n'
+                '1. nickname - никнейм пользователя.',
+    responses={status.HTTP_200_OK: models.SearchedNicknameSerializer,
+               status.HTTP_400_BAD_REQUEST: models.SearchedNicknameSerializer},
+    tags=["Users"]
 )
 @api_view(['GET'])
 def get_profile_info(request, nickname):
     user = settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(nickname).get()
     if len(user.each()) == 0:
-        return JsonResponse({'error': 'INVALID_DATA'})
+        return JsonResponse({'error': 'INVALID_DATA'}, status=400)
     user_data = user.val().popitem()[1].get('user_data')
     serialized_data = models.UserDataSerializer(data=user_data)
     serialized_data.is_valid()
@@ -82,7 +92,10 @@ def get_profile_info(request, nickname):
 
 @extend_schema(
     request=models.ChangingUserDataSerializer,
-    responses=None,
+    responses={status.HTTP_204_NO_CONTENT: None,
+               status.HTTP_400_BAD_REQUEST: models.ChangingUserDataSerializer},
+    description="Метод для смены публичной информации о пользователе. Предоставляются:\n"
+                "1. idToken - токен пользователя.",
     tags=["Users"]
 )
 @api_view(['PUT'])
@@ -97,19 +110,22 @@ def change_profile(request, idToken):
         decoded_token = settings.auth.verify_id_token(idToken)
         uid = decoded_token['user_id']
     except ValidationError:
-        return JsonResponse({'error': 'INVALID_DATA'})
+        return JsonResponse({'error': 'INVALID_DATA'}, status=400)
     except _JWTError as token_error:
         if token_error.args[0] == 'invalid JWT format':
-            return JsonResponse({'error': 'INVALID_TOKEN'})
+            return JsonResponse({'error': 'INVALID_TOKEN'}, status=400)
         else:
-            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+            return JsonResponse({'error': 'EXPIRED_TOKEN'}, status=400)
     settings.database.child(settings.USERS_TABLE).child(uid).child('user_data').update(dict(models.ChangingUserDataSerializer(user_data).data))
     return Response(status=204)
 
 
 @extend_schema(
-    request=models.AccessToProfileRequestSerializer,
-    responses=models.AccessToProfileRequestSerializer,
+    request=models.PlusReputationRequestSerializer,
+    responses={status.HTTP_200_OK: models.PlusReputationRequestSerializer,
+               status.HTTP_400_BAD_REQUEST: models.PlusReputationRequestSerializer,
+               status.HTTP_403_FORBIDDEN: models.PlusReputationRequestSerializer},
+    description="Метод для увеличения репутации пользователя другим пользователем.",
     tags=["Users"],
 )
 @api_view(['POST'])
@@ -118,11 +134,11 @@ def plus_reputation(request):
         address_uid, requester_uid = extract_access_data(request)
     except _JWTError as token_error:
         if token_error.args[0] == 'invalid JWT format':
-            return JsonResponse({'error': 'INVALID_TOKEN'})
+            return JsonResponse({'error': 'INVALID_TOKEN'}, status=400)
         else:
-            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+            return JsonResponse({'error': 'EXPIRED_TOKEN'}, status=400)
     if requester_uid == address_uid:
-        return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'})
+        return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'}, status=400)
     try:
         new_reputation = __change_rep_algorithm(address_uid, requester_uid, True)
     except ValueError as exception:
@@ -131,8 +147,11 @@ def plus_reputation(request):
 
 
 @extend_schema(
-    request=models.AccessToProfileRequestSerializer,
-    responses=models.AccessToProfileRequestSerializer,
+    request=models.MinusReputationRequestSerializer,
+    responses={status.HTTP_200_OK: None,
+               status.HTTP_400_BAD_REQUEST: models.MinusReputationRequestSerializer,
+               status.HTTP_403_FORBIDDEN: models.MinusReputationRequestSerializer},
+    description="Метод для уменьшения репутации пользователя другим пользователем.",
     tags=["Users"],
 )
 @api_view(['POST'])
@@ -141,21 +160,24 @@ def minus_reputation(request):
         address_uid, requester_uid = extract_access_data(request)
     except _JWTError as token_error:
         if token_error.args[0] == 'invalid JWT format':
-            return JsonResponse({'error': 'INVALID_TOKEN'})
+            return JsonResponse({'error': 'INVALID_TOKEN'}, status=400)
         else:
-            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+            return JsonResponse({'error': 'EXPIRED_TOKEN'}, status=400)
     if requester_uid == address_uid:
-        return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'})
+        return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'}, status=400)
     try:
         new_reputation = __change_rep_algorithm(address_uid, requester_uid, False)
     except ValueError as exception:
-        return JsonResponse({'error': exception.args[0]})
+        return JsonResponse({'error': exception.args[0]}, status=400)
     return JsonResponse({'new_reputation': new_reputation})
 
 
 @extend_schema(
-    request=models.AccessToProfileRequestSerializer,
-    responses=models.AccessToProfileRequestSerializer,
+    request=models.BanRequestSerializer,
+    responses={status.HTTP_204_NO_CONTENT: None,
+               status.HTTP_400_BAD_REQUEST: models.BanRequestSerializer,
+               status.HTTP_403_FORBIDDEN: models.BanRequestSerializer},
+    description="Метод для блокировки пользователя другим пользователем.",
     tags=["Users"],
 )
 @api_view(['POST'])
@@ -164,27 +186,30 @@ def ban(request):
         address_uid, requester_uid = extract_access_data(request)
     except _JWTError as token_error:
         if token_error.args[0] == 'invalid JWT format':
-            return JsonResponse({'error': 'INVALID_TOKEN'})
+            return JsonResponse({'error': 'INVALID_TOKEN'}, status=400)
         else:
-            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+            return JsonResponse({'error': 'EXPIRED_TOKEN'}, status=400)
     if requester_uid == address_uid:
-        return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'})
+        return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'}, status=400)
     is_admin = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child(
         'is_admin').get().val()
     if not is_admin:
-        return JsonResponse({'error': 'ACCESS_DENIED'})
+        return JsonResponse({'error': 'ACCESS_DENIED'}, status=400)
     is_banned = settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child(
         'is_banned').get().val()
     if is_banned:
-        return JsonResponse({'error': 'ALREADY_BANNED'})
+        return JsonResponse({'error': 'ALREADY_BANNED'}, status=400)
     else:
         settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child('is_banned').set(True)
     return Response(status=204)
 
 
 @extend_schema(
-    request=models.AccessToProfileRequestSerializer,
-    responses=models.AccessToProfileRequestSerializer,
+    request=models.UnbanRequestSerializer,
+    responses={status.HTTP_204_NO_CONTENT: None,
+               status.HTTP_400_BAD_REQUEST: models.UnbanRequestSerializer,
+               status.HTTP_403_FORBIDDEN: models.UnbanRequestSerializer},
+    description="Метод для разблокировки пользователя другим пользователем.",
     tags=["Users"],
 )
 @api_view(['POST'])
@@ -193,19 +218,19 @@ def unban(request):
         address_uid, requester_uid = extract_access_data(request)
     except _JWTError as token_error:
         if token_error.args[0] == 'invalid JWT format':
-            return JsonResponse({'error': 'INVALID_TOKEN'})
+            return JsonResponse({'error': 'INVALID_TOKEN'}, status=400)
         else:
-            return JsonResponse({'error': 'EXPIRED_TOKEN'})
+            return JsonResponse({'error': 'EXPIRED_TOKEN'}, status=400)
     if requester_uid == address_uid:
         return JsonResponse({'error': 'REQUESTER_IS_ADDRESSER'})
     is_admin = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child(
         'is_admin').get().val()
     if not is_admin:
-        return JsonResponse({'error': 'ACCESS_DENIED'})
+        return JsonResponse({'error': 'ACCESS_DENIED'}, status=400)
     is_banned = settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child(
         'is_banned').get().val()
     if not is_banned:
-        return JsonResponse({'error': 'ALREADY_UNBANNED'})
+        return JsonResponse({'error': 'ALREADY_UNBANNED'}, status=400)
     else:
         settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child('is_banned').set(False)
     return Response(status=204)

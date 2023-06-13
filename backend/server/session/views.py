@@ -5,17 +5,19 @@ from django.http import JsonResponse, HttpRequest
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from python_jwt import _JWTError
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from onboardProject import settings
 from session import models
-from utils.serializing import complete_serialize
 
 
 @extend_schema(
     request=models.SessionRegistrationSerializer,
-    responses=None,
+    description="Метод для создания игровой сессии.",
+    responses={status.HTTP_204_NO_CONTENT: None,
+               status.HTTP_400_BAD_REQUEST: models.SessionRegistrationSerializer},
     tags=['Sessions']
 )
 @api_view(['POST'])
@@ -36,7 +38,7 @@ def create_session(request):
         session = session.save()
         auth_user = settings.auth.verify_id_token(body_data['idToken'])
     except ValidationError:
-        return JsonResponse({'error': 'INVALID_CREDENTIALS'})
+        return JsonResponse({'error': 'INVALID_DATA'})
     except _JWTError as token_error:
         if token_error.args[0] == 'invalid JWT format':
             return JsonResponse({'error': 'INVALID_TOKEN'})
@@ -51,7 +53,12 @@ def create_session(request):
 
 @extend_schema(
     request=None,
-    responses=None,
+    responses={status.HTTP_204_NO_CONTENT: None,
+               status.HTTP_400_BAD_REQUEST: models.SessionDeleteSerializer,
+               status.HTTP_403_FORBIDDEN: models.SessionDeleteSerializer},
+    description="Метод для удаления игровой сессии по её идентификатору. Предоставляются:\n"
+                "1. idToken - токен пользователя.\n"
+                "2. session_id - идентификатор игровой сессии.",
     tags=['Sessions'],
     parameters=[OpenApiParameter("idToken", OpenApiTypes.STR, OpenApiParameter.QUERY, required=True)],
 )
@@ -89,8 +96,11 @@ def delete_session_algorythm(requester_uid, session_id):
 
 
 @extend_schema(
-    responses=models.SessionPublicInfoSerializer,
+    responses={status.HTTP_200_OK: models.SessionPublicInfoSerializer,
+               status.HTTP_400_BAD_REQUEST: models.SessionPublicInfoSerializer},
     request=None,
+    description="Метод для получения подробной информации об игровой сессии по её идентификатору. Предоставляются:\n"
+                "1. session_id - идентификатор игровой сессии.\n",
     tags=['Sessions']
 )
 @api_view(['GET'])
@@ -114,6 +124,7 @@ def get_session_info(request, session_id):
 @extend_schema(
     responses=models.SessionsListSerializer,
     request=None,
+    description="Метод для получения краткой сводки информации обо всех игровых сессиях.",
     tags=['Sessions']
 )
 @api_view(['GET'])
@@ -136,7 +147,11 @@ def get_sessions(request):
 
 @extend_schema(
     request=None,
-    responses=None,
+    responses={status.HTTP_204_NO_CONTENT: None,
+               status.HTTP_400_BAD_REQUEST: models.SessionJoinSerializer},
+    description="Метод для присоединения к игровой сессии. Предоставляются:\n"
+                "1. idToken - токен пользователя.\n"
+                "2. session_id - идентификатор игровой сессии.",
     tags=['Sessions'],
     parameters=[OpenApiParameter("idToken", OpenApiTypes.STR, OpenApiParameter.QUERY, required=True),
                 OpenApiParameter("session_id", OpenApiTypes.INT, OpenApiParameter.PATH, required=True)]
@@ -178,7 +193,11 @@ def join_session(request, session_id):
 
 @extend_schema(
     request=None,
-    responses=None,
+    responses={status.HTTP_204_NO_CONTENT: None,
+               status.HTTP_400_BAD_REQUEST: models.SessionLeftSerializer},
+    description="Метод для ухода с игровой сессии Предоставляются:\n"
+                "1. idToken - токен пользователя.\n"
+                "2. session_id - идентификатор игровой сессии.",
     tags=['Sessions'],
     parameters=[OpenApiParameter("idToken", OpenApiTypes.STR, OpenApiParameter.QUERY, required=True),
                 OpenApiParameter("session_id", OpenApiTypes.INT, OpenApiParameter.PATH, required=True)]
@@ -208,7 +227,7 @@ def leave_session(request, session_id):
     else:
         played_sessions = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').get().val()
         if not played_sessions or not played_sessions.__contains__(session_id):
-            return JsonResponse({'error': 'INVALID_DATA'})
+            return JsonResponse({'error': 'ALREADY_LEFT'})
         played_sessions.remove(session_id)
         settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child('played_sessions').set(played_sessions)
         session_players.remove(nickname)
@@ -218,7 +237,13 @@ def leave_session(request, session_id):
 
 @extend_schema(
     request=None,
-    responses=None,
+    responses={status.HTTP_204_NO_CONTENT: None,
+               status.HTTP_400_BAD_REQUEST: models.ChangeSessionNameSerializer,
+               status.HTTP_403_FORBIDDEN: models.ChangeSessionNameSerializer},
+    description="Метод для смены названия игровой сессии. Предоставляются:\n"
+                "1. idToken - токен пользователя.\n"
+                "2. new_name - новое имя игровой сессии.\n"
+                "3. session_id - игровой сессии, название которой надо сменить.",
     tags=['Sessions'],
     parameters=[OpenApiParameter("idToken", OpenApiTypes.STR, OpenApiParameter.QUERY, required=True),
                 OpenApiParameter("session_id", OpenApiTypes.INT, OpenApiParameter.PATH, required=True),
