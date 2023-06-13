@@ -16,12 +16,12 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.auth.service.AuthService
-import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentSessionBinding
-import vsu.tp53.onboardapplication.home.service.SessionService
-import vsu.tp53.onboardapplication.model.entity.ProfileInfoEntity
-import vsu.tp53.onboardapplication.model.entity.SessionInfoBody
+import vsu.tp53.onboardapplication.model.ProfileInfoEntity
+import vsu.tp53.onboardapplication.model.SessionInfoBody
+import vsu.tp53.onboardapplication.service.AuthService
+import vsu.tp53.onboardapplication.service.ProfileService
+import vsu.tp53.onboardapplication.service.SessionService
 
 
 class SessionFragment : Fragment() {

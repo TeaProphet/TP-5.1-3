@@ -1,4 +1,4 @@
-package vsu.tp53.onboardapplication.model.entity
+package vsu.tp53.onboardapplication.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.serialization.Serializable

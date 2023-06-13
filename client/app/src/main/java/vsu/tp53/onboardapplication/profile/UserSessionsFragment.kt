@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
-import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentUserSessionsBinding
 import vsu.tp53.onboardapplication.home.SessionAdapter
-import vsu.tp53.onboardapplication.home.service.SessionService
-import vsu.tp53.onboardapplication.model.entity.SessionBody
+import vsu.tp53.onboardapplication.model.SessionBody
+import vsu.tp53.onboardapplication.service.ProfileService
+import vsu.tp53.onboardapplication.service.SessionService
 
 class UserSessionsFragment : Fragment() {
 
@@ -40,7 +40,8 @@ class UserSessionsFragment : Fragment() {
 
         lifecycleScope.launch {
             val sessions = sessionService.getSessions()
-            val profileInfo = profileService.getProfileInfo(requireArguments().getString("nickname"))
+            val profileInfo =
+                profileService.getProfileInfo(requireArguments().getString("nickname"))
             val userSessionIds = profileInfo!!.played_sessions
             val listOfSessions = mutableListOf<SessionBody>()
 
@@ -54,8 +55,7 @@ class UserSessionsFragment : Fragment() {
                 }
             }
 
-            sessionAdapter =
-                SessionAdapter(listOfSessions)
+            sessionAdapter = SessionAdapter(listOfSessions)
             recyclerView.adapter = sessionAdapter
         }
 

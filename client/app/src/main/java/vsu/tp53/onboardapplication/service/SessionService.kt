@@ -1,4 +1,4 @@
-package vsu.tp53.onboardapplication.home.service
+package vsu.tp53.onboardapplication.service
 
 import android.content.Context
 import android.os.StrictMode
@@ -14,12 +14,10 @@ import org.springframework.http.converter.json.GsonHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
 import org.springframework.web.client.RestTemplate
-import vsu.tp53.onboardapplication.auth.service.AuthService
-import vsu.tp53.onboardapplication.auth.service.ProfileService
-import vsu.tp53.onboardapplication.model.entity.ErrorEntity
-import vsu.tp53.onboardapplication.model.entity.SessionBody
-import vsu.tp53.onboardapplication.model.entity.SessionEntity
-import vsu.tp53.onboardapplication.model.entity.SessionInfoBody
+import vsu.tp53.onboardapplication.model.ErrorEntity
+import vsu.tp53.onboardapplication.model.SessionBody
+import vsu.tp53.onboardapplication.model.SessionEntity
+import vsu.tp53.onboardapplication.model.SessionInfoBody
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -72,9 +70,6 @@ class SessionService(
 
     suspend fun getSessionInfo(sessionId: Int): SessionInfoBody? {
         return withContext(Dispatchers.IO) {
-            val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-            StrictMode.setThreadPolicy(policy)
-
             restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
             restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
             restTemplate.messageConverters.add(GsonHttpMessageConverter())

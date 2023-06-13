@@ -1,4 +1,4 @@
-package vsu.tp53.onboardapplication.auth.service
+package vsu.tp53.onboardapplication.service
 
 enum class Errors(var text: String) {
     INVALID_CREDENTIALS("Недействительные учётные данные"),
