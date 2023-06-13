@@ -1,12 +1,11 @@
-package vsu.tp53.onboardapplication
+package vsu.tp53.onboardapplication.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.WindowManager
+import vsu.tp53.onboardapplication.R
 
 @SuppressLint("CustomSplashScreen")
 class SplashScreenActivity : AppCompatActivity() {

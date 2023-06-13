@@ -1,4 +1,4 @@
-package vsu.tp53.onboardapplication
+package vsu.tp53.onboardapplication.home
 
 import android.os.Bundle
 import android.view.LayoutInflater

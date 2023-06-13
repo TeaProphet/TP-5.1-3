@@ -294,12 +294,6 @@ class AuthService(
         }
     }
 
-    fun checkEmail(email: String): Boolean {
-        val regex: Pattern =
-            Pattern.compile("^[a-z0-9.]+@([a-z0-9]+-?[a-z0-9]+)+\\.([a-z0-9]+-?[a-z0-9]+)+\$")
-        return regex.matcher(email).find()
-    }
-
     //TODO: remove when dev to be ended
     private fun readData() {
         val db = dbHelper.readableDatabase

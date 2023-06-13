@@ -30,6 +30,7 @@ import vsu.tp53.onboardapplication.model.ChangeProfile
 import vsu.tp53.onboardapplication.service.AuthService
 import vsu.tp53.onboardapplication.service.Errors
 import vsu.tp53.onboardapplication.service.ProfileService
+import vsu.tp53.onboardapplication.util.Validators
 import java.util.regex.Pattern
 
 /**
@@ -115,7 +116,7 @@ class EditProfileFragment : Fragment() {
             changeProfileEntity.games = binding.editFavGames.text.toString()
         }
         if (binding.userVk.text.toString() != "") {
-            if (checkVk(binding.userVk.text.toString())) {
+            if (Validators.checkVk(binding.userVk.text.toString())) {
                 changeProfileEntity.vk = binding.userVk.text.toString()
             } else {
                 Toast.makeText(
@@ -127,7 +128,7 @@ class EditProfileFragment : Fragment() {
             }
         }
         if (binding.userTg.text.toString() != "") {
-            if (checkTg(binding.userTg.text.toString())) {
+            if (Validators.checkTg(binding.userTg.text.toString())) {
                 changeProfileEntity.tg = binding.userTg.text.toString()
             } else {
                 Toast.makeText(
@@ -179,16 +180,6 @@ class EditProfileFragment : Fragment() {
     @SuppressLint("ResourceType")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-    }
-
-    fun checkVk(vk: String): Boolean {
-        val regex = Pattern.compile("^vk.com/.+\$")
-        return regex.matcher(vk).find()
-    }
-
-    fun checkTg(tg: String): Boolean {
-        val regex = Pattern.compile("^t.me/.+\$")
-        return regex.matcher(tg).find()
     }
 
     // extension function to filter edit text number range

@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -14,8 +15,10 @@ import vsu.tp53.onboardapplication.R
 import vsu.tp53.onboardapplication.databinding.FragmentCreateSessionBinding
 import vsu.tp53.onboardapplication.model.SessionEntity
 import vsu.tp53.onboardapplication.service.AuthService
+import vsu.tp53.onboardapplication.service.Errors
 import vsu.tp53.onboardapplication.service.ProfileService
 import vsu.tp53.onboardapplication.service.SessionService
+import vsu.tp53.onboardapplication.util.Validators
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -43,15 +46,23 @@ class CreateSessionFragment : Fragment() {
             Log.i("CreateSession", "ButtonPressed")
             lifecycleScope.launch {
                 Log.i("CreateSession", "Insude scope")
-                createSession()
-                it.findNavController().navigate(R.id.homeFragment)
+                if (createSession())
+                    it.findNavController().navigate(R.id.homeFragment)
             }
         }
         return _binding!!.root
     }
 
-    private suspend fun createSession() {
+    private suspend fun createSession(): Boolean {
         Log.i("CreateSession", "Creact session method")
+        if (!Validators.checkDate(_binding!!.dateInput.text.toString())) {
+            Toast.makeText(context, "Неверный формат даты", Toast.LENGTH_LONG).show()
+            return false
+        }
+        if (!Validators.checkTime(_binding!!.timeInput.text.toString())) {
+            Toast.makeText(context, "Неверный формат времени", Toast.LENGTH_LONG).show()
+            return false
+        }
         val df: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
         val localDate: LocalDateTime =
             LocalDateTime.parse("${_binding!!.dateInput.text} ${_binding!!.timeInput.text}", df)
@@ -64,7 +75,19 @@ class CreateSessionFragment : Fragment() {
             arrayOf(profileService.getUserNickname()),
             _binding!!.playersNumberInput.text.toString().toInt()
         )
-
-        _sessionService.createSession(sessionEntity)
+        val resp = _sessionService.createSession(sessionEntity)
+        return if (resp.error == "") {
+            true
+        } else {
+            if (Errors.getByName(resp.error) != "") {
+                Toast.makeText(context, Errors.getByName(resp.error), Toast.LENGTH_LONG)
+                    .show()
+                false
+            } else {
+                Toast.makeText(context, "Произошла ошибка", Toast.LENGTH_LONG)
+                    .show()
+                false
+            }
+        }
     }
 }
