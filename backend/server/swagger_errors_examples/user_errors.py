@@ -131,4 +131,14 @@ access_denied = OpenApiExample(
 	response_only=True,
 	status_codes=[403]
 )
+requester_is_addresser = OpenApiExample(
+	'Нельзя изменять репутацию самому себе',
+	summary="Ошибка: попытка смены репутации самому себе",
+	description="Ошибка, возникающая при попытке сменить репутацию самому себе, что запрещено. Возвращает код ошибки error.",
+	value={
+		'error': 'REQUESTER_IS_ADDRESSER'
+	},
+	response_only=True,
+	status_codes=[400]
+)
 

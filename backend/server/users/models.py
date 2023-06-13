@@ -248,7 +248,8 @@ class SearchedNicknameSerializer(serializers.Serializer):
         swagger_errors_examples.user_errors.access_denied,
         swagger_errors_examples.user_errors.already_plused,
         swagger_errors_examples.user_errors.expired_token,
-        swagger_errors_examples.user_errors.invalid_token
+        swagger_errors_examples.user_errors.invalid_token,
+        swagger_errors_examples.user_errors.requester_is_addresser
     ]
 )
 class PlusReputationRequestSerializer(serializers.Serializer):
@@ -284,7 +285,8 @@ class PlusReputationRequestSerializer(serializers.Serializer):
         swagger_errors_examples.user_errors.access_denied,
         swagger_errors_examples.user_errors.already_plused,
         swagger_errors_examples.user_errors.expired_token,
-        swagger_errors_examples.user_errors.invalid_token
+        swagger_errors_examples.user_errors.invalid_token,
+        swagger_errors_examples.user_errors.requester_is_addresser
     ]
 )
 class MinusReputationRequestSerializer(serializers.Serializer):
