@@ -73,8 +73,8 @@ def credentials_authorize(request):
 
 @extend_schema(
     request=models.SearchedNicknameSerializer,
-    description='Метод, возвращающий публичную информацию о пользователе по его Предоставляются:\n'
-                '1. nickname - никнейм пользователя.',
+    description='Метод, возвращающий публичную информацию о пользователе по его никнейму. '
+                'Предоставляется никнейм пользователя.',
     responses={status.HTTP_200_OK: models.SearchedNicknameSerializer,
                status.HTTP_400_BAD_REQUEST: models.SearchedNicknameSerializer},
     tags=["Users"]

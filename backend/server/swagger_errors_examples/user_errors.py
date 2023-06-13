@@ -21,6 +21,36 @@ invalid_email = OpenApiExample(
 	response_only=True,
 	status_codes=[400]
 )
+email_not_exist = OpenApiExample(
+	'Электронная почта не существует',
+	summary="Ошибка: несуществующий логин",
+	description="Ошибка, возникающая при введении несуществующего логина. Возвращает код ошибки error.",
+	value={
+		'error': 'EMAIL_NOT_FOUND'
+	},
+	response_only=True,
+	status_codes=[400]
+)
+weak_password = OpenApiExample(
+	'Слабый пароль',
+	summary="Ошибка: слабый пароль",
+	description="Ошибка, возникающая при введении пароля длинной менее 6 символов. Возвращает код ошибки error.",
+	value={
+		'error': 'WEAK_PASSWORD : Password should be at least 6 characters'
+	},
+	response_only=True,
+	status_codes=[400]
+)
+nickname_exists = OpenApiExample(
+	'Никнейм уже существует',
+	summary="Ошибка: никнейм уже существует",
+	description="Ошибка, возникающая при введении при регистрации никнейма который уже сущесвует. Возвращает код ошибки error.",
+	value={
+		'error': 'NICKNAME_EXISTS'
+	},
+	response_only=True,
+	status_codes=[400]
+)
 email_exists = OpenApiExample(
 	'Почта уже зарегистрирована',
 	summary="Ошибка: электронная почта зарегистрирована",

@@ -130,7 +130,9 @@ class UserSerializer(serializers.Serializer):
             response_only=True,
             status_codes=[200]
         ),
-        swagger_errors_examples.user_errors.invalid_credentials
+        swagger_errors_examples.user_errors.invalid_credentials,
+        swagger_errors_examples.user_errors.email_not_exist,
+        swagger_errors_examples.user_errors.weak_password,
     ]
 )
 class AuthorizationSerializer(serializers.Serializer):
@@ -170,7 +172,9 @@ class AuthorizationSerializer(serializers.Serializer):
         ),
         swagger_errors_examples.user_errors.invalid_credentials,
         swagger_errors_examples.user_errors.invalid_email,
-        swagger_errors_examples.user_errors.email_exists
+        swagger_errors_examples.user_errors.email_exists,
+        swagger_errors_examples.user_errors.nickname_exists,
+        swagger_errors_examples.user_errors.weak_password
     ]
 )
 class RegistrationSerializer(serializers.Serializer):
