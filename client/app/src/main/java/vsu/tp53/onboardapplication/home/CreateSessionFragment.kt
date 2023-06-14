@@ -26,6 +26,7 @@ import vsu.tp53.onboardapplication.service.SessionService
 import vsu.tp53.onboardapplication.util.InputFilterMinMax
 import vsu.tp53.onboardapplication.util.Validators
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
@@ -139,8 +140,16 @@ class CreateSessionFragment : Fragment() {
 
             if (selectedDate >= currentDate) {
                 val timePickerDialog = TimePickerDialog(requireContext(), { _: TimePicker, selectedHour: Int, selectedMinute: Int ->
-                    val formattedDateTime = String.format("%02d/%02d/%04d %02d:%02d", selectedDay, selectedMonth + 1, selectedYear, selectedHour, selectedMinute)
-                    dateTimeInput.setText(formattedDateTime)
+                    val selectedDateTime = LocalDateTime.of(selectedYear, selectedMonth + 1, selectedDay, selectedHour, selectedMinute)
+                    val currentDateTime = LocalDateTime.now()
+
+                    if (selectedDateTime.isAfter(currentDateTime.plusMinutes(1))) {
+                        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                        val formattedDateTime = selectedDateTime.format(formatter)
+                        dateTimeInput.setText(formattedDateTime)
+                    } else {
+                        Toast.makeText(context, "Выберите не прошедшее время", Toast.LENGTH_LONG).show()
+                    }
                 }, hour, minute, true)
 
                 timePickerDialog.show()
