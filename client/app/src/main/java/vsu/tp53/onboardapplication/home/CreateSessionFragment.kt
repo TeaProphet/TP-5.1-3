@@ -4,12 +4,12 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.text.InputFilter
-import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -56,17 +56,11 @@ class CreateSessionFragment : Fragment() {
             }
         }
         binding.dateInput.apply {
-            inputType = InputType.TYPE_NULL
+            keyListener = null
             isFocusable = false
+            isClickable = true
             setOnClickListener {
-                showDatePickerDialog(binding.dateInput)
-            }
-        }
-        binding.timeInput.apply {
-            inputType = InputType.TYPE_NULL
-            isFocusable = false
-            setOnClickListener {
-                showTimePickerDialog(binding.timeInput)
+                showDateTimePickerDialog(binding.dateInput)
             }
         }
         binding.playersNumberInput.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(2), InputFilterMinMax(0, 16))
@@ -77,7 +71,7 @@ class CreateSessionFragment : Fragment() {
         Log.i("CreateSession", "Create session method")
         if (binding.nameInput.text.toString() == "" || binding.addressInput.text.toString() == "" ||
                 binding.gamesInput.text.toString() == "" || binding.playersNumberInput.text.toString() == "" ||
-                binding.dateInput.text.toString() == "" || binding.timeInput.text.toString() == "") {
+                binding.dateInput.text.toString() == "") {
             Toast.makeText(context, "Заполните все поля", Toast.LENGTH_LONG).show()
             return false
         }
@@ -85,17 +79,13 @@ class CreateSessionFragment : Fragment() {
             Toast.makeText(context, "Минимальное количество игроков: 2", Toast.LENGTH_LONG).show()
             return false
         }
-        if (!Validators.checkDate(binding.dateInput.text.toString())) {
+        if (!Validators.checkDateAndTime(binding.dateInput.text.toString())) {
             Toast.makeText(context, "Неверный формат даты", Toast.LENGTH_LONG).show()
-            return false
-        }
-        if (!Validators.checkTime(binding.timeInput.text.toString())) {
-            Toast.makeText(context, "Неверный формат времени", Toast.LENGTH_LONG).show()
             return false
         }
         val df: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
         val localDate: LocalDateTime =
-            LocalDateTime.parse("${binding.dateInput.text} ${binding.timeInput.text}", df)
+            LocalDateTime.parse("${binding.dateInput.text}", df)
         val sessionEntity = SessionEntity(
             "",
             binding.nameInput.text.toString(),
@@ -134,15 +124,32 @@ class CreateSessionFragment : Fragment() {
         datePickerDialog.show()
     }
 
-    private fun showTimePickerDialog(timeInput: EditText) {
+    private fun showDateTimePickerDialog(dateTimeInput: EditText) {
+        val currentDate = calendar.timeInMillis
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
 
-        val timePickerDialog = TimePickerDialog(requireContext(), { _, selectedHour, selectedMinute ->
-            val formattedTime = String.format("%02d:%02d", selectedHour, selectedMinute)
-            timeInput.setText(formattedTime)
-        }, hour, minute, true)
+        val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+            val selectedCalendar = Calendar.getInstance()
+            selectedCalendar.set(selectedYear, selectedMonth, selectedDay)
+            val selectedDate = selectedCalendar.timeInMillis
 
-        timePickerDialog.show()
+            if (selectedDate >= currentDate) {
+                val timePickerDialog = TimePickerDialog(requireContext(), { _: TimePicker, selectedHour: Int, selectedMinute: Int ->
+                    val formattedDateTime = String.format("%02d/%02d/%04d %02d:%02d", selectedDay, selectedMonth + 1, selectedYear, selectedHour, selectedMinute)
+                    dateTimeInput.setText(formattedDateTime)
+                }, hour, minute, true)
+
+                timePickerDialog.show()
+            } else {
+                Toast.makeText(context, "Выберите дату, которая еще не прошла", Toast.LENGTH_LONG).show()
+            }
+        }, year, month, day)
+
+        datePickerDialog.datePicker.minDate = currentDate
+        datePickerDialog.show()
     }
 }

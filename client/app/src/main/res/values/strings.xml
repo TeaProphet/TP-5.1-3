@@ -56,8 +56,7 @@
     <string name="session_name">Название игровой сессии:</string>
     <string name="session_name_hint">Название</string>
     <string name="games_hint">Список игр игровой сессии</string>
-    <string name="date_hint">DD/MM/YYYY</string>
-    <string name="time_hint">HH:mm</string>
+    <string name="date_hint">DD/MM/YYYY HH:mm</string>
     <string name="players_num">Кол-во игроков (макс. 16, мин. 2):</string>
     <string name="create">Создать</string>
     <string name="dice_sides">Кол-во граней</string>
