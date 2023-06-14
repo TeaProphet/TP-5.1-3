@@ -76,7 +76,13 @@ class HomeFragment : Fragment() {
             lifecycleScope.launch {
                 val sessions = _sessionService.getSessions()
                 sessionAdapter = if (sessions.isNotEmpty()) {
-                    SessionAdapter(_sessionService.getSessions() as MutableList<SessionBody>)
+                    val filteredSessions = mutableListOf<SessionBody>()
+                    for (session in sessions){
+                        if (session.date_time > LocalDateTime.now()){
+                            filteredSessions.add(session)
+                        }
+                    }
+                    SessionAdapter(filteredSessions)
                 } else {
                     SessionAdapter(mutableListOf())
                 }
