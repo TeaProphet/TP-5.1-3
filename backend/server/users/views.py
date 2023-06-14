@@ -86,7 +86,7 @@ def get_profile_info(request, nickname):
     if len(user.each()) == 0:
         return JsonResponse({'error': 'INVALID_DATA'}, status=400)
     user_data = user.val().popitem()[1].get('user_data')
-    serialized_data = models.UserDataSerializer(data=user_data)
+    serialized_data = serializers.UserDataSerializer(data=user_data)
     serialized_data.is_valid()
     return JsonResponse(serialized_data.data)
 
