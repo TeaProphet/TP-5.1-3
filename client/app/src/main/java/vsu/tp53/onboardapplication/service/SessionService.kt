@@ -85,7 +85,7 @@ class SessionService(
         }
     }
 
-    suspend fun createSession(sessionEntity: SessionEntity): ErrorEntity {
+    suspend fun createSession(sessionEntity: SessionEntity): ErrorEntity? {
         return withContext(Dispatchers.IO) {
             Log.i("SessionService", "Create")
             restTemplate.messageConverters.add(MappingJacksonHttpMessageConverter())
