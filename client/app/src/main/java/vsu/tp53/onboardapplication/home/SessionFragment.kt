@@ -22,6 +22,8 @@ import vsu.tp53.onboardapplication.model.SessionInfoBody
 import vsu.tp53.onboardapplication.service.AuthService
 import vsu.tp53.onboardapplication.service.ProfileService
 import vsu.tp53.onboardapplication.service.SessionService
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 class SessionFragment : Fragment() {
@@ -97,14 +99,18 @@ class SessionFragment : Fragment() {
 
         binding.joinSessionButton.setOnClickListener {
             lifecycleScope.launch {
+                val sessionInfo: SessionInfoBody? = _sessionService.getSessionInfo(binding.inSessionID.text.toString().toInt())
                 if (binding.joinSessionButton.text == "Записаться") {
                     _sessionService.joinSession(binding.inSessionID.text.toString().toInt())
                     binding.joinSessionButton.text = "Отписаться"
                 } else {
                     _sessionService.leaveSession(binding.inSessionID.text.toString().toInt())
-                    binding.joinSessionButton.text = "Записаться"
+                    if (sessionInfo != null && sessionInfo.players.size == 1){
+                        it.findNavController().navigate(R.id.homeFragment)
+                    } else {
+                        binding.joinSessionButton.text = "Записаться"
+                    }
                 }
-                val sessionInfo: SessionInfoBody? = _sessionService.getSessionInfo(binding.inSessionID.text.toString().toInt())
                 if (sessionInfo != null) {
                     binding.inSessionID.setText(binding.inSessionID.text.toString())
                     setSessionData(sessionInfo)
@@ -165,5 +171,10 @@ class SessionFragment : Fragment() {
 
         playersAdapter = PlayerAdapter(listPlayers)
         playersRecyclerView.adapter = playersAdapter
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        if (LocalDateTime.parse(binding.inSessionDate.text.toString(), formatter) < LocalDateTime.now()){
+            binding.joinSessionButton.visibility = View.GONE
+        }
     }
 }
