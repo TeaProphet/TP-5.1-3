@@ -10,14 +10,15 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from onboardProject import settings
-from session import models
+from session import models, serializers
+from session.serializers import SessionSerializer
 
 
 @extend_schema(
-    request=models.SessionRegistrationSerializer,
+    request=serializers.SessionRegistrationSerializer,
     description="Метод для создания игровой сессии.",
     responses={status.HTTP_204_NO_CONTENT: None,
-               status.HTTP_400_BAD_REQUEST: models.SessionRegistrationSerializer},
+               status.HTTP_400_BAD_REQUEST: serializers.SessionRegistrationSerializer},
     tags=['Sessions']
 )
 @api_view(['POST'])
@@ -32,7 +33,7 @@ def create_session(request):
         except TypeError:
             pass
         body_data['session_id'] = session_id
-        session = models.SessionRegistrationSerializer(data=dict(body_data))
+        session = serializers.SessionRegistrationSerializer(data=dict(body_data))
         if not session.is_valid():
             raise ValidationError
         session = session.save()
@@ -46,7 +47,18 @@ def create_session(request):
             return JsonResponse({'error': 'EXPIRED_TOKEN'})
     uid = auth_user['user_id']
     nickname = settings.database.child(settings.USERS_TABLE).child(uid).child('nickname').get().val()
-    session.register_session(nickname, uid)
+    session.owner = nickname
+    session.players = [nickname]
+    session_info = SessionSerializer(session).data
+    settings.database.child(settings.SESSIONS_TABLE).child(session.session_id).update(session_info)
+    user_sessions = settings.database.child(settings.USERS_TABLE).child(uid).child('user_data').child(
+        'played_sessions').get().val()
+    if user_sessions:
+        user_sessions += [session.session_id]
+    else:
+        user_sessions = [session.session_id]
+    settings.database.child(settings.USERS_TABLE).child(uid).child('user_data').child('played_sessions') \
+        .set(user_sessions)
 
     return Response(status=204)
 
@@ -54,8 +66,8 @@ def create_session(request):
 @extend_schema(
     request=None,
     responses={status.HTTP_204_NO_CONTENT: None,
-               status.HTTP_400_BAD_REQUEST: models.SessionDeleteSerializer,
-               status.HTTP_403_FORBIDDEN: models.SessionDeleteSerializer},
+               status.HTTP_400_BAD_REQUEST: serializers.SessionDeleteSerializer,
+               status.HTTP_403_FORBIDDEN: serializers.SessionDeleteSerializer},
     description="Метод для удаления игровой сессии по её идентификатору. Предоставляются:\n"
                 "1. idToken - токен пользователя.\n"
                 "2. session_id - идентификатор игровой сессии.",
@@ -96,8 +108,8 @@ def delete_session_algorythm(requester_uid, session_id):
 
 
 @extend_schema(
-    responses={status.HTTP_200_OK: models.SessionPublicInfoSerializer,
-               status.HTTP_400_BAD_REQUEST: models.SessionPublicInfoSerializer},
+    responses={status.HTTP_200_OK: serializers.SessionPublicInfoSerializer,
+               status.HTTP_400_BAD_REQUEST: serializers.SessionPublicInfoSerializer},
     request=None,
     description="Метод для получения подробной информации об игровой сессии по её идентификатору. Предоставляются:\n"
                 "1. session_id - идентификатор игровой сессии.\n",
@@ -112,17 +124,17 @@ def get_session_info(request, session_id):
         else:
             session_info = dict(session_info)
         session_info['session_id'] = session_id
-        session = models.SessionPublicInfoSerializer(data=session_info)
+        session = serializers.SessionPublicInfoSerializer(data=session_info)
         if not session.is_valid():
             raise ValidationError
         session = session.save()
     except ValidationError:
         return JsonResponse({'error': 'INVALID_SESSION_ID'})
-    return JsonResponse(models.SessionPublicInfoSerializer(session).data)
+    return JsonResponse(serializers.SessionPublicInfoSerializer(session).data)
 
 
 @extend_schema(
-    responses=models.SessionsListSerializer,
+    responses=serializers.SessionsListSerializer,
     request=None,
     description="Метод для получения краткой сводки информации обо всех игровых сессиях.",
     tags=['Sessions']
@@ -135,7 +147,7 @@ def get_sessions(request):
         if type(raw_sessions_info) == list:
             raw_sessions_info = OrderedDict((index, item) for index, item in enumerate(raw_sessions_info) if item is not None)
         for key, val in raw_sessions_info.items():
-            serialized_raw = models.SessionPublicShortInfoSerializer(data=val)
+            serialized_raw = serializers.SessionPublicShortInfoSerializer(data=val)
             serialized_raw.is_valid()
             serialized = serialized_raw.validated_data
             serialized['sessionId'] = int(key)
@@ -148,7 +160,7 @@ def get_sessions(request):
 @extend_schema(
     request=None,
     responses={status.HTTP_204_NO_CONTENT: None,
-               status.HTTP_400_BAD_REQUEST: models.SessionJoinSerializer},
+               status.HTTP_400_BAD_REQUEST: serializers.SessionJoinSerializer},
     description="Метод для присоединения к игровой сессии. Предоставляются:\n"
                 "1. idToken - токен пользователя.\n"
                 "2. session_id - идентификатор игровой сессии.",
@@ -194,7 +206,7 @@ def join_session(request, session_id):
 @extend_schema(
     request=None,
     responses={status.HTTP_204_NO_CONTENT: None,
-               status.HTTP_400_BAD_REQUEST: models.SessionLeftSerializer},
+               status.HTTP_400_BAD_REQUEST: serializers.SessionLeftSerializer},
     description="Метод для ухода с игровой сессии Предоставляются:\n"
                 "1. idToken - токен пользователя.\n"
                 "2. session_id - идентификатор игровой сессии.",
@@ -238,8 +250,8 @@ def leave_session(request, session_id):
 @extend_schema(
     request=None,
     responses={status.HTTP_204_NO_CONTENT: None,
-               status.HTTP_400_BAD_REQUEST: models.ChangeSessionNameSerializer,
-               status.HTTP_403_FORBIDDEN: models.ChangeSessionNameSerializer},
+               status.HTTP_400_BAD_REQUEST: serializers.ChangeSessionNameSerializer,
+               status.HTTP_403_FORBIDDEN: serializers.ChangeSessionNameSerializer},
     description="Метод для смены названия игровой сессии. Предоставляются:\n"
                 "1. idToken - токен пользователя.\n"
                 "2. new_name - новое имя игровой сессии.\n"

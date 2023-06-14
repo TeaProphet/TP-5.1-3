@@ -8,20 +8,15 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-
-import swagger_errors_examples.user_errors
 from onboardProject import settings
-from users import models
+from users import models, serializers
 from utils.serializing import complete_serialize
 
 
-# Expiried token: yJhbGciOiJSUzI1NiIsImtpZCI6IjJkM2E0YTllYjY0OTk0YzUxM2YyYzhlMGMwMTY1MzEzN2U5NTg3Y2EiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vb25ib2FyZGFwcC03ZjQ4ZCIsImF1ZCI6Im9uYm9hcmRhcHAtN2Y0OGQiLCJhdXRoX3RpbWUiOjE2ODU1MzQzODUsInVzZXJfaWQiOiJPVDBxRVFORVc3UXh3YzVtWEZpUnpqVDJMbDYyIiwic3ViIjoiT1QwcUVRTkVXN1F4d2M1bVhGaVJ6alQyTGw2MiIsImlhdCI6MTY4NTUzNDM4NSwiZXhwIjoxNjg1NTM3OTg1LCJlbWFpbCI6InF3ZXJ0eUB5YW5kZXgucnUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsicXdlcnR5QHlhbmRleC5ydSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.bdD3bJOsmuZYfrZuwEOiVkaIwaiQok23KByPfjnOgkHs5Wkt4RQs9yZwahJpENxGHIRHnOpIlQSzjUarqrllIBWhC9SZMJ7zuwyN7wsLZy2AJIdMgZgHliBdYIpjgYzoz8YH5tHZWZAPLVsxuJ-3U3l_iHOm-peRf-lX30pnqr0OjRc7CzLhUCqL4bXOoQ8K7OQC3oOAg3XlkobqB5sE5EdylvyDM_4GS3WHK_R5sV-lIhv5Il1oSyztaxUh_5oOxRb6_v-SlLvTLkxM34VJJ3aYmcs2DlIdwn6ODHxc4Jjdot07lT8Abz6dDjACy3h9r1xPbkxp4CF7eeXq3SQ2cg
-
-
 @extend_schema(
-    request=models.RegistrationSerializer,
-    responses={status.HTTP_200_OK: models.RegistrationSerializer,
-               status.HTTP_400_BAD_REQUEST: models.RegistrationSerializer},
+    request=serializers.RegistrationSerializer,
+    responses={status.HTTP_200_OK: serializers.RegistrationSerializer,
+               status.HTTP_400_BAD_REQUEST: serializers.RegistrationSerializer},
     description="Метод для регистрации пользователя.",
     tags=["Users"]
 )
@@ -33,7 +28,7 @@ def register(request):
         if not body_data.keys().__contains__('password'):
             raise ValidationError
         password = body_data['password']
-        credentials = complete_serialize(body_data, models.RegistrationSerializer)
+        credentials = complete_serialize(body_data, serializers.RegistrationSerializer)
     except ValidationError:
         return JsonResponse({'error': 'INVALID_CREDENTIALS'}, status=400)
     try:
@@ -43,7 +38,13 @@ def register(request):
     user = models.User(uid=auth_user.get('localId'), login=credentials.login, user_data=models.UserData(),
                        nickname=credentials.nickname)
     try:
-        user.save_data()
+        user_data = dict(serializers.UserDataSerializer(user.user_data).data)
+        if len(settings.database.child(settings.USERS_TABLE).order_by_child('nickname').equal_to(
+                user.nickname).get().each()) > 0:
+            raise ValueError('NICKNAME_EXISTS')
+        settings.database.child(settings.USERS_TABLE).child(user.uid).child('user_data').update(user_data)
+        settings.database.child(settings.USERS_TABLE).child(user.uid).child('login').set(user.login)
+        settings.database.child(settings.USERS_TABLE).child(user.uid).child('nickname').set(user.nickname)
     except ValueError as e:
         settings.auth.delete_user_account(auth_user['idToken'])
         return JsonResponse({'error': e.args[0]})
@@ -51,9 +52,9 @@ def register(request):
 
 
 @extend_schema(
-    request=models.AuthorizationSerializer,
-    responses={status.HTTP_200_OK: models.AuthorizationSerializer,
-               status.HTTP_400_BAD_REQUEST:models.AuthorizationSerializer},
+    request=serializers.AuthorizationSerializer,
+    responses={status.HTTP_200_OK: serializers.AuthorizationSerializer,
+               status.HTTP_400_BAD_REQUEST:serializers.AuthorizationSerializer},
     description="Метод для авторизации пользователя.",
     tags=["Users"]
 )
@@ -72,11 +73,11 @@ def credentials_authorize(request):
 
 
 @extend_schema(
-    request=models.SearchedNicknameSerializer,
+    request=serializers.SearchedNicknameSerializer,
     description='Метод, возвращающий публичную информацию о пользователе по его никнейму. '
                 'Предоставляется никнейм пользователя.',
-    responses={status.HTTP_200_OK: models.SearchedNicknameSerializer,
-               status.HTTP_400_BAD_REQUEST: models.SearchedNicknameSerializer},
+    responses={status.HTTP_200_OK: serializers.SearchedNicknameSerializer,
+               status.HTTP_400_BAD_REQUEST: serializers.SearchedNicknameSerializer},
     tags=["Users"]
 )
 @api_view(['GET'])
@@ -91,9 +92,9 @@ def get_profile_info(request, nickname):
 
 
 @extend_schema(
-    request=models.ChangingUserDataSerializer,
+    request=serializers.ChangingUserDataSerializer,
     responses={status.HTTP_204_NO_CONTENT: None,
-               status.HTTP_400_BAD_REQUEST: models.ChangingUserDataSerializer},
+               status.HTTP_400_BAD_REQUEST: serializers.ChangingUserDataSerializer},
     description="Метод для смены публичной информации о пользователе. Предоставляются:\n"
                 "1. idToken - токен пользователя.",
     tags=["Users"]
@@ -103,7 +104,7 @@ def change_profile(request, idToken):
     try:
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
-        user_data = models.ChangingUserDataSerializer(data=body_data)
+        user_data = serializers.ChangingUserDataSerializer(data=body_data)
         if not user_data.is_valid():
             raise ValidationError
         user_data = user_data.save()
@@ -116,15 +117,15 @@ def change_profile(request, idToken):
             return JsonResponse({'error': 'INVALID_TOKEN'}, status=400)
         else:
             return JsonResponse({'error': 'EXPIRED_TOKEN'}, status=400)
-    settings.database.child(settings.USERS_TABLE).child(uid).child('user_data').update(dict(models.ChangingUserDataSerializer(user_data).data))
+    settings.database.child(settings.USERS_TABLE).child(uid).child('user_data').update(dict(serializers.ChangingUserDataSerializer(user_data).data))
     return Response(status=204)
 
 
 @extend_schema(
-    request=models.PlusReputationRequestSerializer,
-    responses={status.HTTP_200_OK: models.PlusReputationRequestSerializer,
-               status.HTTP_400_BAD_REQUEST: models.PlusReputationRequestSerializer,
-               status.HTTP_403_FORBIDDEN: models.PlusReputationRequestSerializer},
+    request=serializers.PlusReputationRequestSerializer,
+    responses={status.HTTP_200_OK: serializers.PlusReputationRequestSerializer,
+               status.HTTP_400_BAD_REQUEST: serializers.PlusReputationRequestSerializer,
+               status.HTTP_403_FORBIDDEN: serializers.PlusReputationRequestSerializer},
     description="Метод для увеличения репутации пользователя другим пользователем.",
     tags=["Users"],
 )
@@ -147,10 +148,10 @@ def plus_reputation(request):
 
 
 @extend_schema(
-    request=models.MinusReputationRequestSerializer,
+    request=serializers.MinusReputationRequestSerializer,
     responses={status.HTTP_200_OK: None,
-               status.HTTP_400_BAD_REQUEST: models.MinusReputationRequestSerializer,
-               status.HTTP_403_FORBIDDEN: models.MinusReputationRequestSerializer},
+               status.HTTP_400_BAD_REQUEST: serializers.MinusReputationRequestSerializer,
+               status.HTTP_403_FORBIDDEN: serializers.MinusReputationRequestSerializer},
     description="Метод для уменьшения репутации пользователя другим пользователем.",
     tags=["Users"],
 )
@@ -173,10 +174,10 @@ def minus_reputation(request):
 
 
 @extend_schema(
-    request=models.BanRequestSerializer,
+    request=serializers.BanRequestSerializer,
     responses={status.HTTP_204_NO_CONTENT: None,
-               status.HTTP_400_BAD_REQUEST: models.BanRequestSerializer,
-               status.HTTP_403_FORBIDDEN: models.BanRequestSerializer},
+               status.HTTP_400_BAD_REQUEST: serializers.BanRequestSerializer,
+               status.HTTP_403_FORBIDDEN: serializers.BanRequestSerializer},
     description="Метод для блокировки пользователя другим пользователем.",
     tags=["Users"],
 )
@@ -205,10 +206,10 @@ def ban(request):
 
 
 @extend_schema(
-    request=models.UnbanRequestSerializer,
+    request=serializers.UnbanRequestSerializer,
     responses={status.HTTP_204_NO_CONTENT: None,
-               status.HTTP_400_BAD_REQUEST: models.UnbanRequestSerializer,
-               status.HTTP_403_FORBIDDEN: models.UnbanRequestSerializer},
+               status.HTTP_400_BAD_REQUEST: serializers.UnbanRequestSerializer,
+               status.HTTP_403_FORBIDDEN: serializers.UnbanRequestSerializer},
     description="Метод для разблокировки пользователя другим пользователем.",
     tags=["Users"],
 )

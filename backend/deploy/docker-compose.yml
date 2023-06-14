@@ -1,7 +1,5 @@
 version: '3'
 services:
-
-services:
     server:
         image: nginx:alpine
         restart: always
@@ -18,8 +16,6 @@ services:
         image: harmonysword/tp5.1-3:latest
         command: bash -c "/code/run.sh"
         restart: always
-        env_file:
-            - ../const.env
         volumes:
             - public:/code/public
 
