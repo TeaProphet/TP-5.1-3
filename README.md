@@ -34,5 +34,6 @@ Admin:
 1. Техническое Задание [docx](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/Техническое%20задание%20ТП-5.1-3.docx) [pdf](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/%D0%A2%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5%20%D0%B7%D0%B0%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%A2%D0%9F-5.1-3.pdf)
 2. Курсовая работа [docx](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/Курсовая%20работа.docx) [pdf](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/%D0%9A%D1%83%D1%80%D1%81%D0%BE%D0%B2%D0%B0%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0.pdf)
 3. Сопроводительное письмо [docx](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/Сопроводительное%20письмо.docx) [pdf](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/Сопроводительное%20письмо.pdf)
+4. Инструкция по запуску приложения [docx](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/Инструкция%20по%20использованию%20приложения.docx) [pdf](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/Инструкция%20по%20использованию%20приложения.pdf)
 ## APK Файл
 [APK](https://github.com/TeaProphet/TP-5.1-3/blob/develop/app-release.apk)
