@@ -12,6 +12,7 @@
 User:
 - login: qwerty@yandex.ru
 - pwd: qwerty
+
 Admin:
 - login: admin@yandex.ru
 - pwd: qwerty
