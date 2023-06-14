@@ -8,8 +8,7 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.model.entity.SessionBody
-import java.io.Serializable
+import vsu.tp53.onboardapplication.model.SessionBody
 
 class SessionAdapter (_newSessions: MutableList<SessionBody>) : RecyclerView.Adapter<SessionAdapter.SessionViewHolder>() {
 
@@ -23,9 +22,8 @@ class SessionAdapter (_newSessions: MutableList<SessionBody>) : RecyclerView.Ada
     override fun onBindViewHolder(holder: SessionViewHolder, position: Int) {
         holder.sessionID.text = newSessions[position].sessionId.toString()
         holder.sessionName.text = newSessions[position].name
-        holder.sessionDate.text = newSessions[position].date_time.toString()
+        holder.sessionDate.text = newSessions[position].date_time.toString().replace('T', ' ')
         holder.sessionCity.text = newSessions[position].city_address
-        holder.sessionPlayers.text = newSessions[position].players_max.toString()
         holder.sessionPlayers.text = newSessions[position].players_max.toString()
 
         val bundle = Bundle()

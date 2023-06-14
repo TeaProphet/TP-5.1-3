@@ -56,9 +56,8 @@
     <string name="session_name">Название игровой сессии:</string>
     <string name="session_name_hint">Название</string>
     <string name="games_hint">Список игр игровой сессии</string>
-    <string name="date_hint">DD/MM/YYYY</string>
-    <string name="time_hint">HH/MM</string>
-    <string name="players_num">Кол-во недостающих игроков:</string>
+    <string name="date_hint">DD/MM/YYYY HH:mm</string>
+    <string name="players_num">Кол-во игроков (макс. 16, мин. 2):</string>
     <string name="create">Создать</string>
     <string name="dice_sides">Кол-во граней</string>
     <string name="dice_num">Кол-во кубов</string>
@@ -75,7 +74,7 @@
     </string>
     <string name="signUpButtonText">Зарегистрироваться</string>
     <string name="passwordHint">Пароль</string>
-    <string name="loginHint">name@mail.com</string>
+    <string name="loginHint">Логин (электронная почта)</string>
     <string name="nicknameHint">Никнейм</string>
     <string name="banInfo">Ваша учётная запись заблокирована администратором. Причиной могли послужить: нарушение УК РФ, оскорбительные названия игровых сессий/учётной записи и иные нарушения. Обратитесь по следующему адресу электронной почты за дополнительными разъяснениями: e-mail</string>
     <string name="chooseAvatarButton">Выбрать аватар</string>
@@ -89,5 +88,6 @@
     <string name="agePlaceholder">Не указано</string>
     <string name="gamesPlaceholder">Не указано</string>
     <string name="vkPlaceholder">Не указано</string>
-    <string name="tgPlaceholder">Не задано</string>
+    <string name="tgPlaceholder">Не указано</string>
+    <string name="signInButtonText">Войти</string>
 </resources>

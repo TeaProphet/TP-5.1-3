@@ -11,10 +11,11 @@ import androidx.navigation.findNavController
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.auth.service.AuthService
-import vsu.tp53.onboardapplication.auth.service.Errors
 import vsu.tp53.onboardapplication.databinding.SignUpBinding
-import vsu.tp53.onboardapplication.model.domain.User
+import vsu.tp53.onboardapplication.model.User
+import vsu.tp53.onboardapplication.service.AuthService
+import vsu.tp53.onboardapplication.service.Errors
+import vsu.tp53.onboardapplication.util.Validators
 
 class SignUpFragment : Fragment() {
     private var _binding: SignUpBinding? = null
@@ -61,7 +62,7 @@ class SignUpFragment : Fragment() {
             return false
         }
 
-        if (!authService.checkEmail(login)) {
+        if (!Validators.checkEmail(login)) {
             binding.signUpError.text = "Неверный формат логина"
             return false
         }

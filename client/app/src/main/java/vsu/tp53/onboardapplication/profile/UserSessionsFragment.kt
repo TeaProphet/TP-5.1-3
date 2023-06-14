@@ -1,54 +1,65 @@
-package vsu.tp53.onboardapplication.home
+package vsu.tp53.onboardapplication.profile
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
-import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.databinding.FragmentHomeBinding
-import vsu.tp53.onboardapplication.home.service.SessionService
-import vsu.tp53.onboardapplication.model.entity.SessionBody
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import vsu.tp53.onboardapplication.databinding.FragmentUserSessionsBinding
+import vsu.tp53.onboardapplication.home.SessionAdapter
+import vsu.tp53.onboardapplication.model.SessionBody
+import vsu.tp53.onboardapplication.service.ProfileService
+import vsu.tp53.onboardapplication.service.SessionService
 
-/**
- * A simple [Fragment] subclass as the default destination in the navigation.
- */
 class UserSessionsFragment : Fragment() {
 
-    private lateinit var binding: FragmentHomeBinding
+    private lateinit var binding: FragmentUserSessionsBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var sessionAdapter: SessionAdapter
     private lateinit var _sessionService: SessionService
+    private lateinit var _profileService: ProfileService
     private val sessionService get() = _sessionService
+    private val profileService get() = _profileService
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding = FragmentUserSessionsBinding.inflate(inflater, container, false)
         if (container != null) {
             _sessionService = SessionService(RestTemplate(), container.context)
+            _profileService = ProfileService(RestTemplate(), container.context)
         }
 
-        recyclerView = binding.recyclerSessionsSession
+        recyclerView = binding.recyclerUserSessions
         recyclerView.layoutManager = LinearLayoutManager(activity)
 
         lifecycleScope.launch {
-            sessionAdapter = SessionAdapter(_sessionService.getSessions() as MutableList<SessionBody>)
-            recyclerView.adapter = sessionAdapter
-        }
+            val sessions = sessionService.getSessions()
+            val profileInfo =
+                profileService.getProfileInfo(requireArguments().getString("nickname"))
+            val userSessionIds = profileInfo!!.played_sessions
+            val listOfSessions = mutableListOf<SessionBody>()
 
-        binding.addButton.setOnClickListener {
-            it.findNavController().navigate(R.id.createSessionFragment)
+            if (userSessionIds != null) {
+                if (userSessionIds.isNotEmpty()) {
+                    for (session in sessions) {
+                        if (userSessionIds.contains(session.sessionId)) {
+                            listOfSessions.add(session)
+                        }
+                    }
+                }
+            }
+
+            sessionAdapter = SessionAdapter(listOfSessions)
+            recyclerView.adapter = sessionAdapter
+
+            binding.pageContent.visibility = View.VISIBLE
+            binding.progressContent.visibility = View.GONE
         }
 
         return binding.root

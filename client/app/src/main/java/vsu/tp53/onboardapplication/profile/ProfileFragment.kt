@@ -1,7 +1,6 @@
 package vsu.tp53.onboardapplication.profile
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,15 +14,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.auth.service.AuthService
-import vsu.tp53.onboardapplication.auth.service.Errors
-import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentProfileBinding
-import vsu.tp53.onboardapplication.model.entity.ChangeReputationEntity
-import vsu.tp53.onboardapplication.model.entity.ProfileBanEntity
+import vsu.tp53.onboardapplication.model.ChangeReputationEntity
+import vsu.tp53.onboardapplication.model.ErrorEntity
+import vsu.tp53.onboardapplication.model.ProfileBanEntity
+import vsu.tp53.onboardapplication.model.ReputationEntity
+import vsu.tp53.onboardapplication.service.AuthService
+import vsu.tp53.onboardapplication.service.Errors
+import vsu.tp53.onboardapplication.service.ProfileService
 
 class ProfileFragment : Fragment() {
 
@@ -47,9 +50,10 @@ class ProfileFragment : Fragment() {
 
         try {
             nickname = requireArguments().getString("nickname")
-        } catch (e: IllegalStateException){}
+        } catch (e: IllegalStateException) {
+        }
 
-        if (nickname != null){
+        if (nickname != null) {
             lifecycleScope.launch {
                 initProfile(nickname)
                 binding.progressContent.visibility = View.GONE
@@ -81,7 +85,10 @@ class ProfileFragment : Fragment() {
 
 
         binding.openUserSessions.setOnClickListener {
-            it.findNavController().navigate(R.id.userSessionsFragment)
+            val bundle = Bundle()
+            bundle.putString("nickname", binding.profileName.text.toString())
+
+            it.findNavController().navigate(R.id.userSessionsFragment, bundle)
         }
 
         binding.blockUser.setOnClickListener {
@@ -132,7 +139,7 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        if (!authService.checkIfUserLoggedIn() || nickname != profileService.getUserNickname()){
+        if (!authService.checkIfUserLoggedIn() || nickname != profileService.getUserNickname()) {
             binding.editProfileButton.visibility = View.GONE
         } else {
             binding.editProfileButton.setOnClickListener {
@@ -142,17 +149,24 @@ class ProfileFragment : Fragment() {
 
         binding.increaseRep.setOnClickListener {
             lifecycleScope.launch {
-                changeRepPlus(nickname)
+                if (!authService.checkIfUserLoggedIn()) {
+                    Toast.makeText(context, "Доступ запрещён", Toast.LENGTH_LONG).show()
+                } else {
+                    changeRepPlus(nickname)
+                }
             }
         }
 
         binding.decreaseRep.setOnClickListener {
             lifecycleScope.launch {
-                changeRepMinus(nickname)
+                if (!authService.checkIfUserLoggedIn()) {
+                    Toast.makeText(context, "Доступ запрещён", Toast.LENGTH_LONG).show()
+                } else {
+                    changeRepMinus(nickname)
+                }
             }
         }
 
-//        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner,this)
         activity?.onBackPressedDispatcher?.addCallback {
             NavHostFragment.findNavController(this@ProfileFragment).navigateUp()
         }
@@ -166,7 +180,7 @@ class ProfileFragment : Fragment() {
 
     private suspend fun initProfile(nickname: String?) {
         var is_admin = false
-        if (authService.checkIfUserLoggedIn() && authService.checkTokenIsNotExpired()){
+        if (authService.checkIfUserLoggedIn() && authService.checkTokenIsNotExpired()) {
             val currentUserInfo = profileService.getProfileInfo(profileService.getUserNickname())
             is_admin = currentUserInfo!!.is_admin
         }
@@ -198,57 +212,89 @@ class ProfileFragment : Fragment() {
     }
 
     private suspend fun changeRepPlus(nickname: String?) {
-        if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()){
+        if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()) {
             findNavController().navigate(R.id.pageUnauthorizedFragment)
         }
         val changeRepEntity = ChangeReputationEntity(
-            authService.getRowByLogin(profileService.getUserLogin())!!.tokenId,
+            profileService.getUserToken(),
             binding.profileName.text.toString()
         )
-        val rep = profileService.increaseReputation(changeRepEntity)
-
-        if (rep != null) {
-            if (rep.error != null) {
-                val toast: Toast =
-                    Toast.makeText(this.context, Errors.getByName(rep.error!!), Toast.LENGTH_LONG)
-                toast.show()
+        var rep: ReputationEntity? = ReputationEntity()
+        try {
+            rep = profileService.increaseReputation(changeRepEntity)
+            if (rep != null) {
+                if (rep.error != null) {
+                    val toast: Toast =
+                        Toast.makeText(
+                            this.context,
+                            Errors.getByName(rep.error!!),
+                            Toast.LENGTH_LONG
+                        )
+                    toast.show()
+                } else {
+                    binding.playerReputation.text = rep.new_reputation.toString()
+                }
+            }
+        } catch (e: HttpClientErrorException) {
+            if (rep != null) {
+                if (rep.error != null) {
+                    val toast: Toast =
+                        Toast.makeText(
+                            this.context,
+                            Errors.getByName(rep.error!!),
+                            Toast.LENGTH_LONG
+                        )
+                    toast.show()
+                }
             } else {
-                binding.playerReputation.text = rep.new_reputation.toString()
+                val responseBody = e.responseBodyAsString
+                val errorEntity = Gson().fromJson(responseBody, ErrorEntity::class.java)
+                val toast: Toast =
+                    Toast.makeText(
+                        this.context,
+                        Errors.getByName(errorEntity.error),
+                        Toast.LENGTH_LONG
+                    )
+                toast.show()
             }
         }
     }
 
     private suspend fun changeRepMinus(nickname: String?) {
-        if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()){
+        if (!authService.checkIfUserLoggedIn() || !authService.checkTokenIsNotExpired()) {
             findNavController().navigate(R.id.pageUnauthorizedFragment)
         }
         val changeRepEntity = ChangeReputationEntity(
             authService.getRowByLogin(profileService.getUserLogin())!!.tokenId,
             binding.profileName.text.toString()
         )
-        val rep = profileService.decreaseReputation(changeRepEntity)
-
-        if (rep != null) {
-            if (rep.error != null) {
-                val toast: Toast =
-                    Toast.makeText(this.context, Errors.getByName(rep.error!!), Toast.LENGTH_LONG)
-                toast.show()
-            } else {
-                binding.playerReputation.text = rep.new_reputation.toString()
+        val rep: ReputationEntity?
+        try {
+            rep = profileService.decreaseReputation(changeRepEntity)
+            if (rep != null) {
+                if (rep.error != null) {
+                    val toast: Toast =
+                        Toast.makeText(
+                            this.context,
+                            Errors.getByName(rep.error!!),
+                            Toast.LENGTH_LONG
+                        )
+                    toast.show()
+                } else {
+                    binding.playerReputation.text = rep.new_reputation.toString()
+                }
             }
+        } catch (e: HttpClientErrorException) {
+            val responseBody = e.responseBodyAsString
+            val errorEntity = Gson().fromJson(responseBody, ErrorEntity::class.java)
+            val toast: Toast =
+                Toast.makeText(this.context, Errors.getByName(errorEntity.error), Toast.LENGTH_LONG)
+            toast.show()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    fun handleOnBackPressed() {
-        //Do your job here
-        //use next line if you just need navigate up
-        NavHostFragment.findNavController(this).navigateUp()
-        //Log.e(getClass().getSimpleName(), "handleOnBackPressed");
-        return
     }
 }

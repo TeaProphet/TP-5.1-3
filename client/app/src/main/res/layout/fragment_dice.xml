@@ -7,7 +7,7 @@
     android:gravity="center"
     android:orientation="vertical"
     android:padding="15dp"
-    tools:context=".DiceFragment">
+    tools:context=".home.DiceFragment">
 
     <EditText
         android:id="@+id/diceSides"
@@ -20,7 +20,8 @@
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:maxLength="3"/>
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -41,7 +42,8 @@
             android:ems="10"
             android:gravity="center"
             android:hint="@string/dice_num"
-            android:inputType="number" />
+            android:inputType="number"
+            android:maxLength="2"/>
 
         <EditText
             android:id="@+id/diceMod"
@@ -51,7 +53,8 @@
             android:ems="10"
             android:gravity="center"
             android:hint="@string/dice_mod"
-            android:inputType="number" />
+            android:inputType="number"
+            android:maxLength="2"/>
     </LinearLayout>
 
     <LinearLayout
@@ -69,7 +72,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
             android:text="@string/dice_result"
-            android:textColor="@color/white"
+            android:textColor="@color/primary_text"
             android:textSize="@dimen/session_headings"
             android:visibility="invisible" />
 
@@ -79,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="TextView"
-            android:textColor="@color/white"
+            android:textColor="@color/primary_text"
             android:textSize="@dimen/session_headings"
             android:visibility="invisible" />
     </LinearLayout>

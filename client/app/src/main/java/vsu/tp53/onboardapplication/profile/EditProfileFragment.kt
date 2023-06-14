@@ -1,18 +1,14 @@
 package vsu.tp53.onboardapplication.profile
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
-import android.content.Intent
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.text.InputFilter
 import android.text.Spanned
 import android.util.Log
@@ -29,11 +25,12 @@ import androidx.navigation.findNavController
 import kotlinx.coroutines.launch
 import org.springframework.web.client.RestTemplate
 import vsu.tp53.onboardapplication.R
-import vsu.tp53.onboardapplication.auth.service.AuthService
-import vsu.tp53.onboardapplication.auth.service.Errors
-import vsu.tp53.onboardapplication.auth.service.ProfileService
 import vsu.tp53.onboardapplication.databinding.FragmentEditProfileBinding
-import vsu.tp53.onboardapplication.model.entity.ChangeProfile
+import vsu.tp53.onboardapplication.model.ChangeProfile
+import vsu.tp53.onboardapplication.service.AuthService
+import vsu.tp53.onboardapplication.service.Errors
+import vsu.tp53.onboardapplication.service.ProfileService
+import vsu.tp53.onboardapplication.util.Validators
 
 /**
  * A simple [Fragment] subclass.
@@ -76,8 +73,12 @@ class EditProfileFragment : Fragment() {
             binding.progressContent.visibility = View.VISIBLE
             binding.pageContent.visibility = View.GONE
             lifecycleScope.launch {
-                if (changeProfile())
+                if (changeProfile()) {
                     it.findNavController().navigate(R.id.profileFragment)
+                } else {
+                    binding.progressContent.visibility = View.GONE
+                    binding.pageContent.visibility = View.VISIBLE
+                }
             }
         }
 
@@ -114,10 +115,28 @@ class EditProfileFragment : Fragment() {
             changeProfileEntity.games = binding.editFavGames.text.toString()
         }
         if (binding.userVk.text.toString() != "") {
-            changeProfileEntity.vk = binding.userVk.text.toString()
+            if (Validators.checkVk(binding.userVk.text.toString())) {
+                changeProfileEntity.vk = binding.userVk.text.toString()
+            } else {
+                Toast.makeText(
+                    this.context,
+                    "Адрес Vk должен начинаться с vk.com/",
+                    Toast.LENGTH_LONG
+                ).show()
+                return false
+            }
         }
         if (binding.userTg.text.toString() != "") {
-            changeProfileEntity.tg = binding.userTg.text.toString()
+            if (Validators.checkTg(binding.userTg.text.toString())) {
+                changeProfileEntity.tg = binding.userTg.text.toString()
+            } else {
+                Toast.makeText(
+                    this.context,
+                    "Адрес telegram должен начинаться с t.me/",
+                    Toast.LENGTH_LONG
+                ).show()
+                return false
+            }
         }
 
         Log.i("EditProfFragment", binding.ageInput.text.toString() + " age")
