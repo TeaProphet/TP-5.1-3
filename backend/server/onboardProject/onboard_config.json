@@ -1,0 +1,10 @@
+{
+  "apiKey": "AIzaSyBHpvo-bVZJmP9jFTDil9pkO6rGjJTN51o",
+  "authDomain": "onboardapp-7f48d.firebaseapp.com",
+  "databaseURL": "https://onboardapp-7f48d-default-rtdb.europe-west1.firebasedatabase.app",
+  "projectId": "onboardapp-7f48d",
+  "storageBucket": "onboardapp-7f48d.appspot.com",
+  "messagingSenderId": "677868702169",
+  "appId": "1:677868702169:web:9567b0a752bcf771df71c8",
+  "serviceAccount": "onboardProject/onboard_service_account.json"
+}
