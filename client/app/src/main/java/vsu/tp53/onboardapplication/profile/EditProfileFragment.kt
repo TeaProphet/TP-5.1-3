@@ -31,7 +31,6 @@ import vsu.tp53.onboardapplication.service.AuthService
 import vsu.tp53.onboardapplication.service.Errors
 import vsu.tp53.onboardapplication.service.ProfileService
 import vsu.tp53.onboardapplication.util.Validators
-import java.util.regex.Pattern
 
 /**
  * A simple [Fragment] subclass.
