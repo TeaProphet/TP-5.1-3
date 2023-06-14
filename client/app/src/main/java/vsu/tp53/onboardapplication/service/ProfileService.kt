@@ -23,6 +23,7 @@ import vsu.tp53.onboardapplication.model.ProfileInfoEntity
 import vsu.tp53.onboardapplication.model.ReputationEntity
 import vsu.tp53.onboardapplication.model.SearchProfile
 import vsu.tp53.onboardapplication.sqlitedb.UserTokenDbHelper
+import kotlin.math.log
 
 class ProfileService(
     private val restTemplate: RestTemplate,
@@ -41,8 +42,12 @@ class ProfileService(
     suspend fun getProfileInfo(login: String? = null): ProfileInfoEntity? {
         try {
             return withContext(Dispatchers.IO) {
-                var searchedLogin: String =
-                    login ?: prefs.getString(LAST_NICKNAME_KEY, "").toString()
+                var searchedLogin = ""
+                if (login == null){
+                    searchedLogin = prefs.getString(LAST_NICKNAME_KEY, "").toString()
+                } else {
+                    searchedLogin = login
+                }
                 Log.i("Profile-last", searchedLogin)
                 Log.i("Profile-lasLogin", searchedLogin)
 

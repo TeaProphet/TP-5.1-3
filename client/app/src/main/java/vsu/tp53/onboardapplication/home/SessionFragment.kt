@@ -54,12 +54,6 @@ class SessionFragment : Fragment() {
                 setSessionData(sessionInfo)
             }
             Log.i("SessionFragment", sessionInfo.toString())
-            val profileInfo = _profileService.getProfileInfo(null)
-            Log.i("SessionFragment", profileInfo.toString())
-            val res: Boolean =
-                !(authService.checkIfUserLoggedIn() && (_profileService.getUserNickname() == sessionInfo!!.owner
-                        || profileInfo!!.is_admin))
-            Log.i("SessionFragment-res", res.toString())
             Log.i(
                 "SessionFragment-owner",
                 (_profileService.getUserNickname() != sessionInfo!!.owner).toString()
@@ -71,15 +65,18 @@ class SessionFragment : Fragment() {
                 binding.removeSessionButton.isVisible = false
             }
             if (authService.checkIfUserLoggedIn()) {
+                val profileInfo = _profileService.getProfileInfo(null)
+                Log.i("SessionFragment", profileInfo.toString())
+                val res: Boolean =
+                    !(authService.checkIfUserLoggedIn() && (_profileService.getUserNickname() == sessionInfo!!.owner
+                            || profileInfo!!.is_admin))
+                Log.i("SessionFragment-res", res.toString())
                 val isOwner = _profileService.getUserNickname() == sessionInfo.owner
                 val isAdmin = profileInfo!!.is_admin
                 if (!(isOwner || isAdmin)) {
                     binding.changeSessionNameButton.isVisible = false
                     binding.removeSessionButton.isVisible = false
                 }
-            }
-
-            if (authService.checkIfUserLoggedIn()) {
                 if (profileInfo!!.played_sessions != null) {
                     if (profileInfo.played_sessions!!.contains(
                             binding.inSessionID.text.toString().toInt()
