@@ -57,6 +57,9 @@ class UserSessionsFragment : Fragment() {
 
             sessionAdapter = SessionAdapter(listOfSessions)
             recyclerView.adapter = sessionAdapter
+
+            binding.pageContent.visibility = View.VISIBLE
+            binding.progressContent.visibility = View.GONE
         }
 
         return binding.root
