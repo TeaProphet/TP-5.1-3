@@ -25,7 +25,6 @@ class SessionAdapter (_newSessions: MutableList<SessionBody>) : RecyclerView.Ada
         holder.sessionDate.text = newSessions[position].date_time.toString().replace('T', ' ')
         holder.sessionCity.text = newSessions[position].city_address
         holder.sessionPlayers.text = newSessions[position].players_max.toString()
-        holder.sessionPlayers.text = newSessions[position].players_max.toString()
 
         val bundle = Bundle()
 

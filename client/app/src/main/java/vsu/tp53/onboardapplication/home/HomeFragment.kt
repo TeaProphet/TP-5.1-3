@@ -17,6 +17,7 @@ import vsu.tp53.onboardapplication.databinding.FragmentHomeBinding
 import vsu.tp53.onboardapplication.model.SessionBody
 import vsu.tp53.onboardapplication.service.AuthService
 import vsu.tp53.onboardapplication.service.SessionService
+import java.time.LocalDateTime
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -46,7 +47,13 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             val sessions = _sessionService.getSessions()
             sessionAdapter = if (sessions.isNotEmpty()) {
-                SessionAdapter(_sessionService.getSessions() as MutableList<SessionBody>)
+                val filteredSessions = mutableListOf<SessionBody>()
+                for (session in sessions){
+                    if (session.date_time > LocalDateTime.now()){
+                        filteredSessions.add(session)
+                    }
+                }
+                SessionAdapter(filteredSessions)
             } else {
                 SessionAdapter(mutableListOf())
             }

@@ -21,20 +21,10 @@ class Validators {
             return regex.matcher(tg).find()
         }
 
-        fun checkDate(date: String): Boolean {
-            val df = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        fun checkDateAndTime(date: String): Boolean {
+            val df = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
             return try {
                 df.parse(date)
-                true
-            } catch (e: Exception) {
-                false
-            }
-        }
-
-        fun checkTime(time: String): Boolean {
-            val df = DateTimeFormatter.ofPattern("HH:mm")
-            return try {
-                df.parse(time)
                 true
             } catch (e: Exception) {
                 false
