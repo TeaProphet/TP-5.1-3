@@ -1,0 +1,93 @@
+<resources>
+    <string name="app_name">OnBoardApplication</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="lorem_ipsum">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
+        volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
+        dui nec risus. Maecenas non sodales nisi, vel dictum dolor. Class aptent taciti sociosqu ad
+        litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse blandit eleifend
+        diam, vel rutrum tellus vulputate quis. Aliquam eget libero aliquet, imperdiet nisl a,
+        ornare ex. Sed rhoncus est ut libero porta lobortis. Fusce in dictum tellus.\n\n
+        Suspendisse interdum ornare ante. Aliquam nec cursus lorem. Morbi id magna felis. Vivamus
+        egestas, est a condimentum egestas, turpis nisl iaculis ipsum, in dictum tellus dolor sed
+        neque. Morbi tellus erat, dapibus ut sem a, iaculis tincidunt dui. Interdum et malesuada
+        fames ac ante ipsum primis in faucibus. Curabitur et eros porttitor, ultricies urna vitae,
+        molestie nibh. Phasellus at commodo eros, non aliquet metus. Sed maximus nisl nec dolor
+        bibendum, vel congue leo egestas.\n\n
+        Sed interdum tortor nibh, in sagittis risus mollis quis. Curabitur mi odio, condimentum sit
+        amet auctor at, mollis non turpis. Nullam pretium libero vestibulum, finibus orci vel,
+        molestie quam. Fusce blandit tincidunt nulla, quis sollicitudin libero facilisis et. Integer
+        interdum nunc ligula, et fermentum metus hendrerit id. Vestibulum lectus felis, dictum at
+        lacinia sit amet, tristique id quam. Cras eu consequat dui. Suspendisse sodales nunc ligula,
+        in lobortis sem porta sed. Integer id ultrices magna, in luctus elit. Sed a pellentesque
+        est.\n\n
+        Aenean nunc velit, lacinia sed dolor sed, ultrices viverra nulla. Etiam a venenatis nibh.
+        Morbi laoreet, tortor sed facilisis varius, nibh orci rhoncus nulla, id elementum leo dui
+        non lorem. Nam mollis ipsum quis auctor varius. Quisque elementum eu libero sed commodo. In
+        eros nisl, imperdiet vel imperdiet et, scelerisque a mauris. Pellentesque varius ex nunc,
+        quis imperdiet eros placerat ac. Duis finibus orci et est auctor tincidunt. Sed non viverra
+        ipsum. Nunc quis augue egestas, cursus lorem at, molestie sem. Morbi a consectetur ipsum, a
+        placerat diam. Etiam vulputate dignissim convallis. Integer faucibus mauris sit amet finibus
+        convallis.\n\n
+        Phasellus in aliquet mi. Pellentesque habitant morbi tristique senectus et netus et
+        malesuada fames ac turpis egestas. In volutpat arcu ut felis sagittis, in finibus massa
+        gravida. Pellentesque id tellus orci. Integer dictum, lorem sed efficitur ullamcorper,
+        libero justo consectetur ipsum, in mollis nisl ex sed nisl. Donec maximus ullamcorper
+        sodales. Praesent bibendum rhoncus tellus nec feugiat. In a ornare nulla. Donec rhoncus
+        libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
+        vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
+    </string>
+    <string name="add_button_text">Add</string>
+    <string name="action_home_item">Игровые сессии</string>
+    <string name="action_dice_item">Бросок кубиков</string>
+    <string name="action_profile_item">Профиль</string>
+    <string name="action_settings">Settings</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="games">Список игр: </string>
+    <string name="id">ID: </string>
+    <string name="address">Город, адрес: </string>
+    <string name="address_hint">Город, улица, номер дома </string>
+    <string name="date_and_time">Дата и время: </string>
+    <string name="players">Кол-во игроков: </string>
+    <string name="reputation">Значение репутации: </string>
+    <string name="change_session_name">Изменить название</string>
+    <string name="remove_session">Удалить</string>
+    <string name="join_session">Записаться</string>
+    <string name="session_name">Название игровой сессии:</string>
+    <string name="session_name_hint">Название</string>
+    <string name="games_hint">Список игр игровой сессии</string>
+    <string name="date_hint">DD/MM/YYYY HH:mm</string>
+    <string name="players_num">Кол-во игроков (макс. 16, мин. 2):</string>
+    <string name="create">Создать</string>
+    <string name="dice_sides">Кол-во граней</string>
+    <string name="dice_num">Кол-во кубов</string>
+    <string name="dice_mod">Модификатор</string>
+    <string name="dice_throw">Бросить кубы</string>
+    <string name="dice_result">Результат броска:</string>
+    <string name="dice_fill_error">Ошибка: заполните все поля</string>
+    <string name="dice_modificator_info">*Модификатор - число, добавляемое к результату (может быть отрицательным)</string>
+    <string name="games_list_example">
+        Игра
+        Игра
+        Игра
+        Игра
+    </string>
+    <string name="signUpButtonText">Зарегистрироваться</string>
+    <string name="passwordHint">Пароль</string>
+    <string name="loginHint">Логин (электронная почта)</string>
+    <string name="nicknameHint">Никнейм</string>
+    <string name="banInfo">Ваша учётная запись заблокирована администратором. Причиной могли послужить: нарушение УК РФ, оскорбительные названия игровых сессий/учётной записи и иные нарушения. Обратитесь по следующему адресу электронной почты за дополнительными разъяснениями: e-mail</string>
+    <string name="chooseAvatarButton">Выбрать аватар</string>
+    <string name="aboutUser">О себе</string>
+    <string name="ageLabel">Возраст:</string>
+    <string name="favGamesLabel">Любимые игры:</string>
+    <string name="mediaLinks">Список соцсетей:</string>
+    <string name="openSessionsButton">Открыть список игровых сессий</string>
+    <string name="blockButton">Заблокировать</string>
+    <string name="unblockButton">Разблокировать</string>
+    <string name="agePlaceholder">Не указано</string>
+    <string name="gamesPlaceholder">Не указано</string>
+    <string name="vkPlaceholder">Не указано</string>
+    <string name="tgPlaceholder">Не указано</string>
+    <string name="signInButtonText">Войти</string>
+</resources>
