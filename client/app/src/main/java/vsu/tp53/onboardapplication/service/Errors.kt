@@ -16,7 +16,8 @@ enum class Errors(var text: String) {
     NICKNAME_EXISTS("Такой никнейм уже существует"),
     EMAIL_NOT_FOUND("Пользователь с таким логином не найден"),
     WEAK_PASSWORD("Пароль должен быть не менее 6  символов"),
-    ALREADY_CHANGED("Репутация уже изменена");
+    ALREADY_CHANGED("Репутация уже изменена"),
+    NOT_PLAYED_SAME("Не играли вместе");
 
     companion object {
         fun getByName(name: String): String {
