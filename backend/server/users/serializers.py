@@ -221,7 +221,8 @@ class SearchedNicknameSerializer(serializers.Serializer):
         swagger_errors_examples.user_errors.already_plused,
         swagger_errors_examples.user_errors.expired_token,
         swagger_errors_examples.user_errors.invalid_token,
-        swagger_errors_examples.user_errors.requester_is_addresser
+        swagger_errors_examples.user_errors.requester_is_addresser,
+        swagger_errors_examples.user_errors.not_played_same
     ]
 )
 class PlusReputationRequestSerializer(serializers.Serializer):

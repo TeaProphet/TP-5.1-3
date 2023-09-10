@@ -141,4 +141,14 @@ requester_is_addresser = OpenApiExample(
 	response_only=True,
 	status_codes=[400]
 )
+not_played_same = OpenApiExample(
+	'Нельзя изменять репутацию тому, с кем не играл в одной сессии',
+	summary="Ошибка: попытка смены репутации пользователю, с которым не играли вместе",
+	description="Ошибка, возникающая при попытке сменить репутацию тому с кем не играли в рамках одной игровой сессии. Возвращает код ошибки error.",
+	value={
+		'error': 'NOT_PLAYED_SAME'
+	},
+	response_only=True,
+	status_codes=[400]
+)
 
