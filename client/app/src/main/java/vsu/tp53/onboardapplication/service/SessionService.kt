@@ -21,7 +21,7 @@ import vsu.tp53.onboardapplication.model.SessionInfoBody
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-const val baseUrl = "http://193.233.49.112"
+const val baseUrl = "http://212.192.14.104"
 
 class SessionService(
     private val restTemplate: RestTemplate,
