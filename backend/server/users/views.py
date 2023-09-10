@@ -10,6 +10,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from onboardProject import settings
 from users import models, serializers
+from utils.errors import NotPlayedSameError
 from utils.serializing import complete_serialize
 
 
@@ -144,6 +145,8 @@ def plus_reputation(request):
         new_reputation = __change_rep_algorithm(address_uid, requester_uid, True)
     except ValueError as exception:
         return JsonResponse({'error': exception.args[0]})
+    except NotPlayedSameError as exception:
+        return JsonResponse({'error': exception.__str__()})
     return JsonResponse({'new_reputation': new_reputation})
 
 
@@ -267,6 +270,20 @@ def __change_rep_algorithm(address_uid, requester_uid, plused):
         opposite_changes_list = {}
     if dict(changes_list).keys().__contains__(requester_uid):
         raise ValueError('ALREADY_CHANGED')
+    user_sessions = settings.database.child('users').child(requester_uid).child('user_data').child('played_sessions').get().val()
+    address_name = settings.database.child('users').child(address_uid).child('login').get().val()
+    print(user_sessions)
+    print(requester_uid)
+    played_in_same_session = False
+    if user_sessions:
+        for session_id in user_sessions:
+            current_players: list = settings.database.child('sessions').child(session_id).child('players').get().val()
+            if (current_players.__contains__(address_name)):
+                played_in_same_session = True
+                break
+    if not played_in_same_session:
+        raise NotPlayedSameError
+
 
     address_reputation = settings.database.child(settings.USERS_TABLE).child(address_uid).child('user_data').child("reputation").get().val()
     reputation = settings.database.child(settings.USERS_TABLE).child(requester_uid).child('user_data').child("reputation").get().val()

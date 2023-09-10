@@ -29,12 +29,12 @@ class ProfileService(
     private val restTemplate: RestTemplate,
     val context: Context
 ) {
-    private val getProfileUrl: String = "http://193.233.49.112/get_profile_info/{nickname}"
-    private val editProfileUrl: String = "http://193.233.49.112/change_profile/{idToken}"
-    private val increaseRepUrl: String = "http://193.233.49.112/plus_reputation/"
-    private val decreaseRepUrl: String = "http://193.233.49.112/minus_reputation/"
-    private val banUserUrl: String = "http://193.233.49.112/ban/"
-    private val unbanUserUrl: String = "http://193.233.49.112/unban/"
+    private val getProfileUrl: String = "http://212.192.14.104/get_profile_info/{nickname}"
+    private val editProfileUrl: String = "http://212.192.14.104/change_profile/{idToken}"
+    private val increaseRepUrl: String = "http://212.192.14.104/plus_reputation/"
+    private val decreaseRepUrl: String = "http://212.192.14.104/minus_reputation/"
+    private val banUserUrl: String = "http://212.192.14.104/ban/"
+    private val unbanUserUrl: String = "http://212.192.14.104/unban/"
     private val dbHelper = UserTokenDbHelper(context)
     private val authService = AuthService(restTemplate, context)
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -61,7 +61,7 @@ class ProfileService(
                 restTemplate.messageConverters.add(GsonHttpMessageConverter())
 
                 val profResp = restTemplate.getForObject(
-                    "http://193.233.49.112/get_profile_info/$searchedLogin",
+                    "http://212.192.14.104/get_profile_info/$searchedLogin",
                     ProfileInfoEntity::class.java,
                 )
 
