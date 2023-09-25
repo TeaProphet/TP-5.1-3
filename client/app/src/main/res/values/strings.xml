@@ -90,4 +90,5 @@
     <string name="vkPlaceholder">Не указано</string>
     <string name="tgPlaceholder">Не указано</string>
     <string name="signInButtonText">Войти</string>
+    <string name="searchIdHint">id</string>
 </resources>

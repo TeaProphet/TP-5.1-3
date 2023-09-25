@@ -21,7 +21,7 @@ import vsu.tp53.onboardapplication.model.SessionInfoBody
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-const val baseUrl = "http://212.192.14.104"
+const val baseUrl = "http://193.233.18.159"
 
 class SessionService(
     private val restTemplate: RestTemplate,
@@ -34,6 +34,7 @@ class SessionService(
     private val changeSessionUrl: String = "/change_session_name/"
     private val joinSessionUrl: String = "/join_session/"
     private val leaveSessionUrl: String = "/leave_session/"
+    private val searchSessionUrl: String = "/search_by_id/"
     private val authService: AuthService = AuthService(restTemplate, context)
     private val profileService: ProfileService = ProfileService(restTemplate, context)
 
@@ -94,11 +95,11 @@ class SessionService(
 
             val url = "$baseUrl$createSessionUrl"
 
-            Log.i("SessionSeervice", "url: $url")
+            Log.i("SessionService", "url: $url")
 
             sessionEntity.idToken = profileService.getUserToken()
 
-            Log.i("SessionSeervice", sessionEntity.toString())
+            Log.i("SessionService", sessionEntity.toString())
             val resp = restTemplate.postForEntity(
                 url,
                 sessionEntity,
@@ -188,6 +189,28 @@ class SessionService(
             )
 
             Log.i("SessionService", "Leave session resp; " + resp.statusCode.toString())
+        }
+    }
+
+    suspend fun searchSession(sessionId: Int): List<SessionBody> {
+        return withContext(Dispatchers.IO) {
+            Log.i("SessionService", "Search session")
+
+            val url = "$baseUrl$searchSessionUrl$sessionId?idToken={idToken}"
+
+            val params = HashMap<String, String>()
+            params["idToken"] = profileService.getUserToken()
+//            val body = HashMap<String, Int>()
+//            body["requested_id"] = sessionId
+
+            val resp = restTemplate.getForObject(
+                url,
+                Array<SessionBody>::class.java,
+                params
+            )
+
+            Log.i("SessionService", "Search session resp; $resp")
+            resp.toList()
         }
     }
 }

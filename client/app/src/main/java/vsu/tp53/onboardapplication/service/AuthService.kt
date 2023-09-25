@@ -33,9 +33,9 @@ class AuthService(
     private val restTemplate: RestTemplate,
     val context: Context
 ) {
-    private val regUrl: String = "http://212.192.14.104/register/"
-    private val authUrl: String = "http://212.192.14.104/authorize/"
-    private val tokenAuthUrl: String = "http://212.192.14.104/token_authorize/"
+    private val regUrl: String = "http://193.233.18.159/register/"
+    private val authUrl: String = "http://193.233.18.159/authorize/"
+    private val tokenAuthUrl: String = "http://193.233.18.159/token_authorize/"
     private val dbHelper = UserTokenDbHelper(context)
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
