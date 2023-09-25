@@ -82,8 +82,13 @@ class HomeFragment : Fragment() {
                 val sessionIdTxt = editText.text.toString()
                 if (sessionIdTxt.isNotBlank()) {
                     val sessionId = sessionIdTxt.toInt()
-                    val sessions: MutableList<SessionBody> =
-                        _sessionService.searchSession(sessionId) as MutableList<SessionBody>
+                    val preSessions: List<SessionBody> =
+                        _sessionService.searchSession(sessionId)
+                    val sessions = if (preSessions.isNotEmpty()) {
+                        preSessions as MutableList<SessionBody>
+                    } else {
+                        mutableListOf()
+                    }
                     sessionAdapter = if (sessions.isNotEmpty()) {
                         val filteredSessions = mutableListOf<SessionBody>()
                         for (session in sessions) {
