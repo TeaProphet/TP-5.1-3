@@ -292,7 +292,7 @@ def change_name(request, session_id, new_name):
 @extend_schema(
     request=serializers.SearchIdSerializer,
     description="Метод для поиска игровой сессии по id.",
-    tags=["Users"],
+    tags=["Sessions"],
 )
 @api_view(['GET'])
 def search_by_id(request, request_id):
