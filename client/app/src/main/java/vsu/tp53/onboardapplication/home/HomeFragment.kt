@@ -1,6 +1,7 @@
 package vsu.tp53.onboardapplication.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,12 +45,15 @@ class HomeFragment : Fragment() {
         recyclerView = binding.recyclerSessionsSession
         recyclerView.layoutManager = LinearLayoutManager(activity)
 
+        val editText = binding.editTextText
+        val searchBtn = binding.searchImageBtn
+
         lifecycleScope.launch {
             val sessions = _sessionService.getSessions()
             sessionAdapter = if (sessions.isNotEmpty()) {
                 val filteredSessions = mutableListOf<SessionBody>()
-                for (session in sessions){
-                    if (session.date_time > LocalDateTime.now()){
+                for (session in sessions) {
+                    if (session.date_time > LocalDateTime.now()) {
                         filteredSessions.add(session)
                     }
                 }
@@ -71,14 +75,42 @@ class HomeFragment : Fragment() {
             it.findNavController().navigate(R.id.createSessionFragment)
         }
 
+        searchBtn.setOnClickListener {
+            binding.progressContent.visibility = View.VISIBLE
+            binding.pageContent.visibility = View.GONE
+            lifecycleScope.launch {
+                val sessionIdTxt = editText.text.toString()
+                if (sessionIdTxt.isNotBlank()) {
+                    val sessionId = sessionIdTxt.toInt()
+                    val sessions: MutableList<SessionBody> =
+                        _sessionService.searchSession(sessionId) as MutableList<SessionBody>
+                    sessionAdapter = if (sessions.isNotEmpty()) {
+                        val filteredSessions = mutableListOf<SessionBody>()
+                        for (session in sessions) {
+                            if (session.date_time > LocalDateTime.now()) {
+                                filteredSessions.add(session)
+                            }
+                        }
+                        SessionAdapter(filteredSessions)
+                    } else {
+                        SessionAdapter(mutableListOf())
+                    }
+
+                    recyclerView.adapter = sessionAdapter
+                }
+                binding.progressContent.visibility = View.GONE
+                binding.pageContent.visibility = View.VISIBLE
+            }
+        }
+
         val swipeRefreshLayout = binding.refreshLayout
         swipeRefreshLayout.setOnRefreshListener {
             lifecycleScope.launch {
                 val sessions = _sessionService.getSessions()
                 sessionAdapter = if (sessions.isNotEmpty()) {
                     val filteredSessions = mutableListOf<SessionBody>()
-                    for (session in sessions){
-                        if (session.date_time > LocalDateTime.now()){
+                    for (session in sessions) {
+                        if (session.date_time > LocalDateTime.now()) {
                             filteredSessions.add(session)
                         }
                     }
