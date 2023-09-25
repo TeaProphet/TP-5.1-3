@@ -288,3 +288,29 @@ def change_name(request, session_id, new_name):
         return JsonResponse({'error': 'PERMISSION_DENIED'})
     return Response(status=204)
 
+
+@extend_schema(
+    request=serializers.SearchIdSerializer,
+    description="Метод для поиска игровой сессии по id.",
+    tags=["Users"],
+)
+@api_view(['GET'])
+def search_by_id(request, request_id):
+    raw_sessions_info = settings.database.child(settings.SESSIONS_TABLE).get().val()
+    print(raw_sessions_info)
+    if raw_sessions_info:
+        sessions_info = []
+        if type(raw_sessions_info) == list:
+            raw_sessions_info = OrderedDict(
+                (index, item) for index, item in enumerate(raw_sessions_info) if item is not None)
+        for key, val in raw_sessions_info.items():
+            if key == request_id:
+                serialized_raw = serializers.SessionPublicShortInfoSerializer(data=val)
+                serialized_raw.is_valid()
+                serialized = serialized_raw.validated_data
+                serialized['sessionId'] = int(key)
+                sessions_info.append(serialized)
+    else:
+        sessions_info = []
+    return JsonResponse(sessions_info, safe=False)
+

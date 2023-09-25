@@ -195,3 +195,21 @@ class ChangeSessionNameSerializer(serializers.Serializer):
     idToken = serializers.IntegerField()
     new_name = serializers.CharField(max_length=256)
     session_id = serializers.IntegerField()
+
+@extend_schema_serializer(
+    examples=[
+    OpenApiExample(
+            'Запрос для поиска сессий по id',
+            summary="Запрос поиска по id.",
+            description="Вводимые значения:\n"
+                        "1. requested_id - id сессии, которую нужно найти.\n",
+            value={
+                'requested_id': 'int'
+            },
+            request_only=True,
+            response_only=False
+        )
+    ]
+)
+class SearchIdSerializer(serializers.Serializer):
+    requested_id = serializers.IntegerField()
