@@ -34,9 +34,20 @@
             android:paddingTop="10dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/editTextText"
-            app:layout_constraintEnd_toEndOf="parent"
+
             android:layout_marginEnd="160dp"
             android:src="@android:drawable/ic_menu_search" />
+
+        <ImageView
+            android:id="@+id/clearBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="150dp"
+            android:paddingTop="10dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/searchImageBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/refreshLayout"
