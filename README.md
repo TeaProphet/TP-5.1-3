@@ -25,7 +25,7 @@ Admin:
 - login: admin@yandex.ru
 - pwd: qwerty
 ## Ссылки
-1. [Swagger](http://193.233.49.112/swagger/)
+1. [Swagger](http://193.233.18.159/swagger/)
 2. [Yandex.Tracker](https://docs.google.com/document/d/1esMn-L8x2q1sNRL3jg6hi2o9e-7awD45wHRp4baL2wE/edit?usp=sharing)
 3. [Miro](https://miro.com/app/board/uXjVPiN6orU=/?share_link_id=691673774508)
 4. [Диаграммы](https://github.com/TeaProphet/TP-5.1-3/tree/main/documentation/diagrams)
