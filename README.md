@@ -37,3 +37,5 @@ Admin:
 4. Инструкция по запуску приложения [docx](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/Инструкция%20по%20использованию%20приложения.docx) [pdf](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/Инструкция%20по%20использованию%20приложения.pdf)
 ## APK Файл
 [APK](https://github.com/TeaProphet/TP-5.1-3/blob/develop/app-release.apk)
+## Ревью команды 5.2.4
+[Презентация](https://github.com/TeaProphet/TP-5.1-3/blob/main/documentation/%D0%A0%D0%B5%D0%B2%D1%8C%D1%8E%205.2.4.pptx)
